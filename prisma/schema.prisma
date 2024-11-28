@@ -1,0 +1,288 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  password    String
+  role        Role
+  email       String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  employee_id Int?     @unique
+
+  // Relasi
+  activityLogs  ActivityLog[]
+  checkInOuts   CheckInOut[]
+  maintenances  Maintenance?    @relation("UserMaintenance")
+  notifications Notifications[]
+  employee      Employee?       @relation(fields: [employee_id], references: [id])
+  Session       Session[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  INVENTARIS
+  TEKNISI
+}
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  name       String
+  department String
+  phone      String
+  email      String  @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relasi
+  user User?
+
+  @@map("employees")
+}
+
+model Asset {
+  id              Int            @id @default(autoincrement())
+  name            String
+  type_id         Int // Relasi ke Tipe Aset
+  status          AssetStatus
+  purchase_date   DateTime
+  lifecycle_stage LifecycleStage
+  initial_value   Float           // Initial cost of the asset
+  salvage_value   Float           // Estimated value at the end of its lifecycle
+  useful_life     Int    
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  // Relasi
+  type            AssetType              @relation(fields: [type_id], references: [id])
+  locationHistory AssetLocationHistory[]
+  maintenances    Maintenance[]
+  checkInOuts     CheckInOut[]
+  assetLifecycles AssetLifecycle[]
+
+  @@map("assets")
+}
+
+model AssetType {
+  id           Int      @id @default(autoincrement())
+  model        String
+  manufacturer String
+  category     String
+  description  String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relasi
+  assets Asset[]
+
+  @@map("asset_types")
+}
+
+model AssetLifecycle {
+  id          Int            @id @default(autoincrement())
+  asset_id    Int
+  stage       LifecycleStage
+  change_date DateTime
+  notes       String?
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+
+  // Relasi
+  asset Asset @relation(fields: [asset_id], references: [id])
+
+  @@map("asset_lifecycles")
+}
+
+enum AssetStatus {
+  AKTIF
+  TIDAK_AKTIF
+  RUSAK
+}
+
+enum LifecycleStage {
+  BARU
+  DIGUNAKAN
+  PERBAIKAN
+  DIHAPUS
+}
+
+model Location {
+  id         Int          @id @default(autoincrement())
+  name       String
+  address    String
+  type       LocationType
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  // Relasi
+  locationHistory AssetLocationHistory[]
+  inventories     Inventory[]
+
+  @@map("locations")
+}
+
+enum LocationType {
+  GUDANG
+  KANTOR
+  DATA_CENTER
+}
+
+model AssetLocationHistory {
+  id            Int       @id @default(autoincrement())
+  asset_id      Int
+  location_id   Int
+  assigned_date DateTime
+  release_date  DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relasi
+  asset    Asset    @relation(fields: [asset_id], references: [id])
+  location Location @relation(fields: [location_id], references: [id])
+
+  @@index([asset_id, location_id])
+  @@map("asset_location_histories")
+}
+
+model Inventory {
+  id            Int      @id @default(autoincrement())
+  name          String
+  category      String
+  quantity      Int
+  reorder_level Int
+  unit_price    Float
+  location_id   Int?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relasi
+  location         Location?              @relation(fields: [location_id], references: [id])
+  maintenanceItems MaintenanceInventory[]
+
+  @@map("inventories")
+}
+
+model Maintenance {
+  id             Int               @id @default(autoincrement())
+  asset_id       Int
+  mechanic_id    Int               @unique
+  scheduled_date DateTime
+  status         MaintenanceStatus
+  notes          String?
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+
+  // Relasi
+  asset          Asset                  @relation(fields: [asset_id], references: [id])
+  mechanic       User                   @relation("UserMaintenance", fields: [mechanic_id], references: [id])
+  inventoryItems MaintenanceInventory[]
+
+  @@index([asset_id, mechanic_id])
+  @@map("maintenances")
+}
+
+enum MaintenanceStatus {
+  DIJADWALKAN
+  SELESAI
+  TERTUNDA
+}
+
+model MaintenanceInventory {
+  maintenance_inventory_id Int      @id @default(autoincrement())
+  maintenance_id           Int
+  inventory_id             Int
+  quantity_used            Int
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+
+  // Relasi
+  maintenance Maintenance @relation(fields: [maintenance_id], references: [id])
+  inventory   Inventory   @relation(fields: [inventory_id], references: [id])
+
+  @@index([maintenance_id, inventory_id])
+  @@map("maintenance_inventories")
+}
+
+model CheckInOut {
+  id                   Int              @id @default(autoincrement())
+  asset_id             Int
+  user_id              Int
+  check_out_date       DateTime
+  expected_return_date DateTime
+  actual_return_date   DateTime?
+  status               CheckInOutStatus
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+
+  // Relasi
+  asset Asset @relation(fields: [asset_id], references: [id])
+  user  User  @relation(fields: [user_id], references: [id])
+
+  @@map("check_in_outs")
+}
+
+enum CheckInOutStatus {
+  DIPINJAM
+  DIKEMBALIKAN
+}
+
+
+model ActivityLog {
+  id          Int        @id @default(autoincrement())
+  user_id     Int
+  action      String
+  target_type TargetType
+  target_id   Int
+  timestamp   DateTime   @default(now())
+
+  // Relasi
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("activity_logs")
+}
+
+enum TargetType {
+  ASSET
+  INVENTORY
+  MAINTENANCE
+}
+
+model Notifications {
+  id         Int              @id @default(autoincrement())
+  user_id    Int
+  message    String
+  type       NotificationType
+  is_read    Boolean          @default(false)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+
+  // Relasi
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  PEMELIHARAAN
+  STOK_RENDAH
+  CHECKOUT_TERLAMBAT
+  STATUS_ASET
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  user_id   Int
+  user      User     @relation(references: [id], fields: [user_id], onDelete: Cascade)
+}

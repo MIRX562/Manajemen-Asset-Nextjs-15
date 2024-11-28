@@ -1,80 +1,67 @@
 "use client";
 
-import {
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
+import { getCurrentSession } from "@/lib/auth";
+import { Role } from "@prisma/client";
+import { useEffect, useState } from "react";
 
-export function NavProjects({
-  projects,
+export function NavAdmin({
+  items,
 }: {
-  projects: {
+  items: {
     name: string;
     url: string;
     icon: LucideIcon;
   }[];
 }) {
-  const { isMobile } = useSidebar();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { user } = await getCurrentSession();
+      // console.log(session);
+      if (user) {
+        setRole(user.role);
+      }
+    };
+    fetchSession();
+  }, []);
+
+  if (!role) {
+    return (
+      <div className="flex w-full h-full items-center justify-center">
+        <p className="mt-4 text-lg font-medium text-muted-foreground animate-pulse">
+          Loading...
+        </p>
+      </div>
+    );
+  }
+
+  if (role !== Role.ADMIN) {
+    return null;
+  }
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarGroupLabel>Admin</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
+        {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
+            <SidebarMenuButton asChild tooltip={item.name}>
+              <Link prefetch={true} href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Forward className="text-muted-foreground" />
-                  <span>Share Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete Project</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

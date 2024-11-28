@@ -3,18 +3,21 @@
 import * as React from "react";
 import {
   Archive,
+  Bell,
   BookA,
-  Boxes,
-  Frame,
+  Box,
+  Clipboard,
+  FileText,
   GalleryVerticalEnd,
-  Settings2,
+  MapPin,
   SquareTerminal,
   UserRound,
+  Users2,
   Wrench,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-admin";
+import { NavAdmin } from "@/components/nav-admin";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -22,17 +25,12 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { AppLogo } from "./sidebar-logo";
-import { Separator } from "./ui/separator";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   app: {
     name: "Asset Mnagement",
     logo: GalleryVerticalEnd,
@@ -46,54 +44,81 @@ const data = {
     },
     {
       title: "Assets",
-      url: "#",
-      icon: Archive,
+      url: "/assets",
+      icon: Box,
       items: [
-        {
-          title: "Overview",
-          url: "/dashboard/assets",
-        },
-        {
-          title: "Check-In",
-          url: "/dashboard/assets/check-in",
-        },
-        {
-          title: "Check-Out",
-          url: "/dashboard/assets/check-out",
-        },
+        { title: "Asset Types", url: "/assets/types" },
+        { title: "Update Asset Lifecycle", url: "/assets/lifecycle" },
+      ],
+    },
+    {
+      title: "Asset Locations",
+      url: "/locations",
+      icon: MapPin,
+      items: [
+        { title: "Assign Location", url: "/locations/assign" },
+        { title: "Manage Locations", url: "/locations/manage" },
+      ],
+    },
+    {
+      title: "Maintenance",
+      url: "/maintenance",
+      icon: Wrench,
+      items: [
+        { title: "Schedule Maintenance", url: "/maintenance/schedule" },
+        { title: "Maintenance Logs", url: "/maintenance/logs" },
+      ],
+    },
+    {
+      title: "Check-In/Check-Out",
+      url: "/checkin-checkout",
+      icon: Clipboard,
+      items: [
+        { title: "Check-Out Asset", url: "/check-in-out/check-out" },
+        { title: "Check-In Asset", url: "/check-in-out/check-in" },
       ],
     },
     {
       title: "Inventory",
-      url: "/dashboard/inventory",
-      icon: Boxes,
+      url: "/inventory",
+      icon: Archive,
+      items: [
+        { title: "Manage Inventory", url: "/inventory/manage" },
+        { title: "Inventory Locations", url: "/inventory/locations" },
+        { title: "Inventory Transactions", url: "/inventory/transactions" },
+      ],
     },
     {
-      title: "Maintenance",
-      url: "/dashboard/maintenance",
-      icon: Wrench,
+      title: "Reports",
+      url: "/reports",
+      icon: FileText,
+      items: [
+        { title: "Location Report", url: "/reports/location" },
+        { title: "Depreciation Report", url: "/reports/depreciation" },
+        { title: "Maintenance Report", url: "/reports/maintenance" },
+        { title: "Inventory Report", url: "/reports/inventory" },
+      ],
     },
-
     {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings2,
+      title: "Notification",
+      url: "/notification",
+      icon: Bell,
     },
   ],
-  projects: [
+  admin: [
     {
-      name: "Categories",
-      url: "/dashboard/assets/categories",
-      icon: Frame,
+      name: "Employees",
+      url: "/employees",
+      icon: Users2,
     },
     {
-      name: "Activities",
-      url: "/dashboard/activities",
+      name: "Activity Logs",
+      url: "/activities",
       icon: BookA,
     },
     {
-      name: "Users",
-      url: "/dashboard/users",
+      name: "User Management",
+      url: "/users",
       icon: UserRound,
     },
   ],
@@ -105,13 +130,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <AppLogo app={data.app} />
       </SidebarHeader>
-      <Separator />
+      <SidebarSeparator />
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <SidebarSeparator />
+        <NavAdmin items={data.admin} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

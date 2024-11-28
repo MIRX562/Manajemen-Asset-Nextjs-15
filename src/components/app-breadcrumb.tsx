@@ -11,30 +11,44 @@ import {
 } from "@/components/ui/breadcrumb";
 import React from "react";
 
-export default function DynamicBreadcrumb() {
+export default function DynamicBreadcrumb({
+  prefix = "",
+}: {
+  prefix?: string;
+}) {
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
 
-  const capitalize = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
+  // Remove prefix segments from the path
+  const prefixSegments = prefix.split("/").filter(Boolean);
+  const segments = pathSegments.slice(prefixSegments.length);
+
+  // Helper function to format path segments
+  const formatSegment = (segment: string) =>
+    decodeURIComponent(segment) // Decode URI components (e.g., "%20" -> " ")
+      .replace(/-/g, " ") // Replace dashes with spaces
+      .replace(/_/g, " ") // Replace underscores with spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {pathSegments.map((segment, index) => {
-          const href = "/" + pathSegments.slice(0, index + 1).join("/");
-          const isLast = index === pathSegments.length - 1;
+        {segments.map((segment, index) => {
+          const href =
+            "/" +
+            [...prefixSegments, ...segments.slice(0, index + 1)].join("/");
+          const isLast = index === segments.length - 1;
 
           return (
             <React.Fragment key={href}>
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage className="font-bold">
-                    {capitalize(segment)}
+                    {formatSegment(segment)}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink href={href}>
-                    {capitalize(segment.replace(/-/g, " "))}
+                    {formatSegment(segment)}
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
