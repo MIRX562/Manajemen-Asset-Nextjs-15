@@ -70,12 +70,12 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4 w-screen md:w-full ">
+    <div className="space-y-4 w-full ">
       <DataTableToolbar
         table={table}
         insertDataComponent={insertDataComponent}
       />
-      <div className="rounded-md border">
+      <div className="max-w-full overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

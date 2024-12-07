@@ -1,11 +1,12 @@
 "use server";
 import prisma from "@/lib/db";
+import { Location, LocationType } from "@prisma/client";
 
 // Create a new location
 export async function createLocation(data: {
   name: string;
   address: string;
-  type: "GUDANG" | "KANTOR" | "DATA_CENTER";
+  type: LocationType;
 }) {
   try {
     return await prisma.location.create({ data });
@@ -18,12 +19,7 @@ export async function createLocation(data: {
 // Get all locations
 export async function getAllLocations() {
   try {
-    return await prisma.location.findMany({
-      include: {
-        locationHistory: true,
-        inventories: true,
-      },
-    });
+    return await prisma.location.findMany();
   } catch (error) {
     console.error("[getAllLocations] Failed to retrieve locations:", error);
     throw new Error("Failed to retrieve locations. Please try again.");
@@ -36,8 +32,21 @@ export async function getLocationById(id: number) {
     const location = await prisma.location.findUnique({
       where: { id },
       include: {
-        locationHistory: true,
-        inventories: true,
+        locationHistory: {
+          include: {
+            asset: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        inventories: {
+          select: {
+            name: true,
+            quantity: true,
+          },
+        },
       },
     });
     if (!location) {
@@ -54,22 +63,20 @@ export async function getLocationById(id: number) {
 }
 
 // Update a location
-export async function updateLocation(
-  id: number,
-  data: {
-    name?: string;
-    address?: string;
-    type?: "GUDANG" | "KANTOR" | "DATA_CENTER";
-  }
-) {
+export async function updateLocation(data: {
+  name?: string;
+  address?: string;
+  type?: "GUDANG" | "KANTOR" | "DATA_CENTER";
+  id: number;
+}) {
   try {
     return await prisma.location.update({
-      where: { id },
+      where: { id: data.id },
       data,
     });
   } catch (error) {
     console.error(
-      `[updateLocation] Failed to update location with ID ${id}:`,
+      `[updateLocation] Failed to update location with ID ${data.id}:`,
       error
     );
     throw new Error("Failed to update the location. Please try again.");
@@ -77,14 +84,14 @@ export async function updateLocation(
 }
 
 // Delete a location
-export async function deleteLocation(id: number) {
+export async function deleteLocation(data: Location) {
   try {
     return await prisma.location.delete({
-      where: { id },
+      where: { id: data.id },
     });
   } catch (error) {
     console.error(
-      `[deleteLocation] Failed to delete location with ID ${id}:`,
+      `[deleteLocation] Failed to delete location with ID ${data.id}:`,
       error
     );
     throw new Error("Failed to delete the location. Please try again.");

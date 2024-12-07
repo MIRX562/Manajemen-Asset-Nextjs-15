@@ -61,6 +61,16 @@ const data = {
       ],
     },
     {
+      title: "Inventory",
+      url: "/inventory",
+      icon: Archive,
+      items: [
+        { title: "Manage Inventory", url: "/inventory/manage" },
+        { title: "Inventory Locations", url: "/inventory/locations" },
+        { title: "Inventory Transactions", url: "/inventory/transactions" },
+      ],
+    },
+    {
       title: "Maintenance",
       url: "/maintenance",
       icon: Wrench,
@@ -78,16 +88,7 @@ const data = {
         { title: "Check-In Asset", url: "/check-in-out/check-in" },
       ],
     },
-    {
-      title: "Inventory",
-      url: "/inventory",
-      icon: Archive,
-      items: [
-        { title: "Manage Inventory", url: "/inventory/manage" },
-        { title: "Inventory Locations", url: "/inventory/locations" },
-        { title: "Inventory Transactions", url: "/inventory/transactions" },
-      ],
-    },
+
     {
       title: "Reports",
       url: "/reports",

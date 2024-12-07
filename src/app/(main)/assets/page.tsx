@@ -6,7 +6,7 @@ import InsertDataDialog from "@/components/table/insertDataButton";
 import AddAssetForm from "./_components/form-add";
 import { getAllAssetTypes } from "@/actions/asset-type-actions";
 
-export default async function Assets() {
+export default async function AssetsPage() {
   const data = await getAllAssets();
   const assetType = await getAllAssetTypes();
   return (

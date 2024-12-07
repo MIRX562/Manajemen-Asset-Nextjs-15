@@ -4,7 +4,7 @@ export const addAssetTypeSchema = z.object({
   model: z.string(),
   manufacturer: z.string(),
   category: z.string(),
-  description: z.string().optional().nullable(),
+  description: z.string().nullable(),
   created_at: z.date(),
   updated_at: z.date(),
 });

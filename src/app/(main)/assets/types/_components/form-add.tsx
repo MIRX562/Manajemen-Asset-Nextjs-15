@@ -15,24 +15,30 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { addAssetTypeSchema } from "@/schemas/asset-type-echema";
+import { addAssetTypeSchema } from "@/schemas/asset-type-schema";
+import { createAssetType } from "@/actions/asset-type-actions";
+import { useRouter } from "next/navigation";
 
 export default function AddAssetTypeForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof addAssetTypeSchema>>({
     resolver: zodResolver(addAssetTypeSchema),
+    defaultValues: {
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
   });
 
-  function onSubmit(values: z.infer<typeof addAssetTypeSchema>) {
+  async function onSubmit(data: z.infer<typeof addAssetTypeSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      await toast.promise(createAssetType(data), {
+        loading: "Adding asset type...",
+        success: "asset type added successfully!",
+        error: (err) => err.message || "Failed to add asset type",
+      });
+      router.refresh();
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error(error);
     }
   }
 

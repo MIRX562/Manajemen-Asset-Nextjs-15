@@ -15,30 +15,32 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { editAssetTypeSchema } from "@/schemas/asset-type-echema";
+import { editAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { AssetType } from "@prisma/client";
+import { editAssetType } from "@/actions/asset-type-actions";
+import { useRouter } from "next/navigation";
 
 interface MyFormProps {
   data: AssetType;
 }
 
 export default function EditAssetTypeForm({ data }: MyFormProps) {
+  const router = useRouter();
   const form = useForm<z.infer<typeof editAssetTypeSchema>>({
     resolver: zodResolver(editAssetTypeSchema),
     defaultValues: data,
   });
 
-  function onSubmit(values: z.infer<typeof editAssetTypeSchema>) {
+  async function onSubmit(data: z.infer<typeof editAssetTypeSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      await toast.promise(editAssetType(data), {
+        loading: "Updating asset type...",
+        success: "asset type updated successfully!",
+        error: (err) => err.message || "Failed to update asset type",
+      });
+      router.refresh();
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error(error);
     }
   }
 

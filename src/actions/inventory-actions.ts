@@ -13,7 +13,10 @@ export async function createInventoryItem(data: {
   try {
     return await prisma.inventory.create({ data });
   } catch (error) {
-    console.error("[createInventoryItem] Failed to create inventory item:", error);
+    console.error(
+      "[createInventoryItem] Failed to create inventory item:",
+      error
+    );
     throw new Error("Failed to create inventory item. Please try again.");
   }
 }
@@ -23,11 +26,16 @@ export async function getAllInventoryItems() {
   try {
     return await prisma.inventory.findMany({
       include: {
-        location: true,
+        location: {
+          select: { name: true },
+        },
       },
     });
   } catch (error) {
-    console.error("[getAllInventoryItems] Failed to retrieve inventory items:", error);
+    console.error(
+      "[getAllInventoryItems] Failed to retrieve inventory items:",
+      error
+    );
     throw new Error("Failed to retrieve inventory items. Please try again.");
   }
 }
@@ -46,7 +54,10 @@ export async function getInventoryItemById(id: number) {
     }
     return item;
   } catch (error) {
-    console.error(`[getInventoryItemById] Failed to retrieve item with ID ${id}:`, error);
+    console.error(
+      `[getInventoryItemById] Failed to retrieve item with ID ${id}:`,
+      error
+    );
     throw new Error("Failed to retrieve the inventory item. Please try again.");
   }
 }
@@ -61,8 +72,13 @@ export async function getInventoryItemsByLocation(location_id: number) {
       },
     });
   } catch (error) {
-    console.error(`[getInventoryItemsByLocation] Failed to retrieve items for location ID ${location_id}:`, error);
-    throw new Error("Failed to retrieve inventory items for the specified location. Please try again.");
+    console.error(
+      `[getInventoryItemsByLocation] Failed to retrieve items for location ID ${location_id}:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve inventory items for the specified location. Please try again."
+    );
   }
 }
 
@@ -84,7 +100,10 @@ export async function updateInventoryItem(
       data,
     });
   } catch (error) {
-    console.error(`[updateInventoryItem] Failed to update inventory item with ID ${id}:`, error);
+    console.error(
+      `[updateInventoryItem] Failed to update inventory item with ID ${id}:`,
+      error
+    );
     throw new Error("Failed to update the inventory item. Please try again.");
   }
 }
@@ -96,7 +115,10 @@ export async function deleteInventoryItem(id: number) {
       where: { id },
     });
   } catch (error) {
-    console.error(`[deleteInventoryItem] Failed to delete inventory item with ID ${id}:`, error);
+    console.error(
+      `[deleteInventoryItem] Failed to delete inventory item with ID ${id}:`,
+      error
+    );
     throw new Error("Failed to delete the inventory item. Please try again.");
   }
 }
@@ -115,8 +137,13 @@ export async function getLowStockInventoryItems() {
       },
     });
   } catch (error) {
-    console.error("[getLowStockInventoryItems] Failed to retrieve low stock items:", error);
-    throw new Error("Failed to retrieve low stock inventory items. Please try again.");
+    console.error(
+      "[getLowStockInventoryItems] Failed to retrieve low stock items:",
+      error
+    );
+    throw new Error(
+      "Failed to retrieve low stock inventory items. Please try again."
+    );
   }
 }
 
@@ -130,8 +157,13 @@ export async function getTotalInventoryValue() {
     });
     return result._sum.unit_price || 0;
   } catch (error) {
-    console.error("[getTotalInventoryValue] Failed to calculate total inventory value:", error);
-    throw new Error("Failed to calculate total inventory value. Please try again.");
+    console.error(
+      "[getTotalInventoryValue] Failed to calculate total inventory value:",
+      error
+    );
+    throw new Error(
+      "Failed to calculate total inventory value. Please try again."
+    );
   }
 }
 
@@ -153,7 +185,12 @@ export async function getInventoryTurnoverRate() {
       },
     });
   } catch (error) {
-    console.error("[getInventoryTurnoverRate] Failed to calculate inventory turnover rate:", error);
-    throw new Error("Failed to calculate inventory turnover rate. Please try again.");
+    console.error(
+      "[getInventoryTurnoverRate] Failed to calculate inventory turnover rate:",
+      error
+    );
+    throw new Error(
+      "Failed to calculate inventory turnover rate. Please try again."
+    );
   }
 }

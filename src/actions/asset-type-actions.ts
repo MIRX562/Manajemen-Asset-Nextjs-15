@@ -1,19 +1,13 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { addAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { z } from "zod";
 
-const createAssetTypeSchema = z.object({
-  model: z.string(),
-  manufacturer: z.string(),
-  category: z.string(),
-  description: z.string().optional(),
-});
-
 export const createAssetType = async (
-  data: z.infer<typeof createAssetTypeSchema>
+  data: z.infer<typeof addAssetTypeSchema>
 ) => {
-  const value = createAssetTypeSchema.parse(data);
+  const value = addAssetTypeSchema.parse(data);
   try {
     const assetType = await prisma.assetType.create({
       data: {
@@ -26,7 +20,7 @@ export const createAssetType = async (
   }
 };
 
-const editAssetTypeSchema = createAssetTypeSchema.extend({
+const editAssetTypeSchema = addAssetTypeSchema.extend({
   id: z.number(),
 });
 
@@ -66,10 +60,6 @@ export const deleteAssetType = async (
     throw new Error("Failed to delete asset type");
   }
 };
-
-const getAssetTypeSchema = z.object({
-  id: z.number(),
-});
 
 export const getAssetTypeById = async (id: number) => {
   try {

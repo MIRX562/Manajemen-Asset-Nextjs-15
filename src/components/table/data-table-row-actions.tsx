@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { TrashIcon, EyeIcon } from "lucide-react";
+import { TrashIcon, Eye } from "lucide-react";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -38,8 +38,9 @@ export function DataTableRowActions<TData>({
   return (
     <TooltipProvider>
       <div className="flex space-x-2">
+        {/* View Action */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
@@ -51,7 +52,7 @@ export function DataTableRowActions<TData>({
                 )
               }
             >
-              <EyeIcon className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -59,9 +60,10 @@ export function DataTableRowActions<TData>({
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger>
-            <Dialog>
+        {/* Edit Action */}
+        <Dialog>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
@@ -72,20 +74,20 @@ export function DataTableRowActions<TData>({
                   <Pencil2Icon className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <TooltipContent>
-                <p>Edit Data</p>
-              </TooltipContent>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit Data</p>
+            </TooltipContent>
+          </Tooltip>
+          <DialogContent>
+            <DialogTitle>Edit</DialogTitle>
+            <EditComponent data={data} />
+          </DialogContent>
+        </Dialog>
 
-              <DialogContent>
-                <DialogTitle>Edit</DialogTitle>
-                <EditComponent data={data} />
-              </DialogContent>
-            </Dialog>
-          </TooltipTrigger>
-        </Tooltip>
-
+        {/* Delete Action */}
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
@@ -97,6 +99,7 @@ export function DataTableRowActions<TData>({
                     label: "Delete",
                     onClick: () => {
                       onDelete(data);
+                      router.refresh();
                     },
                   },
                 })
