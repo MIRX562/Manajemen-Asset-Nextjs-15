@@ -8,8 +8,9 @@ export async function createInventoryItem(data: {
   quantity: number;
   reorder_level: number;
   unit_price: number;
-  location_id?: number;
+  location_id: number;
 }) {
+  console.log(data);
   try {
     return await prisma.inventory.create({ data });
   } catch (error) {
@@ -83,25 +84,23 @@ export async function getInventoryItemsByLocation(location_id: number) {
 }
 
 // Update an inventory item
-export async function updateInventoryItem(
-  id: number,
-  data: {
-    name?: string;
-    category?: string;
-    quantity?: number;
-    reorder_level?: number;
-    unit_price?: number;
-    location_id?: number;
-  }
-) {
+export async function updateInventoryItem(data: {
+  id: number;
+  name?: string;
+  category?: string;
+  quantity?: number;
+  reorder_level?: number;
+  unit_price?: number;
+  location_id?: number;
+}) {
   try {
     return await prisma.inventory.update({
-      where: { id },
+      where: { id: data.id },
       data,
     });
   } catch (error) {
     console.error(
-      `[updateInventoryItem] Failed to update inventory item with ID ${id}:`,
+      `[updateInventoryItem] Failed to update inventory item with ID ${data.id}:`,
       error
     );
     throw new Error("Failed to update the inventory item. Please try again.");

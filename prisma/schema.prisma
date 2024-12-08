@@ -7,6 +7,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = "linux-musl-openssl-3.0.x"
 }
 
 model User {
@@ -168,7 +169,7 @@ model Inventory {
 
   // Relasi
   location         Location?              @relation(fields: [location_id], references: [id])
-  maintenanceItems MaintenanceInventory[]
+maintenanceItems MaintenanceInventory[]
 
   @@map("inventories")
 }

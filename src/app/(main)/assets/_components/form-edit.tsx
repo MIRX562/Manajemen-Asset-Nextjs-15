@@ -30,12 +30,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { Asset, AssetStatus, LifecycleStage } from "@prisma/client";
 import { editAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownContext } from "@/context/dropdown";
 import { editAsset } from "@/actions/assets-actions";
 import { useRouter } from "next/navigation";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 type FormData = z.infer<typeof editAssetSchema>;
 
@@ -91,25 +99,59 @@ export default function EditAssetForm({ data }: MyFormProps) {
               name="type_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type/Model</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value?.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a model/type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {assetTypes.map((type) => (
-                        <SelectItem key={type.id} value={type.id.toString()}>
-                          {type.model}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>Type or model of the asset</FormDescription>
+                  <FormLabel>Language</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? assetTypes.find((type) => type.id === field.value)
+                                ?.model
+                            : "Select type"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search language..." />
+                        <CommandList>
+                          <CommandEmpty>No language found.</CommandEmpty>
+                          <CommandGroup>
+                            {assetTypes.map((item) => (
+                              <CommandItem
+                                value={item.model}
+                                key={item.id}
+                                onSelect={() => {
+                                  form.setValue("type_id", item.id);
+                                }}
+                              >
+                                {item.model}
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    item.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    This is the language that will be used in the dashboard.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -1,22 +1,23 @@
-// import { notFound } from "next/navigation"; // For handling invalid slugs
+import { getAssetById } from "@/actions/assets-actions";
 
-export default async function SlugPage({
-  params,
-}: {
-  params: { slug: string };
+type Params = Promise<{ slug: string }>;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function Page(props: {
+  params: Params;
+  searchParams: SearchParams;
 }) {
-  const { slug } = await params;
+  const params = await props.params;
+  const searchParams = await props.searchParams;
 
-  // Fetch data from the database or any source using the slug
+  const slug = await params.slug;
+  const id = parseInt(searchParams.id);
 
-  // Handle slug not found
-  //   if (!data) {
-  //     notFound(); // Automatically renders the Next.js 404 page
-  //   }
+  const data = await getAssetById(id);
 
   return (
-    <div className="max-w-3xl mx-auto py-10">
-      <p>{slug}</p>
+    <div className="container flex flex-col gap-4 mt-4">
+      <h1 className="text-3xl font-bold">{decodeURI(slug)}</h1>
     </div>
   );
 }

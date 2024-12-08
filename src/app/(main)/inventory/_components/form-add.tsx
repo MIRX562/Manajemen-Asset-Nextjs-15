@@ -23,24 +23,26 @@ import {
 } from "@/components/ui/select";
 import { useDropdownContext } from "@/context/dropdown";
 import { createInventorySchema } from "@/schemas/inventory-schema";
+import { useRouter } from "next/navigation";
+import { createInventoryItem } from "@/actions/inventory-actions";
 
 export default function AddInventoryForm() {
+  const router = useRouter();
   const { locations } = useDropdownContext();
   const form = useForm<z.infer<typeof createInventorySchema>>({
     resolver: zodResolver(createInventorySchema),
   });
 
-  function onSubmit(values: z.infer<typeof createInventorySchema>) {
+  async function onSubmit(data: z.infer<typeof createInventorySchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      await toast.promise(createInventoryItem(data), {
+        loading: "creating new inventory item...",
+        success: "new item created",
+        error: "failed to create new item",
+      });
+      router.refresh();
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
     }
   }
 

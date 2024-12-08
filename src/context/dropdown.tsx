@@ -7,10 +7,12 @@ type AssetType = {
   category: string;
 };
 type Location = { id: number; name: string; address: string; type: string };
+type User = { id: number; name: string };
 
 type DropdownContextType = {
   assetTypes: AssetType[];
   locations: Location[];
+  mechanics: User[];
 };
 
 const DropdownContext = createContext<DropdownContextType | undefined>(
@@ -24,16 +26,19 @@ export const DropdownProvider = ({
 }) => {
   const [assetTypes, setAssetTypes] = useState<AssetType[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [mechanics, setMechanics] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [assetTypesRes, locationsRes] = await Promise.all([
+        const [assetTypesRes, locationsRes, mechanicRes] = await Promise.all([
           fetch("/api/asset-types").then((res) => res.json()),
           fetch("/api/locations").then((res) => res.json()),
+          fetch("/api/mechanics").then((res) => res.json()),
         ]);
         setAssetTypes(assetTypesRes.types);
         setLocations(locationsRes.locations);
+        setMechanics(mechanicRes.mecanics);
       } catch (error) {
         console.error("Failed to fetch dropdown data", error);
       } finally {
@@ -44,7 +49,7 @@ export const DropdownProvider = ({
   }, []);
 
   return (
-    <DropdownContext.Provider value={{ assetTypes, locations }}>
+    <DropdownContext.Provider value={{ assetTypes, locations, mechanics }}>
       {children}
     </DropdownContext.Provider>
   );

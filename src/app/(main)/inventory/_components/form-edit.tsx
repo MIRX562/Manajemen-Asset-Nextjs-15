@@ -24,29 +24,31 @@ import {
 import { useDropdownContext } from "@/context/dropdown";
 import { updateInventorySchema } from "@/schemas/inventory-schema";
 import { Inventory } from "@prisma/client";
+import { updateInventoryItem } from "@/actions/inventory-actions";
+import { useRouter } from "next/navigation";
 
 interface MyFormProp {
   data: Inventory;
 }
 
 export default function EditInventoryForm({ data }: MyFormProp) {
+  const router = useRouter();
   const { locations } = useDropdownContext();
   const form = useForm<z.infer<typeof updateInventorySchema>>({
     resolver: zodResolver(updateInventorySchema),
     defaultValues: data,
   });
 
-  function onSubmit(values: z.infer<typeof updateInventorySchema>) {
+  async function onSubmit(data: z.infer<typeof updateInventorySchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      await toast.promise(updateInventoryItem(data), {
+        loading: "creating new inventory item...",
+        success: "new item created",
+        error: "failed to create new item",
+      });
+      router.refresh();
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
     }
   }
 

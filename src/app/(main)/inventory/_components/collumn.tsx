@@ -6,6 +6,7 @@ import { formatCurrency } from "@/lib/utils";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import EditInventoryForm from "./form-edit";
 import { deleteAsset } from "@/actions/assets-actions";
+import { Inventory } from "@prisma/client";
 
 export const inventoryColumns: ColumnDef<{
   id: number;
@@ -95,7 +96,7 @@ export const inventoryColumns: ColumnDef<{
         row={row}
         EditComponent={EditInventoryForm}
         onDelete={deleteAsset}
-        viewRoute="/assets"
+        viewRoute="/inventory"
       />
     ),
   },
