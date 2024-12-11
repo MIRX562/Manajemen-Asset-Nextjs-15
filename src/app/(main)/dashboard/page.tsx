@@ -8,7 +8,7 @@ import { getAssetValuationOverYear } from "@/actions/analytics-actions";
 export default async function DashboardPage() {
   const chartData = await getAssetValuationOverYear();
   return (
-    <div className="mx-auto p-2 space-y-4">
+    <div className="p-2 space-y-4">
       <Metrics />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <PortfolioChart data={chartData} />
