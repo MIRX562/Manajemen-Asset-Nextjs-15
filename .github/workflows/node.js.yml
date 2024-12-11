@@ -15,7 +15,7 @@ jobs:
       matrix:
         node-version: [22.11.0]
     env:
-      DATABASE_URL: ${{secrets.DATABASE_URL}}
+      DATABASE_URL: "postgresql://neondb_owner:UZlt2fH0QEud@ep-raspy-haze-a59x6v9m.us-east-2.aws.neon.tech/neondb?sslmode=require"
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
