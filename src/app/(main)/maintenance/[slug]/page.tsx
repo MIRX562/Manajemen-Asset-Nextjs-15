@@ -1,4 +1,5 @@
-import { getAssetById } from "@/actions/assets-actions";
+import { getMaintenanceById } from "@/actions/maintenance-actions";
+import MaintenanceDetailView from "./main";
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -11,13 +12,9 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
 
   const slug = await params.slug;
-  const id = parseInt(searchParams.id);
+  const id = parseInt(slug);
 
-  const data = await getAssetById(id);
+  const data = await getMaintenanceById(id);
 
-  return (
-    <div className="container flex flex-col gap-4 mt-4">
-      <h1 className="text-3xl font-bold">{decodeURI(slug)}</h1>
-    </div>
-  );
+  return <MaintenanceDetailView maintenance={data} />;
 }

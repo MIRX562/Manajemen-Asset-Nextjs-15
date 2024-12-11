@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 import RegisterPage from "./register-page";
 import LoginPage from "./login-page";
 
-export const revalidate = 60; // Revalidate the page every 60 seconds
+export const revalidate = 0; // Revalidate the page every 60 seconds
 
 export default async function AuthPage() {
   // Fetch the user count from the database

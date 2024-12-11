@@ -39,7 +39,14 @@ export async function createActivityLog(data: {
 export async function getAllActivityLogs() {
   return await prisma.activityLog.findMany({
     include: {
-      user: true, // Include user details
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+        },
+      }, // Include user details
     },
     orderBy: {
       timestamp: "desc",

@@ -124,3 +124,28 @@ export const getAssetByType = async (type_id: number) => {
     throw new Error("Failed to fetch asset");
   }
 };
+export const getAvailableAssets = async () => {
+  try {
+    const availableAssets = await prisma.asset.findMany({
+      where: {
+        status: "AKTIF",
+        NOT: {
+          checkInOuts: {
+            some: {
+              actual_return_date: null,
+              status: "DIPINJAM", // Assuming 'CHECKED_OUT' represents active checkouts
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return availableAssets;
+  } catch (error) {
+    throw new Error("Failed to fetch asset");
+  }
+};

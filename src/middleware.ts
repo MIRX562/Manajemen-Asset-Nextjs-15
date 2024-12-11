@@ -8,6 +8,7 @@ const securedRoutes = [
   "/employees",
   "/inventories",
   "/maintenance",
+  "/locations",
   "/notifications",
   "/reports",
   "/settings",

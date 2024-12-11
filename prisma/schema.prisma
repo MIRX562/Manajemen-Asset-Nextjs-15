@@ -6,27 +6,25 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = "linux-musl-openssl-3.0.x"
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String   @unique
-  password    String
-  role        Role
-  email       String   @unique
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  employee_id Int?     @unique
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  role       Role
+  email      String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   // Relasi
   activityLogs  ActivityLog[]
-  checkInOuts   CheckInOut[]
-  maintenances  Maintenance?    @relation("UserMaintenance")
+  maintenances  Maintenance[]    @relation("UserMaintenance")
   notifications Notifications[]
-  employee      Employee?       @relation(fields: [employee_id], references: [id])
   Session       Session[]
+  CheckInOut    CheckInOut[]
 
   @@map("users")
 }
@@ -42,12 +40,12 @@ model Employee {
   name       String
   department String
   phone      String
-  email      String  @unique
+  email      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   // Relasi
-  user User?
+  checkInOuts CheckInOut[]
 
   @@map("employees")
 }
@@ -59,9 +57,9 @@ model Asset {
   status          AssetStatus
   purchase_date   DateTime
   lifecycle_stage LifecycleStage
-  initial_value   Float           // Initial cost of the asset
-  salvage_value   Float           // Estimated value at the end of its lifecycle
-  useful_life     Int    
+  initial_value   Float // Initial cost of the asset
+  salvage_value   Float // Estimated value at the end of its lifecycle
+  useful_life     Int
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
 
@@ -169,7 +167,7 @@ model Inventory {
 
   // Relasi
   location         Location?              @relation(fields: [location_id], references: [id])
-maintenanceItems MaintenanceInventory[]
+  maintenanceItems MaintenanceInventory[]
 
   @@map("inventories")
 }
@@ -177,7 +175,7 @@ maintenanceItems MaintenanceInventory[]
 model Maintenance {
   id             Int               @id @default(autoincrement())
   asset_id       Int
-  mechanic_id    Int               @unique
+  mechanic_id    Int               
   scheduled_date DateTime
   status         MaintenanceStatus
   notes          String?
@@ -219,16 +217,18 @@ model CheckInOut {
   id                   Int              @id @default(autoincrement())
   asset_id             Int
   user_id              Int
+  employee_id          Int
   check_out_date       DateTime
-  expected_return_date DateTime
+  expected_return_date DateTime?
   actual_return_date   DateTime?
   status               CheckInOutStatus
   created_at           DateTime         @default(now())
   updated_at           DateTime         @updatedAt
 
   // Relasi
-  asset Asset @relation(fields: [asset_id], references: [id])
-  user  User  @relation(fields: [user_id], references: [id])
+  asset    Asset    @relation(fields: [asset_id], references: [id])
+  employee Employee @relation(fields: [employee_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
 
   @@map("check_in_outs")
 }
@@ -236,8 +236,9 @@ model CheckInOut {
 enum CheckInOutStatus {
   DIPINJAM
   DIKEMBALIKAN
+  JATUH_TEMPO
+  
 }
-
 
 model ActivityLog {
   id          Int        @id @default(autoincrement())

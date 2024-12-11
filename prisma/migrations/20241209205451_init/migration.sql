@@ -14,7 +14,7 @@ CREATE TYPE "LocationType" AS ENUM ('GUDANG', 'KANTOR', 'DATA_CENTER');
 CREATE TYPE "MaintenanceStatus" AS ENUM ('DIJADWALKAN', 'SELESAI', 'TERTUNDA');
 
 -- CreateEnum
-CREATE TYPE "CheckInOutStatus" AS ENUM ('DIPINJAM', 'DIKEMBALIKAN');
+CREATE TYPE "CheckInOutStatus" AS ENUM ('DIPINJAM', 'DIKEMBALIKAN', 'JATUH_TEMPO');
 
 -- CreateEnum
 CREATE TYPE "TargetType" AS ENUM ('ASSET', 'INVENTORY', 'MAINTENANCE');
@@ -30,7 +30,7 @@ CREATE TABLE "users" (
     "role" "Role" NOT NULL,
     "email" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "employee_id" INTEGER,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -39,10 +39,11 @@ CREATE TABLE "users" (
 CREATE TABLE "employees" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "position" TEXT NOT NULL,
     "department" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
-    "email" TEXT,
+    "email" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "employees_pkey" PRIMARY KEY ("id")
 );
@@ -55,7 +56,11 @@ CREATE TABLE "assets" (
     "status" "AssetStatus" NOT NULL,
     "purchase_date" TIMESTAMP(3) NOT NULL,
     "lifecycle_stage" "LifecycleStage" NOT NULL,
-    "value" DOUBLE PRECISION NOT NULL,
+    "initial_value" DOUBLE PRECISION NOT NULL,
+    "salvage_value" DOUBLE PRECISION NOT NULL,
+    "useful_life" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "assets_pkey" PRIMARY KEY ("id")
 );
@@ -67,8 +72,23 @@ CREATE TABLE "asset_types" (
     "manufacturer" TEXT NOT NULL,
     "category" TEXT NOT NULL,
     "description" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "asset_types_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "asset_lifecycles" (
+    "id" SERIAL NOT NULL,
+    "asset_id" INTEGER NOT NULL,
+    "stage" "LifecycleStage" NOT NULL,
+    "change_date" TIMESTAMP(3) NOT NULL,
+    "notes" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "asset_lifecycles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -77,6 +97,8 @@ CREATE TABLE "locations" (
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "type" "LocationType" NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "locations_pkey" PRIMARY KEY ("id")
 );
@@ -88,6 +110,8 @@ CREATE TABLE "asset_location_histories" (
     "location_id" INTEGER NOT NULL,
     "assigned_date" TIMESTAMP(3) NOT NULL,
     "release_date" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "asset_location_histories_pkey" PRIMARY KEY ("id")
 );
@@ -101,6 +125,8 @@ CREATE TABLE "inventories" (
     "reorder_level" INTEGER NOT NULL,
     "unit_price" DOUBLE PRECISION NOT NULL,
     "location_id" INTEGER,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "inventories_pkey" PRIMARY KEY ("id")
 );
@@ -113,6 +139,8 @@ CREATE TABLE "maintenances" (
     "scheduled_date" TIMESTAMP(3) NOT NULL,
     "status" "MaintenanceStatus" NOT NULL,
     "notes" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "maintenances_pkey" PRIMARY KEY ("id")
 );
@@ -123,6 +151,8 @@ CREATE TABLE "maintenance_inventories" (
     "maintenance_id" INTEGER NOT NULL,
     "inventory_id" INTEGER NOT NULL,
     "quantity_used" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "maintenance_inventories_pkey" PRIMARY KEY ("maintenance_inventory_id")
 );
@@ -132,23 +162,15 @@ CREATE TABLE "check_in_outs" (
     "id" SERIAL NOT NULL,
     "asset_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "employee_id" INTEGER NOT NULL,
     "check_out_date" TIMESTAMP(3) NOT NULL,
     "expected_return_date" TIMESTAMP(3) NOT NULL,
     "actual_return_date" TIMESTAMP(3),
     "status" "CheckInOutStatus" NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "check_in_outs_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "asset_lifecycles" (
-    "id" SERIAL NOT NULL,
-    "asset_id" INTEGER NOT NULL,
-    "stage" "LifecycleStage" NOT NULL,
-    "change_date" TIMESTAMP(3) NOT NULL,
-    "notes" TEXT,
-
-    CONSTRAINT "asset_lifecycles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -171,6 +193,7 @@ CREATE TABLE "notifications" (
     "type" "NotificationType" NOT NULL,
     "is_read" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
 );
@@ -191,16 +214,10 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_employee_id_key" ON "users"("employee_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "employees_email_key" ON "employees"("email");
 
 -- CreateIndex
 CREATE INDEX "asset_location_histories_asset_id_location_id_idx" ON "asset_location_histories"("asset_id", "location_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "maintenances_mechanic_id_key" ON "maintenances"("mechanic_id");
 
 -- CreateIndex
 CREATE INDEX "maintenances_asset_id_mechanic_id_idx" ON "maintenances"("asset_id", "mechanic_id");
@@ -209,10 +226,10 @@ CREATE INDEX "maintenances_asset_id_mechanic_id_idx" ON "maintenances"("asset_id
 CREATE INDEX "maintenance_inventories_maintenance_id_inventory_id_idx" ON "maintenance_inventories"("maintenance_id", "inventory_id");
 
 -- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_employee_id_fkey" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "assets" ADD CONSTRAINT "assets_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "asset_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "assets" ADD CONSTRAINT "assets_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "asset_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "asset_lifecycles" ADD CONSTRAINT "asset_lifecycles_asset_id_fkey" FOREIGN KEY ("asset_id") REFERENCES "assets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "asset_location_histories" ADD CONSTRAINT "asset_location_histories_asset_id_fkey" FOREIGN KEY ("asset_id") REFERENCES "assets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -239,10 +256,10 @@ ALTER TABLE "maintenance_inventories" ADD CONSTRAINT "maintenance_inventories_in
 ALTER TABLE "check_in_outs" ADD CONSTRAINT "check_in_outs_asset_id_fkey" FOREIGN KEY ("asset_id") REFERENCES "assets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "check_in_outs" ADD CONSTRAINT "check_in_outs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "check_in_outs" ADD CONSTRAINT "check_in_outs_employee_id_fkey" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "asset_lifecycles" ADD CONSTRAINT "asset_lifecycles_asset_id_fkey" FOREIGN KEY ("asset_id") REFERENCES "assets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "check_in_outs" ADD CONSTRAINT "check_in_outs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,15 +1,18 @@
 // app/api/notifications/stream/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
 
 export async function GET(request: Request) {
+  const { user } = await getCurrentSession();
+  if (!user) return null;
   const stream = new ReadableStream({
     async start(controller) {
       const interval = setInterval(async () => {
         try {
           // Fetch unread notifications ordered by creation time
           const newNotifications = await prisma.notifications.findMany({
-            where: { is_read: false },
+            where: { is_read: false, user_id: user.id },
             orderBy: { created_at: "desc" },
           });
 

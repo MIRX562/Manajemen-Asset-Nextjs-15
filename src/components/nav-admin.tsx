@@ -13,6 +13,7 @@ import Link from "next/link";
 import { getCurrentSession } from "@/lib/auth";
 import { Role } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { useUser } from "@/context/session";
 
 export function NavAdmin({
   items,
@@ -23,19 +24,8 @@ export function NavAdmin({
     icon: LucideIcon;
   }[];
 }) {
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { user } = await getCurrentSession();
-      // console.log(session);
-      if (user) {
-        setRole(user.role);
-      }
-    };
-    fetchSession();
-  }, []);
-
+  const { user } = useUser();
+  const role = user?.role;
   if (!role) {
     return (
       <div className="flex w-full h-full items-center justify-center">

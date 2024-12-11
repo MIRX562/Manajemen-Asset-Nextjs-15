@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({
         insertDataComponent={insertDataComponent}
       />
       <div className="max-w-full overflow-x-auto rounded-md border">
-        <Table className=" text-sm">
+        <Table className="table-auto text-sm">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
-                    className="px-2 py-1 text-left"
+                    className="px-4 py-1 text-left"
                   >
                     {header.isPlaceholder
                       ? null
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-2 py-1 text-ellipsis "
+                      className="px-4 py-1 text-ellipsis "
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

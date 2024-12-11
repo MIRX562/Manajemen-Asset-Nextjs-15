@@ -1,8 +1,8 @@
 // RbacWrapper.tsx
-import { getCurrentSession } from "@/lib/auth";
 import { Role } from "@prisma/client";
 import React, { ReactNode } from "react";
 import AccessDenied from "./access-denied";
+import { useUser } from "@/context/session";
 
 interface RbacWrapperProps {
   children: ReactNode;
@@ -17,12 +17,12 @@ interface RbacWrapperProps {
  * @param {Role} requiredRole - The exact role required to access the content.
  * @returns {ReactNode} The content or fallback based on the user's role match.
  */
-export default async function RbacWrapper({
+export default function RbacWrapper({
   children,
   requiredRole,
 }: RbacWrapperProps) {
-  const session = await getCurrentSession();
-  const Role = session?.user?.role;
+  const { user } = useUser();
+  const Role = user?.role;
 
   return Role === requiredRole ? <>{children}</> : <AccessDenied />;
 }

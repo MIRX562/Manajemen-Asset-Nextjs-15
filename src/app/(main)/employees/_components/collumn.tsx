@@ -110,6 +110,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         row={row}
         EditComponent={EditEmployeeForm} // Pass as a component reference
         onDelete={deleteEmployee} // Example delete function
+        viewRoute="/employees"
       />
     ),
   },

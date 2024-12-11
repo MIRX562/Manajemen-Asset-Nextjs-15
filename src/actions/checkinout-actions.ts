@@ -152,8 +152,21 @@ export async function getActiveCheckInOuts() {
     return await prisma.checkInOut.findMany({
       where: { status: "DIPINJAM" },
       include: {
-        asset: true,
-        user: true,
+        asset: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        employee: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
   } catch (error) {
@@ -234,3 +247,44 @@ export async function getAssetUsageHistory(asset_id: number) {
     );
   }
 }
+
+export const getCheckoutMetrics = async () => {
+  const checkedOutAssets = await prisma.checkInOut.count({
+    where: {
+      status: "DIPINJAM",
+    },
+  });
+
+  const availableAssets = await prisma.asset.count({
+    where: {
+      checkInOuts: {
+        every: {
+          status: "DIKEMBALIKAN",
+        },
+      },
+    },
+  });
+
+  const overdueCheckouts = await prisma.checkInOut.count({
+    where: {
+      status: "DIPINJAM",
+      expected_return_date: {
+        lt: new Date(),
+      },
+      actual_return_date: null,
+    },
+  });
+
+  const checkoutsInProgress = await prisma.checkInOut.count({
+    where: {
+      status: "DIPINJAM",
+    },
+  });
+
+  return {
+    checkedOutAssets,
+    availableAssets,
+    overdueCheckouts,
+    checkoutsInProgress,
+  };
+};

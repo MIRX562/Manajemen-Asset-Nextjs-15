@@ -86,3 +86,18 @@ export const deleteEmployee = async (data: Employee) => {
     throw new Error("Failed to delete employee: " + error.message);
   }
 };
+
+export const getAllEMployeesDropdown = async () => {
+  try {
+    const employees = await prisma.employee.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return employees;
+  } catch (error) {
+    throw new Error("Failed to fetch asset");
+  }
+};

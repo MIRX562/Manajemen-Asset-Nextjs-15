@@ -7,7 +7,7 @@ type AssetType = {
   category: string;
 };
 type Location = { id: number; name: string; address: string; type: string };
-type User = { id: number; name: string };
+type User = { id: number; username: string };
 
 type DropdownContextType = {
   assetTypes: AssetType[];
@@ -38,7 +38,7 @@ export const DropdownProvider = ({
         ]);
         setAssetTypes(assetTypesRes.types);
         setLocations(locationsRes.locations);
-        setMechanics(mechanicRes.mecanics);
+        setMechanics(mechanicRes.mechanics);
       } catch (error) {
         console.error("Failed to fetch dropdown data", error);
       } finally {

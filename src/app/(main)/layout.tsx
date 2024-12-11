@@ -15,6 +15,7 @@ import Loading from "./loading";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NotificationProvider } from "@/context/notifications";
 import { DropdownProvider } from "@/context/dropdown";
+import { UserProvider } from "@/context/session";
 
 function Header() {
   return (
@@ -38,22 +39,24 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <NotificationProvider>
-      <DropdownProvider>
-        <ThemeProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <Header />
-              <Suspense fallback={<Loading />}>
-                <main className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-y-auto">
-                  {children}
-                </main>
-              </Suspense>
-            </SidebarInset>
-          </SidebarProvider>
-        </ThemeProvider>
-      </DropdownProvider>
-    </NotificationProvider>
+    <UserProvider>
+      <NotificationProvider>
+        <DropdownProvider>
+          <ThemeProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <Header />
+                <Suspense fallback={<Loading />}>
+                  <main className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-y-auto">
+                    {children}
+                  </main>
+                </Suspense>
+              </SidebarInset>
+            </SidebarProvider>
+          </ThemeProvider>
+        </DropdownProvider>
+      </NotificationProvider>
+    </UserProvider>
   );
 }

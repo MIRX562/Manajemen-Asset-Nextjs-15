@@ -10,7 +10,6 @@ export async function createInventoryItem(data: {
   unit_price: number;
   location_id: number;
 }) {
-  console.log(data);
   try {
     return await prisma.inventory.create({ data });
   } catch (error) {
@@ -83,6 +82,26 @@ export async function getInventoryItemsByLocation(location_id: number) {
   }
 }
 
+export async function getAvailableInventoryItems() {
+  try {
+    return await prisma.inventory.findMany({
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[getAvailableInventoryItems] Failed to retrieve available items:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve inventory items for the specified location. Please try again."
+    );
+  }
+}
+
 // Update an inventory item
 export async function updateInventoryItem(data: {
   id: number;
@@ -106,6 +125,45 @@ export async function updateInventoryItem(data: {
     throw new Error("Failed to update the inventory item. Please try again.");
   }
 }
+
+type UseInventoryInput = {
+  inventoryId: number;
+  quantity: number;
+}[];
+
+export const useInventory = async (items: UseInventoryInput) => {
+  return await prisma.$transaction(async (tx) => {
+    const results = [];
+
+    for (const item of items) {
+      // Fetch the inventory item
+      const inventory = await tx.inventory.findUnique({
+        where: { id: item.inventoryId },
+        select: { quantity: true },
+      });
+
+      if (!inventory) {
+        throw new Error(`Inventory item with ID ${item.inventoryId} not found`);
+      }
+
+      if (inventory.quantity < item.quantity) {
+        throw new Error(
+          `Insufficient quantity for inventory ID ${item.inventoryId}. Requested: ${item.quantity}, Available: ${inventory.quantity}`
+        );
+      }
+
+      // Update the inventory quantity
+      const updatedInventory = await tx.inventory.update({
+        where: { id: item.inventoryId },
+        data: { quantity: { decrement: item.quantity } },
+      });
+
+      results.push(updatedInventory);
+    }
+
+    return results;
+  });
+};
 
 // Delete an inventory item
 export async function deleteInventoryItem(id: number) {

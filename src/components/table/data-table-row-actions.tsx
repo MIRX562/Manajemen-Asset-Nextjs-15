@@ -48,7 +48,9 @@ export function DataTableRowActions<TData>({
               aria-label="View"
               onClick={() =>
                 router.push(
-                  `${viewRoute}/${data.name || data.model}?id=${data.id}`
+                  `${viewRoute}/${
+                    data.name || data.model || data.username
+                  }?id=${data.id}`
                 )
               }
             >

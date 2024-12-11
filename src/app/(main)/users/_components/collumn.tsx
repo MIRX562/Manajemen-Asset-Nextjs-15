@@ -20,7 +20,6 @@ export const userColumns: ColumnDef<User>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-y-[2px]"
       />
     ),
     cell: ({ row }) => (
@@ -28,7 +27,6 @@ export const userColumns: ColumnDef<User>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="translate-y-[2px]"
       />
     ),
     enableSorting: false,
@@ -90,11 +88,15 @@ export const userColumns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Action" />
+    ),
     cell: ({ row }) => (
       <DataTableRowActions
         row={row}
         EditComponent={EditUserForm} // Pass as a component reference
         onDelete={deleteUser} // Example delete function
+        viewRoute="/users"
       />
     ),
   },

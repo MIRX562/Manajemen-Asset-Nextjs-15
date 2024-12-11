@@ -48,11 +48,12 @@ const data = {
       icon: Box,
       items: [
         { title: "Asset Types", url: "/assets/types" },
-        { title: "Update Asset Lifecycle", url: "/assets/lifecycle" },
+        { title: "Check-In", url: "/assets/checkin" },
+        { title: "Check-Out", url: "/assets/checkout" },
       ],
     },
     {
-      title: "Asset Locations",
+      title: "Locations",
       url: "/locations",
       icon: MapPin,
       items: [
@@ -80,16 +81,6 @@ const data = {
       ],
     },
     {
-      title: "Check-In/Check-Out",
-      url: "/checkin-checkout",
-      icon: Clipboard,
-      items: [
-        { title: "Check-Out Asset", url: "/check-in-out/check-out" },
-        { title: "Check-In Asset", url: "/check-in-out/check-in" },
-      ],
-    },
-
-    {
       title: "Reports",
       url: "/reports",
       icon: FileText,
@@ -100,11 +91,11 @@ const data = {
         { title: "Inventory Report", url: "/reports/inventory" },
       ],
     },
-    {
-      title: "Notification",
-      url: "/notification",
-      icon: Bell,
-    },
+    // {
+    //   title: "Notification",
+    //   url: "/notification",
+    //   icon: Bell,
+    // },
   ],
   admin: [
     {

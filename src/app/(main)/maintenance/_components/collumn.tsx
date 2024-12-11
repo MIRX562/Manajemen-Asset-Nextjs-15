@@ -3,8 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
+import Link from "next/link";
 
 export const fullMaintenanceColumns: ColumnDef<{
   id: number;
@@ -89,15 +89,11 @@ export const fullMaintenanceColumns: ColumnDef<{
       <DataTableColumnHeader column={column} title="Action" />
     ),
     cell: ({ row }) => (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="p-2"
-        aria-label="View"
-        onClick={() => useRouter().push(`/maintenance/${row.original.id}`)}
-      >
-        <Eye className="h-4 w-4" />
-      </Button>
+      <Link href={`/maintenance/${row.original.id}`}>
+        <Button variant="ghost" size="icon" className="p-2" aria-label="View">
+          <Eye className="h-4 w-4" />
+        </Button>
+      </Link>
     ),
   },
 ];

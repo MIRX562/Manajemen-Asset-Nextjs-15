@@ -49,18 +49,21 @@ export async function Metrics() {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mt-4">
       {metrics.map((metric, index) => {
         const Icon = icons[metric.icon];
         return (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card
+            key={index}
+            className="col-span-1 flex flex-col justify-between"
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
               <CardTitle className="text-sm font-medium">
                 {metric.title}
               </CardTitle>
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0 md:p-8">
               <div className="text-2xl font-bold">{metric.value}</div>
               <p className="text-xs text-muted-foreground">{metric.change}</p>
             </CardContent>

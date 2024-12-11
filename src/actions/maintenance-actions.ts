@@ -1,5 +1,6 @@
 "use server";
 import prisma from "@/lib/db";
+import { endOfWeek, startOfWeek } from "date-fns";
 
 // Get upcoming maintenance tasks
 export async function getUpcomingMaintenance() {
@@ -249,4 +250,84 @@ export async function getDelayedMaintenances() {
       "Unable to fetch delayed maintenance records. Please try again."
     );
   }
+}
+
+// Get delayed maintenance records
+export async function getScheduledMaintenance() {
+  try {
+    return await prisma.maintenance.findMany({
+      where: {
+        status: "DIJADWALKAN",
+      },
+      include: {
+        asset: true,
+        mechanic: true,
+        inventoryItems: {
+          include: { inventory: true },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(
+      "[getScheduledMaintenance] Failed to fetch delayed maintenance records:",
+      error
+    );
+    throw new Error(
+      "Unable to fetch delayed maintenance records. Please try again."
+    );
+  }
+}
+
+export async function getScheduledMaintenanceMetrics() {
+  const now = new Date();
+  const thisWeekStart = startOfWeek(now);
+  const thisWeekEnd = endOfWeek(now);
+
+  const [
+    totalScheduledMaintenance,
+    maintenanceThisWeek,
+    overdueMaintenance,
+    uniqueMechanics,
+    uniqueAssets,
+  ] = await Promise.all([
+    // Total Scheduled Maintenance
+    prisma.maintenance.count({
+      where: { status: "DIJADWALKAN" },
+    }),
+    // Maintenance Scheduled This Week
+    prisma.maintenance.count({
+      where: {
+        status: "DIJADWALKAN",
+        scheduled_date: {
+          gte: thisWeekStart,
+          lte: thisWeekEnd,
+        },
+      },
+    }),
+    // Overdue Maintenance
+    prisma.maintenance.count({
+      where: {
+        status: "DIJADWALKAN",
+        scheduled_date: { lt: now },
+      },
+    }),
+    // Unique Mechanics Assigned
+    prisma.maintenance.groupBy({
+      by: ["mechanic_id"],
+      where: { status: "DIJADWALKAN" },
+    }),
+    // Unique Assets Scheduled
+    prisma.maintenance.groupBy({
+      by: ["asset_id"],
+      where: { status: "DIJADWALKAN" },
+    }),
+  ]);
+
+  return {
+    totalScheduledMaintenance,
+    maintenanceThisWeek,
+    overdueMaintenance,
+    uniqueMechanics: uniqueMechanics.length,
+    uniqueAssets: uniqueAssets.length,
+  };
 }

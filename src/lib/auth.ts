@@ -5,7 +5,7 @@ import {
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import bcrypt from "bcryptjs";
-import { type User, type Session, Role } from "@prisma/client";
+import { type Session, Role } from "@prisma/client";
 import prisma from "./db";
 import { cookies } from "next/headers";
 import { cache } from "react";
@@ -72,7 +72,14 @@ export async function validateSessionToken(
       id: sessionId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          role: true,
+        },
+      },
     },
   });
   if (result === null) {
@@ -314,5 +321,8 @@ export async function registerAndRefresh(
  * @property {User | null} user The user object associated with the session, or null.
  */
 export type SessionValidationResult =
-  | { session: Session; user: User }
+  | {
+      session: Session;
+      user: { id: number; email: string; role: Role; username: string };
+    }
   | { session: null; user: null };

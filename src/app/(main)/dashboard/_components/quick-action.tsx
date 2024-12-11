@@ -44,6 +44,16 @@ export function QuickActions() {
       label: "Settings",
       onClick: () => console.log("Settings clicked"),
     },
+    {
+      icon: FileSearch,
+      label: "Reports",
+      onClick: () => console.log("Reports clicked"),
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      onClick: () => console.log("Settings clicked"),
+    },
   ];
 
   return (

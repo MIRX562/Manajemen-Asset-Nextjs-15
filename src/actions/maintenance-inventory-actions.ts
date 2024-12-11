@@ -10,12 +10,17 @@ export async function createMaintenanceInventory(data: {
   try {
     return await prisma.maintenanceInventory.create({ data });
   } catch (error) {
-    console.error("[createMaintenanceInventory] Failed to create MaintenanceInventory record:", error);
-    throw new Error("Unable to create MaintenanceInventory record. Please try again.");
+    console.error(
+      "[createMaintenanceInventory] Failed to create MaintenanceInventory record:",
+      error
+    );
+    throw new Error(
+      "Unable to create MaintenanceInventory record. Please try again."
+    );
   }
 }
 
-// Get all MaintenanceInventory records
+// Get all MaintenanceInventory record
 export async function getAllMaintenanceInventories() {
   try {
     return await prisma.maintenanceInventory.findMany({
@@ -30,8 +35,13 @@ export async function getAllMaintenanceInventories() {
       },
     });
   } catch (error) {
-    console.error("[getAllMaintenanceInventories] Failed to fetch MaintenanceInventory records:", error);
-    throw new Error("Unable to fetch MaintenanceInventory records. Please try again.");
+    console.error(
+      "[getAllMaintenanceInventories] Failed to fetch MaintenanceInventory records:",
+      error
+    );
+    throw new Error(
+      "Unable to fetch MaintenanceInventory records. Please try again."
+    );
   }
 }
 
@@ -53,12 +63,19 @@ export async function getMaintenanceInventoryById(
       },
     });
     if (!record) {
-      throw new Error(`MaintenanceInventory record with ID ${maintenance_inventory_id} not found.`);
+      throw new Error(
+        `MaintenanceInventory record with ID ${maintenance_inventory_id} not found.`
+      );
     }
     return record;
   } catch (error) {
-    console.error(`[getMaintenanceInventoryById] Failed to fetch MaintenanceInventory record with ID ${maintenance_inventory_id}:`, error);
-    throw new Error("Unable to fetch the specified MaintenanceInventory record. Please try again.");
+    console.error(
+      `[getMaintenanceInventoryById] Failed to fetch MaintenanceInventory record with ID ${maintenance_inventory_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to fetch the specified MaintenanceInventory record. Please try again."
+    );
   }
 }
 
@@ -80,8 +97,13 @@ export async function getMaintenanceInventoriesByMaintenanceId(
       },
     });
   } catch (error) {
-    console.error(`[getMaintenanceInventoriesByMaintenanceId] Failed to fetch MaintenanceInventory records for Maintenance ID ${maintenance_id}:`, error);
-    throw new Error("Unable to fetch MaintenanceInventory records for the specified Maintenance ID. Please try again.");
+    console.error(
+      `[getMaintenanceInventoriesByMaintenanceId] Failed to fetch MaintenanceInventory records for Maintenance ID ${maintenance_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to fetch MaintenanceInventory records for the specified Maintenance ID. Please try again."
+    );
   }
 }
 
@@ -103,8 +125,13 @@ export async function getMaintenanceInventoriesByInventoryId(
       },
     });
   } catch (error) {
-    console.error(`[getMaintenanceInventoriesByInventoryId] Failed to fetch MaintenanceInventory records for Inventory ID ${inventory_id}:`, error);
-    throw new Error("Unable to fetch MaintenanceInventory records for the specified Inventory ID. Please try again.");
+    console.error(
+      `[getMaintenanceInventoriesByInventoryId] Failed to fetch MaintenanceInventory records for Inventory ID ${inventory_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to fetch MaintenanceInventory records for the specified Inventory ID. Please try again."
+    );
   }
 }
 
@@ -123,8 +150,13 @@ export async function updateMaintenanceInventory(
       data,
     });
   } catch (error) {
-    console.error(`[updateMaintenanceInventory] Failed to update MaintenanceInventory record with ID ${maintenance_inventory_id}:`, error);
-    throw new Error("Unable to update the MaintenanceInventory record. Please try again.");
+    console.error(
+      `[updateMaintenanceInventory] Failed to update MaintenanceInventory record with ID ${maintenance_inventory_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to update the MaintenanceInventory record. Please try again."
+    );
   }
 }
 
@@ -137,8 +169,13 @@ export async function deleteMaintenanceInventory(
       where: { maintenance_inventory_id },
     });
   } catch (error) {
-    console.error(`[deleteMaintenanceInventory] Failed to delete MaintenanceInventory record with ID ${maintenance_inventory_id}:`, error);
-    throw new Error("Unable to delete the MaintenanceInventory record. Please try again.");
+    console.error(
+      `[deleteMaintenanceInventory] Failed to delete MaintenanceInventory record with ID ${maintenance_inventory_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to delete the MaintenanceInventory record. Please try again."
+    );
   }
 }
 
@@ -153,8 +190,13 @@ export async function getTotalInventoryUsageByMaintenance(
     });
     return result._sum.quantity_used || 0;
   } catch (error) {
-    console.error(`[getTotalInventoryUsageByMaintenance] Failed to calculate total inventory usage for Maintenance ID ${maintenance_id}:`, error);
-    throw new Error("Unable to calculate total inventory usage for the specified maintenance. Please try again.");
+    console.error(
+      `[getTotalInventoryUsageByMaintenance] Failed to calculate total inventory usage for Maintenance ID ${maintenance_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to calculate total inventory usage for the specified maintenance. Please try again."
+    );
   }
 }
 
@@ -167,7 +209,12 @@ export async function getTotalUsageByInventory(inventory_id: number) {
     });
     return result._sum.quantity_used || 0;
   } catch (error) {
-    console.error(`[getTotalUsageByInventory] Failed to calculate total inventory usage for Inventory ID ${inventory_id}:`, error);
-    throw new Error("Unable to calculate total inventory usage for the specified inventory. Please try again.");
+    console.error(
+      `[getTotalUsageByInventory] Failed to calculate total inventory usage for Inventory ID ${inventory_id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to calculate total inventory usage for the specified inventory. Please try again."
+    );
   }
 }
