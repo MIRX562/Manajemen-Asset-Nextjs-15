@@ -1,14 +1,18 @@
-// app/api/notifications/stream/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const { user } = await getCurrentSession();
-  if (!user) return null;
+  if (!user) return new NextResponse("Unauthorized", { status: 401 });
+
+  let controllerClosed = false; // Track if the controller is closed
+
   const stream = new ReadableStream({
     async start(controller) {
       const interval = setInterval(async () => {
+        if (controllerClosed) return;
+
         try {
           // Fetch unread notifications ordered by creation time
           const newNotifications = await prisma.notifications.findMany({
@@ -22,14 +26,20 @@ export async function GET(request: Request) {
           }
         } catch (error) {
           console.error("Error fetching notifications:", error);
-          controller.close();
+          if (!controllerClosed) {
+            controllerClosed = true;
+            controller.close();
+          }
         }
       }, 5000); // Poll every 5 seconds
 
       // Stop polling and close the stream when client disconnects
       request.signal.addEventListener("abort", () => {
         clearInterval(interval);
-        controller.close();
+        if (!controllerClosed) {
+          controllerClosed = true;
+          controller.close();
+        }
       });
     },
   });

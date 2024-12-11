@@ -37,7 +37,6 @@ export function PortfolioChart({
 }: {
   data: { month: string; totalValue: number }[];
 }) {
-  console.log(data);
   // Calculate highest and lowest
   const highest = React.useMemo(
     () =>

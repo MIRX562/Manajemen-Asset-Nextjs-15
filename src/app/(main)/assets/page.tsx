@@ -22,6 +22,8 @@ import { RecentCheckouts } from "../assets/_components/recent-checkouts";
 import { TopAssets } from "../assets/_components/top-assets";
 import { TopUsers } from "../assets/_components/top-users";
 
+export const dynamic = "force-dynamic";
+
 export default async function AssetsPage() {
   const data = await getAllAssets();
   const assetType = await getAllAssetTypes();
