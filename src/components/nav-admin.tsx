@@ -10,9 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { getCurrentSession } from "@/lib/auth";
 import { Role } from "@prisma/client";
-import { useEffect, useState } from "react";
 import { useUser } from "@/context/session";
 
 export function NavAdmin({

@@ -36,7 +36,7 @@ export default async function page() {
             <CheckoutForm assets={assets} employees={employees} />
           </CardContent>
         </Card>
-        <CheckoutMetrics m />
+        <CheckoutMetrics />
       </div>
       <h1 className="text-3xl font-bold">Active Checkouts</h1>
       <DataTable data={data} columns={activeCheckoutsColumns} />

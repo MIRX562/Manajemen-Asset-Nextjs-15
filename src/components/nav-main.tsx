@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useUser } from "@/context/session";
 
 export function NavMain({
   items,
@@ -33,12 +34,22 @@ export function NavMain({
   }[];
 }) {
   const currentPath = usePathname(); // Get the current pathname
+  const user = useUser();
+  const role = user.user?.role;
+
+  // Filter items based on role
+  const filteredItems =
+    role === "TEKNISI"
+      ? items.filter(
+          (item) => item.title === "Dashboard" || item.title === "Maintenance"
+        )
+      : items;
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>General</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
+        {filteredItems.map((item) => {
           const isOpen =
             currentPath === item.url ||
             item.items?.some((subItem) => currentPath === subItem.url);

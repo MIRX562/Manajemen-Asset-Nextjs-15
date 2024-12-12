@@ -104,6 +104,25 @@ export async function getCheckInOutsByUserId(user_id: number) {
     );
   }
 }
+// Get CheckInOut records by User ID
+export async function getActiveCheckOuts() {
+  try {
+    return await prisma.checkInOut.findMany({
+      where: { status: "DIPINJAM" },
+      select: {
+        id: true,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[getCheckInOutsByUserId] Failed to retrieve records for User ID ${user_id}:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve CheckInOut records for the specified user. Please try again."
+    );
+  }
+}
 
 // Update a CheckInOut record
 export async function updateCheckInOut(

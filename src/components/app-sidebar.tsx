@@ -65,31 +65,22 @@ const data = {
       title: "Inventory",
       url: "/inventory",
       icon: Archive,
-      items: [
-        { title: "Manage Inventory", url: "/inventory/manage" },
-        { title: "Inventory Locations", url: "/inventory/locations" },
-        { title: "Inventory Transactions", url: "/inventory/transactions" },
-      ],
+      // items: [
+      //   { title: "Manage Inventory", url: "/inventory/manage" },
+      //   { title: "Inventory Locations", url: "/inventory/locations" },
+      //   { title: "Inventory Transactions", url: "/inventory/transactions" },
+      // ],
     },
     {
       title: "Maintenance",
       url: "/maintenance",
       icon: Wrench,
-      items: [
-        { title: "Schedule Maintenance", url: "/maintenance/schedule" },
-        { title: "Maintenance Logs", url: "/maintenance/logs" },
-      ],
+      items: [{ title: "Schedule Maintenance", url: "/maintenance/schedule" }],
     },
     {
       title: "Reports",
       url: "/reports",
       icon: FileText,
-      items: [
-        { title: "Location Report", url: "/reports/location" },
-        { title: "Depreciation Report", url: "/reports/depreciation" },
-        { title: "Maintenance Report", url: "/reports/maintenance" },
-        { title: "Inventory Report", url: "/reports/inventory" },
-      ],
     },
     // {
     //   title: "Notification",

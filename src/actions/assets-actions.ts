@@ -149,3 +149,25 @@ export const getAvailableAssets = async () => {
     throw new Error("Failed to fetch asset");
   }
 };
+export const getCheckedOutAvailableAssets = async () => {
+  try {
+    const availableAssets = await prisma.asset.findMany({
+      where: {
+        checkInOuts: {
+          some: {
+            actual_return_date: null,
+            status: "DIPINJAM", // Assuming 'CHECKED_OUT' represents active checkouts
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return availableAssets;
+  } catch (error) {
+    throw new Error("Failed to fetch asset");
+  }
+};

@@ -6,7 +6,7 @@ import { fullMaintenanceColumns } from "./_components/collumn";
 export default async function MaintenancePage() {
   const data = await getAllMaintenances();
   return (
-    <div className="flex flex-col w-full h-full items-center pt-4 space-y-4">
+    <div className="flex flex-col w-full max-h-full items-center pt-4 space-y-4">
       <DataTable columns={fullMaintenanceColumns} data={data} />
     </div>
   );

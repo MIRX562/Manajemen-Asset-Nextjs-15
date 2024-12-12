@@ -22,7 +22,7 @@ export default async function MaintenancePage() {
   const assets = await getAvailableAssets();
   const inventory = await getAvailableInventoryItems();
   return (
-    <div className="flex flex-col w-full h-full pt-4 gap-4">
+    <div className="flex flex-col w-full max-h-screen pt-4 gap-4">
       <div className="grid grid-cols-5 gap-4">
         <Card className="col-span-full md:col-span-1 flex flex-col justify-between">
           <CardHeader>
