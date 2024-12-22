@@ -9,23 +9,58 @@ import {
 } from "@/schemas/asset-schema";
 import { z } from "zod";
 
-export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
+export const createAsset = async (
+  data: z.infer<typeof createAssetSchema>,
+  locationId: number, // Location where the asset is initially assigned
+  lifecycleNotes?: string // Optional notes for the lifecycle stage
+) => {
   const value = createAssetSchema.parse(data);
+
   try {
     const asset = await prisma.asset.create({
       data: {
         ...value,
       },
     });
+
+    // Create AssetLocationHistory
+    await prisma.assetLocationHistory.create({
+      data: {
+        asset_id: asset.id,
+        location_id: locationId,
+        assigned_date: new Date(),
+      },
+    });
+
+    // Create AssetLifecycle
+    await prisma.assetLifecycle.create({
+      data: {
+        asset_id: asset.id,
+        stage: value.lifecycle_stage,
+        change_date: new Date(),
+        notes:
+          lifecycleNotes ||
+          `Asset created with stage: ${value.lifecycle_stage}`,
+      },
+    });
+
     return asset;
   } catch (error) {
-    throw new Error("Failed to create asset");
+    console.error(`[createAsset] Error:`, error);
+    throw new Error("Failed to create asset with associated records");
   }
 };
 
-export const editAsset = async (data: z.infer<typeof editAssetSchema>) => {
+export const editAsset = async (
+  data: z.infer<typeof editAssetSchema>,
+  locationId?: number,
+  lifecycleNotes?: string
+) => {
   const value = editAssetSchema.parse(data);
+  console.log(value);
+
   try {
+    // Update the asset itself
     const asset = await prisma.asset.update({
       where: { id: value.id },
       data: {
@@ -39,9 +74,74 @@ export const editAsset = async (data: z.infer<typeof editAssetSchema>) => {
         useful_life: value.useful_life,
       },
     });
+
+    // If locationId is provided and has changed, update the location history
+    if (locationId) {
+      const currentLocation = await prisma.assetLocationHistory.findFirst({
+        where: {
+          asset_id: asset.id,
+          release_date: null, // Get the active location record
+        },
+      });
+
+      // Check if the location has actually changed before updating
+      if (currentLocation && currentLocation.location_id !== locationId) {
+        // Update the release date for the previous location
+        await prisma.assetLocationHistory.updateMany({
+          where: {
+            asset_id: asset.id,
+            release_date: null, // Only update the active record
+          },
+          data: {
+            release_date: new Date(),
+          },
+        });
+
+        // Add a new AssetLocationHistory entry
+        await prisma.assetLocationHistory.create({
+          data: {
+            asset_id: asset.id,
+            location_id: locationId,
+            assigned_date: new Date(),
+          },
+        });
+      }
+    }
+
+    // If the lifecycle stage has changed, create a new AssetLifecycle entry
+    if (value.lifecycle_stage) {
+      const currentLifecycle = await prisma.assetLifecycle.findFirst({
+        where: {
+          asset_id: asset.id,
+        },
+        orderBy: {
+          change_date: "desc", // Get the latest lifecycle stage
+        },
+      });
+
+      // Check if the lifecycle stage or notes have changed before creating a new record
+      if (
+        !currentLifecycle ||
+        currentLifecycle.stage !== value.lifecycle_stage ||
+        lifecycleNotes !== currentLifecycle.notes
+      ) {
+        await prisma.assetLifecycle.create({
+          data: {
+            asset_id: asset.id,
+            stage: value.lifecycle_stage,
+            change_date: new Date(),
+            notes:
+              lifecycleNotes ||
+              `Lifecycle stage updated to: ${value.lifecycle_stage}`,
+          },
+        });
+      }
+    }
+
     return asset;
   } catch (error) {
-    throw new Error("Failed to update asset");
+    console.error(`[editAsset] Error:`, error);
+    throw new Error("Failed to update asset with associated records");
   }
 };
 

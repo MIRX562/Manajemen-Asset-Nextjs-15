@@ -42,24 +42,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useDropdownContext } from "@/context/dropdown";
 import { MaintenanceStatus } from "@prisma/client";
-
-const formSchema = z.object({
-  asset_id: z.number(),
-  mechanic_id: z.number(),
-  scheduled_date: z.coerce.date(),
-  status: z.string(),
-  notes: z.string().optional(),
-  inventory: z
-    .array(
-      z.object({
-        item_id: z.coerce.number(),
-        quantity: z.coerce
-          .number()
-          .positive("Quantity must be greater than zero"),
-      })
-    )
-    .optional(),
-});
+import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
+import { scheduleMaintenance } from "@/actions/maintenance-inventory-actions";
+import { useRouter } from "next/navigation";
 
 type FormProps = {
   inventoryItems: {
@@ -80,27 +65,28 @@ export default function ScheduleMaintenanceForm({
   const { mechanics } = useDropdownContext();
   console.log(mechanics);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof scheduleMaintenanceSchema>>({
+    resolver: zodResolver(scheduleMaintenanceSchema),
     defaultValues: {
       scheduled_date: new Date(),
       status: MaintenanceStatus.DIJADWALKAN,
     },
   });
+  const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "inventory",
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof scheduleMaintenanceSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      toast.promise(scheduleMaintenance(values), {
+        loading: "Adding new Maintenance...",
+        success: "New maintenance is scheduled",
+        error: "failed to add new maintenance",
+      });
+      router.refresh();
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");

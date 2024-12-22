@@ -21,7 +21,7 @@ import {
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
-  EditComponent: ComponentType<{ data: TData }>;
+  EditComponent?: ComponentType<{ data: TData }>;
   onDelete: (data: TData) => void;
   viewRoute: string; // Base route for the "View" button
 }
@@ -63,29 +63,31 @@ export function DataTableRowActions<TData>({
         </Tooltip>
 
         {/* Edit Action */}
-        <Dialog>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="p-2"
-                  aria-label="Edit"
-                >
-                  <Pencil2Icon className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Edit Data</p>
-            </TooltipContent>
-          </Tooltip>
-          <DialogContent>
-            <DialogTitle>Edit</DialogTitle>
-            <EditComponent data={data} />
-          </DialogContent>
-        </Dialog>
+        {EditComponent && (
+          <Dialog>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="p-2"
+                    aria-label="Edit"
+                  >
+                    <Pencil2Icon className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit Data</p>
+              </TooltipContent>
+            </Tooltip>
+            <DialogContent>
+              <DialogTitle>Edit</DialogTitle>
+              <EditComponent data={data} />
+            </DialogContent>
+          </Dialog>
+        )}
 
         {/* Delete Action */}
         <Tooltip>

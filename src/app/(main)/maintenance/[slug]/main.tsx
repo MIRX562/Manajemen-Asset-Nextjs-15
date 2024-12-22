@@ -1,39 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  CalendarIcon,
   ArrowLeft,
   InfoIcon,
   WrenchIcon,
@@ -77,24 +57,6 @@ export default function MaintenanceDetailView({
 }: {
   maintenance: Maintenance;
 }) {
-  const [notes, setNotes] = useState(maintenance.notes);
-  const [status, setStatus] = useState(maintenance.status);
-  const [scheduledDate, setScheduledDate] = useState(
-    maintenance.scheduled_date
-  );
-
-  const handleNotesChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNotes(event.target.value);
-  };
-
-  const handleStatusChange = (value: string) => {
-    setStatus(value);
-  };
-
-  const handleReschedule = (newDate: string) => {
-    setScheduledDate(newDate);
-  };
-
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "PPP");
   };
@@ -123,8 +85,12 @@ export default function MaintenanceDetailView({
           </Link>
         </Button>
         <h1 className="text-3xl font-bold">Maintenance Details</h1>
-        <Badge className={`text-lg font-semibold ${getStatusColor(status)}`}>
-          {status}
+        <Badge
+          className={`text-lg font-semibold ${getStatusColor(
+            maintenance.status
+          )}`}
+        >
+          {maintenance.status}
         </Badge>
       </div>
 
@@ -139,27 +105,27 @@ export default function MaintenanceDetailView({
           <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div>
               <Label>Maintenance ID</Label>
-              <p className="text-gray-700">{maintenance.id}</p>
+              <p>{maintenance.id}</p>
             </div>
             <div>
               <Label>Asset Name</Label>
-              <p className="text-gray-700">{maintenance.asset.name}</p>
+              <p>{maintenance.asset.name}</p>
             </div>
             <div>
               <Label>Asset Status</Label>
-              <p className="text-gray-700">{maintenance.asset.status}</p>
+              <p>{maintenance.asset.status}</p>
             </div>
             <div>
               <Label>Mechanic Name</Label>
-              <p className="text-gray-700">{maintenance.mechanic.username}</p>
+              <p>{maintenance.mechanic.username}</p>
             </div>
             <div>
               <Label>Mechanic Role</Label>
-              <p className="text-gray-700">{maintenance.mechanic.role}</p>
+              <p>{maintenance.mechanic.role}</p>
             </div>
             <div>
               <Label>Scheduled Date</Label>
-              <p className="text-gray-700">{formatDate(scheduledDate)}</p>
+              <p>{formatDate(maintenance.scheduled_date)}</p>
             </div>
           </CardContent>
         </Card>
@@ -174,7 +140,7 @@ export default function MaintenanceDetailView({
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div>
               <Label>Asset Name</Label>
-              <p className="text-gray-700">{maintenance.asset.name}</p>
+              <p>{maintenance.asset.name}</p>
             </div>
             <div>
               <Label>Asset Type ID</Label>
@@ -196,27 +162,19 @@ export default function MaintenanceDetailView({
             </div>
             <div>
               <Label>Purchase Date</Label>
-              <p className="text-gray-700">
-                {formatDate(maintenance.asset.purchase_date)}
-              </p>
+              <p>{formatDate(maintenance.asset.purchase_date)}</p>
             </div>
             <div>
               <Label>Lifecycle Stage</Label>
-              <p className="text-gray-700">
-                {maintenance.asset.lifecycle_stage}
-              </p>
+              <p>{maintenance.asset.lifecycle_stage}</p>
             </div>
             <div>
               <Label>Initial Value</Label>
-              <p className="text-gray-700">
-                ${maintenance.asset.initial_value.toLocaleString()}
-              </p>
+              <p>${maintenance.asset.initial_value.toLocaleString()}</p>
             </div>
             <div>
               <Label>Salvage Value</Label>
-              <p className="text-gray-700">
-                ${maintenance.asset.salvage_value.toLocaleString()}
-              </p>
+              <p>${maintenance.asset.salvage_value.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
@@ -231,20 +189,39 @@ export default function MaintenanceDetailView({
           <CardContent className="space-y-4">
             <div>
               <Label>Username</Label>
-              <p className="text-gray-700">{maintenance.mechanic.username}</p>
+              <p>{maintenance.mechanic.username}</p>
             </div>
             <div>
               <Label>Role</Label>
-              <p className="text-gray-700">{maintenance.mechanic.role}</p>
+              <p>{maintenance.mechanic.role}</p>
             </div>
             <div>
               <Label>Email</Label>
-              <p className="text-gray-700">{maintenance.mechanic.email}</p>
+              <p>{maintenance.mechanic.email}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <ClockIcon className="mr-2 h-5 w-5" />
+              Timestamps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label>Created At</Label>
+              <p>{formatDate(maintenance.created_at)}</p>
+            </div>
+            <div>
+              <Label>Updated At</Label>
+              <p>{formatDate(maintenance.updated_at)}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-full md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BoxIcon className="mr-2 h-5 w-5" />
@@ -260,89 +237,6 @@ export default function MaintenanceDetailView({
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-full md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <ClockIcon className="mr-2 h-5 w-5" />
-              Timestamps
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Created At</Label>
-              <p className="text-gray-700">
-                {formatDate(maintenance.created_at)}
-              </p>
-            </div>
-            <div>
-              <Label>Updated At</Label>
-              <p className="text-gray-700">
-                {formatDate(maintenance.updated_at)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-full">
-          <CardHeader className="flex flex-col md:flex-row items-center justify-between">
-            <CardTitle>Maintenance Status and Notes</CardTitle>
-            <div className="flex justify-end space-x-4">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline">
-                    <CalendarIcon className="mr-2 h-4 w-4" /> Reschedule
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Reschedule Maintenance</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to reschedule this maintenance? This
-                      action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <div className="py-4">
-                    <Label htmlFor="new-date">New Date</Label>
-                    <Input
-                      id="new-date"
-                      type="date"
-                      onChange={(e) => handleReschedule(e.target.value)}
-                    />
-                  </div>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Confirm</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              <Button>Save Changes</Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Status</Label>
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DIJADWALKAN">Scheduled</SelectItem>
-                  <SelectItem value="SELESAI">Completed</SelectItem>
-                  <SelectItem value="TERTUNDA">Pending</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Notes</Label>
-              <Textarea
-                value={notes}
-                onChange={handleNotesChange}
-                className="h-32"
-              />
-            </div>
           </CardContent>
         </Card>
       </div>

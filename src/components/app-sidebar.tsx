@@ -56,10 +56,6 @@ const data = {
       title: "Locations",
       url: "/locations",
       icon: MapPin,
-      items: [
-        { title: "Assign Location", url: "/locations/assign" },
-        { title: "Manage Locations", url: "/locations/manage" },
-      ],
     },
     {
       title: "Inventory",

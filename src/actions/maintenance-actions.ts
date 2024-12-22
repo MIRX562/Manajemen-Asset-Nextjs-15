@@ -166,14 +166,15 @@ export async function updateMaintenance(
 }
 
 // Delete a maintenance record
-export async function deleteMaintenance(id: number) {
+export async function deleteMaintenance(data: any) {
+  console.log(data);
   try {
     return await prisma.maintenance.delete({
-      where: { id },
+      where: { id: data.id },
     });
   } catch (error) {
     console.error(
-      `[deleteMaintenance] Failed to delete maintenance record with ID ${id}:`,
+      `[deleteMaintenance] Failed to delete maintenance record with ID ${data.id}:`,
       error
     );
     throw new Error(

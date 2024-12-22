@@ -2,9 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
-import Link from "next/link";
+import { DataTableRowActions } from "@/components/table/data-table-row-actions";
+import { deleteMaintenance } from "@/actions/maintenance-actions";
 
 export const fullMaintenanceColumns: ColumnDef<{
   id: number;
@@ -89,11 +88,11 @@ export const fullMaintenanceColumns: ColumnDef<{
       <DataTableColumnHeader column={column} title="Action" />
     ),
     cell: ({ row }) => (
-      <Link href={`/maintenance/${row.original.id}`}>
-        <Button variant="ghost" size="icon" className="p-2" aria-label="View">
-          <Eye className="h-4 w-4" />
-        </Button>
-      </Link>
+      <DataTableRowActions
+        row={row}
+        onDelete={deleteMaintenance}
+        viewRoute="/locations"
+      />
     ),
   },
 ];

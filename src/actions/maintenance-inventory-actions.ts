@@ -1,5 +1,8 @@
 "use server";
 import prisma from "@/lib/db";
+import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
+import { LifecycleStage } from "@prisma/client";
+import { z } from "zod";
 
 // Create a MaintenanceInventory record
 export async function createMaintenanceInventory(data: {
@@ -16,6 +19,76 @@ export async function createMaintenanceInventory(data: {
     );
     throw new Error(
       "Unable to create MaintenanceInventory record. Please try again."
+    );
+  }
+}
+//
+export async function scheduleMaintenance(
+  data: z.infer<typeof scheduleMaintenanceSchema>
+) {
+  try {
+    // Validate the data against the schema
+    const validatedData = await scheduleMaintenanceSchema.parse(data);
+
+    // Perform the creation within a transaction
+    return await prisma.$transaction(async (tx) => {
+      // Create the maintenance record
+      const maintenance = await tx.maintenance.create({
+        data: {
+          asset_id: validatedData.asset_id,
+          mechanic_id: validatedData.mechanic_id,
+          scheduled_date: validatedData.scheduled_date,
+          status: validatedData.status,
+          notes: validatedData.notes,
+        },
+      });
+
+      // Check if inventory data is provided
+      if (validatedData.inventory && validatedData.inventory.length > 0) {
+        const inventoryRecords = validatedData.inventory.map((item) => ({
+          maintenance_id: maintenance.id,
+          inventory_id: item.item_id,
+          quantity_used: item.quantity,
+        }));
+
+        // Create associated inventory records
+        await tx.maintenanceInventory.createMany({
+          data: inventoryRecords,
+        });
+      }
+
+      await tx.asset.update({
+        where: {
+          id: data.asset_id,
+        },
+        data: {
+          lifecycle_stage: LifecycleStage.PERBAIKAN,
+        },
+      });
+
+      await tx.assetLifecycle.create({
+        data: {
+          asset_id: validatedData.asset_id,
+          stage: LifecycleStage.PERBAIKAN,
+          change_date: new Date(),
+          notes: validatedData.notes,
+        },
+      });
+
+      return maintenance;
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("[Validation Error]:", error.errors);
+      throw new Error("Invalid input data. Please check your form fields.");
+    }
+
+    console.error(
+      "[createMaintenanceWithInventory] Failed to create maintenance and inventory records:",
+      error
+    );
+    throw new Error(
+      "Unable to create maintenance and inventory records. Please try again."
     );
   }
 }

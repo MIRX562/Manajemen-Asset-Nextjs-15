@@ -45,9 +45,10 @@ import { createAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownContext } from "@/context/dropdown";
 import { createAsset } from "@/actions/assets-actions";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AddAssetForm() {
-  const { assetTypes } = useDropdownContext();
+  const { assetTypes, locations } = useDropdownContext();
   const router = useRouter();
   const form = useForm<z.infer<typeof createAssetSchema>>({
     resolver: zodResolver(createAssetSchema),
@@ -60,11 +61,14 @@ export default function AddAssetForm() {
 
   async function onSubmit(values: z.infer<typeof createAssetSchema>) {
     try {
-      await toast.promise(createAsset(values), {
-        loading: "Creating Asset...",
-        success: "Asset created successfully!",
-        error: (err) => err.message || "Failed to create user",
-      });
+      await toast.promise(
+        createAsset(values, values.location_id, values.lifecycle_notes),
+        {
+          loading: "Creating Asset...",
+          success: "Asset created successfully!",
+          error: (err) => err.message || "Failed to create user",
+        }
+      );
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -73,7 +77,11 @@ export default function AddAssetForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-2
+        "
+      >
         {/* Asset Name */}
         <FormField
           control={form.control}
@@ -201,6 +209,90 @@ export default function AddAssetForm() {
           </div>
         </div>
 
+        {/* Financial Details */}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="initial_value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Initial Value</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>Initial cost of the asset</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="salvage_value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Salvage Value</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Estimated value at the end of its lifecycle
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="useful_life"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Useful Life</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Estimated useful duration in years
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <FormField
+          control={form.control}
+          name="location_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <Select onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations.map((item) => (
+                    <SelectItem key={item.id} value={item.id.toString()}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>where the items is stored</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Status and Lifecycle Stage */}
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-6">
@@ -266,63 +358,22 @@ export default function AddAssetForm() {
           </div>
         </div>
 
-        {/* Financial Details */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="initial_value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Initial Value</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>Initial cost of the asset</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="salvage_value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Salvage Value</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Estimated value at the end of its lifecycle
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="useful_life"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Useful Life</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Estimated useful duration in years
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+        <FormField
+          control={form.control}
+          name="lifecycle_notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lifecycle note</FormLabel>
+              <FormControl>
+                <Textarea className="resize-none" {...field} />
+              </FormControl>
+              <FormDescription>
+                Note for the current asset condition
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Submit Button */}
         <Button type="submit">Submit</Button>

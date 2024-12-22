@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
-import { Asset, AssetStatus, LifecycleStage } from "@prisma/client";
+import { AssetStatus, LifecycleStage } from "@prisma/client";
 import { editAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownContext } from "@/context/dropdown";
 import { editAsset } from "@/actions/assets-actions";
@@ -44,28 +44,35 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Textarea } from "@/components/ui/textarea";
 
 type FormData = z.infer<typeof editAssetSchema>;
 
-interface MyFormProps {
-  data: Asset;
-}
-
-export default function EditAssetForm({ data }: MyFormProps) {
-  const { assetTypes } = useDropdownContext();
+export default function EditAssetForm({ data }: { data: FormData }) {
+  const { assetTypes, locations } = useDropdownContext();
   const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(editAssetSchema),
-    defaultValues: data,
+    defaultValues: {
+      ...data,
+      location_id:
+        data.locationHistory?.[data.locationHistory.length - 1]?.location_id ??
+        undefined, // Get the location from history
+      lifecycle_notes:
+        data.assetLifecycles?.[data.assetLifecycles.length - 1]?.notes ?? "",
+    },
   });
 
   async function onSubmit(values: FormData) {
     try {
-      await toast.promise(editAsset(values), {
-        loading: "Creating Asset...",
-        success: "Asset created successfully!",
-        error: (err) => err.message || "Failed to create user",
-      });
+      await toast.promise(
+        editAsset(values, values.location_id, values.lifecycle_notes),
+        {
+          loading: "Updatin Asset...",
+          success: "Asset updated successfully!",
+          error: (err) => err.message || "Failed to update user",
+        }
+      );
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -325,6 +332,52 @@ export default function EditAssetForm({ data }: MyFormProps) {
             />
           </div>
         </div>
+
+        <FormField
+          control={form.control}
+          name="location_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value.toString()}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations.map((item) => (
+                    <SelectItem key={item.id} value={item.id.toString()}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>where the items is stored</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="lifecycle_notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lifecycle note</FormLabel>
+              <FormControl>
+                <Textarea className="resize-none" {...field} />
+              </FormControl>
+              <FormDescription>
+                Note for the current asset condition
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Submit Button */}
         <Button type="submit">Submit</Button>
