@@ -133,7 +133,7 @@ export default function CheckInForm({ assets }: CheckoutForm) {
           name="actual_return_date"
           render={({ field }) => (
             <FormItem className="flex flex-col w-full">
-              <FormLabel>Actual return Date</FormLabel>
+              <FormLabel>Return Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -162,7 +162,7 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription>WHen the asset is checked out</FormDescription>
+              <FormDescription>When the asset is checked out</FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -1,23 +1,25 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, BarChart3, FileSearch, Settings } from "lucide-react";
+import Link from "next/link";
 
 interface QuickActionProps {
   icon: React.ElementType;
   label: string;
-  onClick: () => void;
+  url: string;
 }
 
-function QuickActionButton({ icon: Icon, label, onClick }: QuickActionProps) {
+function QuickActionButton({ icon: Icon, label, url }: QuickActionProps) {
   return (
     <Button
       variant="outline"
       className="h-24 flex flex-col items-center justify-center space-y-2 bg-background hover:bg-secondary"
-      onClick={onClick}
+      asChild
     >
-      <Icon className="h-8 w-8" />
-      <span className="text-sm font-medium">{label}</span>
+      <Link href={url}>
+        <Icon className="h-8 w-8" />
+        <span className="text-sm font-medium">{label}</span>
+      </Link>
     </Button>
   );
 }
@@ -27,32 +29,32 @@ export function QuickActions() {
     {
       icon: PlusCircle,
       label: "Add Asset",
-      onClick: () => console.log("Add Asset clicked"),
+      url: "/assets",
     },
     {
       icon: BarChart3,
-      label: "Portfolio",
-      onClick: () => console.log("Portfolio clicked"),
+      label: "Add Location",
+      url: "/locations",
     },
     {
       icon: FileSearch,
       label: "Reports",
-      onClick: () => console.log("Reports clicked"),
+      url: "/reports",
     },
     {
       icon: Settings,
       label: "Settings",
-      onClick: () => console.log("Settings clicked"),
+      url: "/settings",
     },
     {
       icon: FileSearch,
-      label: "Reports",
-      onClick: () => console.log("Reports clicked"),
+      label: "Maintenance",
+      url: "/maintenances",
     },
     {
       icon: Settings,
-      label: "Settings",
-      onClick: () => console.log("Settings clicked"),
+      label: "Inventories",
+      url: "/inventories",
     },
   ];
 

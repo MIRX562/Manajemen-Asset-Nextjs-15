@@ -2,18 +2,11 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-const data = [
-  {
-    name: "Checked-Out",
-    total: 345,
-  },
-  {
-    name: "Returned",
-    total: 889,
-  },
-];
-
-export function AssetStatusChart() {
+export function AssetStatusChart({
+  data,
+}: {
+  data: { name: string; total: number }[];
+}) {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>

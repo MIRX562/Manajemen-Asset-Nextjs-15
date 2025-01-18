@@ -1,4 +1,4 @@
-import { getAllAssets } from "@/actions/assets-actions";
+import { getAllAssets, getAssetData } from "@/actions/assets-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { assetColumns } from "./_components/collumn";
@@ -23,6 +23,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AssetsPage() {
   const data = await getAllAssets();
+  const metric = await getAssetData();
   return (
     <div className="flex flex-col w-full h-full py-4 gap-4">
       <div className="w-full flex flex-col md:flex-row gap-2">
@@ -48,7 +49,7 @@ export default async function AssetsPage() {
             <CardTitle>Asset Status Summary</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <AssetStatusChart />
+            <AssetStatusChart data={metric} />
           </CardContent>
         </Card>
         <Card className="col-span-3 ">

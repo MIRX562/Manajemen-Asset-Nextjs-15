@@ -2,12 +2,7 @@ import { getActiveCheckInOuts } from "@/actions/checkinout-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { activeCheckoutsColumns } from "../checkout/_components/collumn";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { getCheckedOutAvailableAssets } from "@/actions/assets-actions";

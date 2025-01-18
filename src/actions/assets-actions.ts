@@ -5,7 +5,6 @@ import {
   createAssetSchema,
   deleteAssetSchema,
   editAssetSchema,
-  getAssetSchema,
 } from "@/schemas/asset-schema";
 import { z } from "zod";
 
@@ -271,3 +270,27 @@ export const getCheckedOutAvailableAssets = async () => {
     throw new Error("Failed to fetch asset");
   }
 };
+
+export async function getAssetData() {
+  const checkedOutAssets = await prisma.checkInOut.count({
+    where: {
+      status: "DIPINJAM", // Adjust this value based on your `AssetStatus` enum
+    },
+  });
+  const returnedAssets = await prisma.checkInOut.count({
+    where: {
+      status: "DIKEMBALIKAN", // Adjust this value based on your `AssetStatus` enum
+    },
+  });
+
+  return [
+    {
+      name: "Checked-Out",
+      total: checkedOutAssets,
+    },
+    {
+      name: "Returned",
+      total: returnedAssets,
+    },
+  ];
+}
