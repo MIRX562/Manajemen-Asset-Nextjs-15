@@ -8,17 +8,21 @@ import {
 } from "@/schemas/asset-schema";
 import { z } from "zod";
 
-export const createAsset = async (
-  data: z.infer<typeof createAssetSchema>,
-  locationId: number, // Location where the asset is initially assigned
-  lifecycleNotes?: string // Optional notes for the lifecycle stage
-) => {
+export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
   const value = createAssetSchema.parse(data);
+  console.log(value);
 
   try {
     const asset = await prisma.asset.create({
       data: {
-        ...value,
+        name: value.name,
+        type_id: value.type_id,
+        status: value.status,
+        purchase_date: value.purchase_date,
+        initial_value: value.initial_value,
+        salvage_value: value.salvage_value,
+        useful_life: value.useful_life,
+        lifecycle_stage: value.lifecycle_stage,
       },
     });
 
@@ -26,7 +30,7 @@ export const createAsset = async (
     await prisma.assetLocationHistory.create({
       data: {
         asset_id: asset.id,
-        location_id: locationId,
+        location_id: data.location_id,
         assigned_date: new Date(),
       },
     });
@@ -38,7 +42,7 @@ export const createAsset = async (
         stage: value.lifecycle_stage,
         change_date: new Date(),
         notes:
-          lifecycleNotes ||
+          data.lifecycle_notes ||
           `Asset created with stage: ${value.lifecycle_stage}`,
       },
     });

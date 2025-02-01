@@ -61,14 +61,12 @@ export default function AddAssetForm() {
 
   async function onSubmit(values: z.infer<typeof createAssetSchema>) {
     try {
-      await toast.promise(
-        createAsset(values, values.location_id, values.lifecycle_notes),
-        {
-          loading: "Creating Asset...",
-          success: "Asset created successfully!",
-          error: (err) => err.message || "Failed to create user",
-        }
-      );
+      console.log({ values });
+      toast.promise(createAsset(values), {
+        loading: "Creating Asset...",
+        success: "Asset created successfully!",
+        error: (err) => err.message || "Failed to create user",
+      });
       router.refresh();
     } catch (error) {
       console.error(error);

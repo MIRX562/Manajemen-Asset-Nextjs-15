@@ -20,6 +20,28 @@ export async function createCheckInOut(data: {
   }
 }
 
+export async function checkIn(data: {
+  asset_id: number;
+  actual_return_date: Date;
+}) {
+  try {
+    return await prisma.checkInOut.update({
+      where: {
+        asset_id: data.asset_id,
+      },
+      data: {
+        actual_return_date: data.actual_return_date8,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "[createCheckInOut] Failed to create CheckInOut record:",
+      error
+    );
+    throw new Error("Failed to create CheckInOut record. Please try again.");
+  }
+}
+
 // Get all CheckInOut records
 export async function getAllCheckInOuts() {
   try {

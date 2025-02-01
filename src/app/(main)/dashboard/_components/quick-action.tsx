@@ -49,12 +49,12 @@ export function QuickActions() {
     {
       icon: FileSearch,
       label: "Maintenance",
-      url: "/maintenances",
+      url: "/maintenance",
     },
     {
       icon: Settings,
-      label: "Inventories",
-      url: "/inventories",
+      label: "Inventory",
+      url: "/inventory",
     },
   ];
 
