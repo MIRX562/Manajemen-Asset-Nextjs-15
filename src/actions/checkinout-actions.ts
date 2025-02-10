@@ -20,17 +20,18 @@ export async function createCheckInOut(data: {
   }
 }
 
-export async function checkIn(data: {
-  asset_id: number;
-  actual_return_date: Date;
-}) {
+export async function checkIn(data: { id: number; actual_return_date: Date }) {
+  if (!data) {
+    throw Error;
+  }
   try {
-    return await prisma.checkInOut.update({
+    await prisma.checkInOut.update({
       where: {
-        asset_id: data.asset_id,
+        id: data.id,
       },
       data: {
-        actual_return_date: data.actual_return_date8,
+        actual_return_date: data.actual_return_date,
+        status: "DIKEMBALIKAN",
       },
     });
   } catch (error) {
@@ -57,6 +58,30 @@ export async function getAllCheckInOuts() {
       error
     );
     throw new Error("Failed to retrieve CheckInOut records. Please try again.");
+  }
+}
+
+export async function getAllActiveCheckoutsForm() {
+  try {
+    return await prisma.checkInOut.findMany({
+      where: {
+        actual_return_date: null, // Assuming active checkouts have no return date
+      },
+      select: {
+        id: true,
+        asset: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(
+      "[getAllActiveCheckoutsForm] Failed to retrieve active checkouts:",
+      error
+    );
+    throw new Error("Failed to retrieve active checkouts. Please try again.");
   }
 }
 
@@ -137,7 +162,7 @@ export async function getActiveCheckOuts() {
     });
   } catch (error) {
     console.error(
-      `[getCheckInOutsByUserId] Failed to retrieve records for User ID ${user_id}:`,
+      `[getCheckInOutsByUserId] Failed to retrieve records for User ID:`,
       error
     );
     throw new Error(
@@ -191,7 +216,7 @@ export async function deleteCheckInOut(id: number) {
 export async function getActiveCheckInOuts() {
   try {
     return await prisma.checkInOut.findMany({
-      where: { status: "DIPINJAM" },
+      where: { actual_return_date: null },
       include: {
         asset: {
           select: {

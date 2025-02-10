@@ -31,39 +31,35 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { checkIn } from "@/actions/checkinout-actions";
 
 const formSchema = z.object({
   id: z.number(),
-  actual_return_date: z.coerce.date().optional(),
+  actual_return_date: z.coerce.date(),
 });
 
-type CheckoutForm = {
-  assets: {
-    id: number;
+type CheckedOutAssets = {
+  id: number;
+  asset: {
     name: string;
-  }[];
-};
+  };
+}[];
 
-export default function CheckInForm({ assets }: CheckoutForm) {
+export default function CheckInForm({ data }: { data: CheckedOutAssets }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      id: undefined,
       actual_return_date: new Date(),
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
+    toast.promise(checkIn(values), {
+      loading: "Checking in...",
+      success: "Asset checked in",
+      error: "Something went wrong!",
+    });
   }
 
   return (
@@ -87,7 +83,8 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                       )}
                     >
                       {field.value
-                        ? assets.find((asset) => asset.id === field.value)?.name
+                        ? data.find((item) => item.id === field.value)?.asset
+                            .name
                         : "Select asset"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -99,20 +96,16 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                     <CommandList>
                       <CommandEmpty>No asset found.</CommandEmpty>
                       <CommandGroup>
-                        {assets.map((asset) => (
+                        {data.map(({ id, asset }) => (
                           <CommandItem
-                            value={asset.name}
-                            key={asset.id}
-                            onSelect={() => {
-                              form.setValue("id", asset.id);
-                            }}
+                            key={id}
+                            value={id.toString()}
+                            onSelect={() => form.setValue("id", id)}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                asset.id === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
+                                id === field.value ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {asset.name}
@@ -123,7 +116,7 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <FormDescription>Select asset to checkout</FormDescription>
+              <FormDescription>Select asset to check in</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -138,7 +131,7 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant={"outline"}
+                      variant="outline"
                       className={cn(
                         "w-[240px] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
@@ -157,17 +150,17 @@ export default function CheckInForm({ assets }: CheckoutForm) {
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={(date) => field.onChange(date || new Date())}
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription>When the asset is checked out</FormDescription>
+              <FormDescription>When the asset is checked in</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Checkin</Button>
+        <Button type="submit">Check In</Button>
       </form>
     </Form>
   );

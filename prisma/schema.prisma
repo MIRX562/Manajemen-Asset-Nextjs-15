@@ -215,7 +215,7 @@ model MaintenanceInventory {
 
 model CheckInOut {
   id                   Int              @id @default(autoincrement())
-  asset_id             Int
+  asset_id             Int 
   user_id              Int
   employee_id          Int
   check_out_date       DateTime
