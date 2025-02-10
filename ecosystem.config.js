@@ -1,12 +1,12 @@
-module.exports = {
+export default {
   apps: [
     {
       name: "am-kp",
       script: "npm",
       args: "run start",
       watch: true,
-      instances: "max",
-      exec_mode: "cluster",
+      instances: 4,
+      exec_mode: "fork",
       autorestart: true,
     },
   ],
