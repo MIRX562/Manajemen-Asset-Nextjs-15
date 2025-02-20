@@ -41,7 +41,6 @@ export const DropdownProvider = ({
         setMechanics(mechanicRes.mechanics);
       } catch (error) {
         console.error("Failed to fetch dropdown data", error);
-      } finally {
       }
     };
 

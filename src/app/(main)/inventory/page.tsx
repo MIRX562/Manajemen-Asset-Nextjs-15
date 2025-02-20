@@ -1,9 +1,7 @@
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
-import InsertDataDialog from "@/components/table/insertDataButton";
 import { inventoryColumns } from "./_components/collumn";
 import { getAllInventoryItems } from "@/actions/inventory-actions";
-import AddInventoryForm from "./_components/form-add";
 import InventoryMetrics from "./_components/metrics";
 import RecentUpdatesWidget from "./_components/recent-updates";
 import QuickActionsInventory from "./_components/quick-actions";

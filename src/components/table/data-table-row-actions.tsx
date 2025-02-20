@@ -49,7 +49,7 @@ export function DataTableRowActions<TData>({
               onClick={() =>
                 router.push(
                   `${viewRoute}/${
-                    data.name || data.model || data.username
+                    data.name || data.model || data.username || "details"
                   }?id=${data.id}`
                 )
               }

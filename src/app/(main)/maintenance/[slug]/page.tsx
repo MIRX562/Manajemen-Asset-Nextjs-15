@@ -8,11 +8,9 @@ export default async function Page(props: {
   params: Params;
   searchParams: SearchParams;
 }) {
-  const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const slug = await params.slug;
-  const id = parseInt(slug);
+  const id = parseInt(searchParams.id);
 
   const data = await getMaintenanceById(id);
 

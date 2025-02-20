@@ -236,7 +236,7 @@ export const getAvailableAssets = async () => {
           checkInOuts: {
             some: {
               actual_return_date: null,
-              status: "DIPINJAM", // Assuming 'CHECKED_OUT' represents active checkouts
+              status: "DIPINJAM",
             },
           },
         },

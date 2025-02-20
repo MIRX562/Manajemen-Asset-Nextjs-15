@@ -1,7 +1,4 @@
-import {
-  getActiveCheckInOuts,
-  getCheckoutMetrics,
-} from "@/actions/checkinout-actions";
+import { getActiveCheckInOuts } from "@/actions/checkinout-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { activeCheckoutsColumns } from "./_components/collumn";
@@ -12,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import CheckoutForm from "./_components/form-checkout";
+import { CheckoutForm } from "./_components/form-checkout";
 import { getAvailableAssets } from "@/actions/assets-actions";
 import { getAllEMployeesDropdown } from "@/actions/employee-actions";
 import CheckoutMetrics from "./_components/metrics";
@@ -21,7 +18,6 @@ export default async function page() {
   const data = await getActiveCheckInOuts();
   const assets = await getAvailableAssets();
   const employees = await getAllEMployeesDropdown();
-  const metrics = await getCheckoutMetrics();
   return (
     <div className="flex flex-col w-full pt-4 space-y-4">
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">

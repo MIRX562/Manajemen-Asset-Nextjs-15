@@ -9,7 +9,7 @@ import LocationHeader from "./_components/metrics";
 export default async function LocationPage() {
   const data = await getAllLocations();
   return (
-    <div className="flex flex-col w-full h-full items-center pt-4 gap-4">
+    <div className="flex flex-col w-full h-full items-center py-4 gap-4">
       <LocationHeader />
       <DataTable
         columns={locationColumns}

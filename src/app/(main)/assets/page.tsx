@@ -25,7 +25,7 @@ export default async function AssetsPage() {
   const data = await getAllAssets();
   const metric = await getAssetData();
   return (
-    <div className="flex flex-col w-full h-full py-4 gap-4">
+    <div className="flex flex-col w-full py-4 gap-4">
       <div className="w-full flex flex-col md:flex-row gap-2">
         <h1 className="text-3xl font-bold">Asset Management Overview</h1>
         <div className="flex justify-center items-center ml-auto gap-2">

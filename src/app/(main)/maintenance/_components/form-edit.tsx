@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
-export default function form-edit() {
-  return (
-    <div>form-edit</div>
-  )
+export default function Formedit() {
+  return <div>form-edit</div>;
 }

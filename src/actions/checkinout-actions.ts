@@ -1,4 +1,6 @@
 "use server";
+import { CheckOutForm } from "@/app/(main)/assets/checkout/_components/form-checkout";
+import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 // Create a CheckInOut record
@@ -323,9 +325,10 @@ export const getCheckoutMetrics = async () => {
 
   const availableAssets = await prisma.asset.count({
     where: {
+      status: "AKTIF",
       checkInOuts: {
-        every: {
-          status: "DIKEMBALIKAN",
+        none: {
+          status: "DIPINJAM",
         },
       },
     },
@@ -354,3 +357,46 @@ export const getCheckoutMetrics = async () => {
     checkoutsInProgress,
   };
 };
+
+export async function checkoutAsset(data: CheckOutForm) {
+  if (!data) {
+    throw new Error("no data recieved");
+  }
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("not authorized");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // Create checkout record
+    const checkout = await tx.checkInOut.create({
+      data: {
+        asset_id: data.asset_id,
+        user_id: user.id,
+        employee_id: data.employee_id,
+        check_out_date: data.check_out_date,
+        expected_return_date: data.expected_return_date,
+        status: "DIPINJAM",
+      },
+    });
+
+    // Update asset status (optional)
+    await tx.asset.update({
+      where: { id: data.asset_id },
+      data: { status: "TIDAK_AKTIF" },
+    });
+
+    // Log activity
+    await tx.activityLog.create({
+      data: {
+        user_id: user.id,
+        action: "Checkout Asset",
+        target_type: "ASSET",
+        target_id: data.asset_id,
+        timestamp: new Date(),
+      },
+    });
+
+    return checkout;
+  });
+}

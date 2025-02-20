@@ -1,6 +1,8 @@
 "use server";
 import prisma from "@/lib/db";
+import { updateMaintenanceStatusSchema } from "@/schemas/maintenance-schema";
 import { endOfWeek, startOfWeek } from "date-fns";
+import { z } from "zod";
 
 // Get upcoming maintenance tasks
 export async function getUpcomingMaintenance() {
@@ -139,20 +141,17 @@ export async function getMaintenancesByMechanicId(mechanic_id: number) {
 }
 
 // Update a maintenance record
-export async function updateMaintenance(
-  id: number,
-  data: {
-    asset_id?: number;
-    mechanic_id?: number;
-    scheduled_date?: Date;
-    status?: "DIJADWALKAN" | "SELESAI" | "TERTUNDA";
-    notes?: string;
-  }
+export async function updateMaintenanceStatus(
+  data: z.infer<typeof updateMaintenanceStatusSchema>
 ) {
+  const { id, maintenance_status, notes } = data;
   try {
     return await prisma.maintenance.update({
       where: { id },
-      data,
+      data: {
+        notes,
+        status: maintenance_status,
+      },
     });
   } catch (error) {
     console.error(

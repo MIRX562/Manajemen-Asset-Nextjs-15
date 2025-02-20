@@ -31,7 +31,7 @@ export async function GET(request: Request) {
             controller.close();
           }
         }
-      }, 5000); // Poll every 5 seconds
+      }, 360000); // Poll every x seconds
 
       // Stop polling and close the stream when client disconnects
       request.signal.addEventListener("abort", () => {

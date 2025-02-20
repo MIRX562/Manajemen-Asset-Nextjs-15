@@ -5,8 +5,7 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { formatCurrency } from "@/lib/utils";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import EditInventoryForm from "./form-edit";
-import { deleteAsset } from "@/actions/assets-actions";
-import { Inventory } from "@prisma/client";
+import { deleteInventoryItem } from "@/actions/inventory-actions";
 
 export const inventoryColumns: ColumnDef<{
   id: number;
@@ -16,6 +15,7 @@ export const inventoryColumns: ColumnDef<{
   reorder_level: number;
   unit_price: number;
   location?: { name: string } | null;
+  location_id: number;
   created_at: Date;
   updated_at: Date;
 }>[] = [
@@ -95,7 +95,7 @@ export const inventoryColumns: ColumnDef<{
       <DataTableRowActions
         row={row}
         EditComponent={EditInventoryForm}
-        onDelete={deleteAsset}
+        onDelete={deleteInventoryItem}
         viewRoute="/inventory"
       />
     ),

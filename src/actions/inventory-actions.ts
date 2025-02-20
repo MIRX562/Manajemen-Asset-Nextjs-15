@@ -166,14 +166,25 @@ export const useInventory = async (items: UseInventoryInput) => {
 };
 
 // Delete an inventory item
-export async function deleteInventoryItem(id: number) {
+export async function deleteInventoryItem(data: {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  reorder_level: number;
+  unit_price: number;
+  location?: { name: string } | null;
+  location_id: number;
+  created_at: Date;
+  updated_at: Date;
+}) {
   try {
     return await prisma.inventory.delete({
-      where: { id },
+      where: { id: data.id },
     });
   } catch (error) {
     console.error(
-      `[deleteInventoryItem] Failed to delete inventory item with ID ${id}:`,
+      `[deleteInventoryItem] Failed to delete inventory item with ID ${data.id}:`,
       error
     );
     throw new Error("Failed to delete the inventory item. Please try again.");

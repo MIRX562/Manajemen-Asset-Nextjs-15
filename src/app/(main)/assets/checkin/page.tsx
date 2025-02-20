@@ -13,13 +13,12 @@ import CheckInForm from "./_component/form-checkin";
 export default async function Page() {
   const data = await getActiveCheckInOuts();
   const assets = await getAllActiveCheckoutsForm();
-  console.log(assets);
   return (
     <div className="flex flex-col w-full pt-4 space-y-4">
       <div className="flex w-full items-center justify-between">
         <h1 className="text-3xl font-bold">Active Checkouts</h1>
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button>Checkin Asset</Button>
           </DialogTrigger>
           <DialogContent>

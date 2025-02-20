@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { CheckInOutStatus } from "@prisma/client";
 
 export const activeCheckoutsColumns: ColumnDef<{
   id: number;
@@ -11,7 +12,7 @@ export const activeCheckoutsColumns: ColumnDef<{
   check_out_date: Date;
   expected_return_date: Date;
   actual_return_date: Date | null;
-  status: string; // Assuming $Enums.CheckInOutStatus resolves to a string
+  status: CheckInOutStatus;
   created_at: Date;
   updated_at: Date;
   asset: { name: string };

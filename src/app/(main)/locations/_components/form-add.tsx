@@ -35,7 +35,7 @@ export default function AddLocationForm() {
 
   async function onSubmit(data: z.infer<typeof createLocationSchema>) {
     try {
-      await toast.promise(createLocation(data), {
+      toast.promise(createLocation(data), {
         loading: "creating new location...",
         success: "new location created",
         error: "failed to create the location",

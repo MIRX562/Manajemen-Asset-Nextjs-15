@@ -31,13 +31,16 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { checkoutAsset } from "@/actions/checkinout-actions";
 
-const formSchema = z.object({
+export const checkOutSchema = z.object({
   asset_id: z.number(),
   employee_id: z.number(),
   check_out_date: z.coerce.date(),
-  expected_return_date: z.coerce.date().optional(),
+  expected_return_date: z.coerce.date().nullable(),
 });
+
+export type CheckOutForm = z.infer<typeof checkOutSchema>;
 
 type CheckoutForm = {
   assets: {
@@ -50,25 +53,23 @@ type CheckoutForm = {
   }[];
 };
 
-export default function CheckoutForm({ assets, employees }: CheckoutForm) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+export function CheckoutForm({ assets, employees }: CheckoutForm) {
+  const form = useForm<z.infer<typeof checkOutSchema>>({
+    resolver: zodResolver(checkOutSchema),
     defaultValues: {
       check_out_date: new Date(),
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof checkOutSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      toast.promise(checkoutAsset(values), {
+        loading: "Checking out asset...",
+        success: "Asset checked out",
+        error: "Failed to checkout asset",
+      });
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
     }
   }
 

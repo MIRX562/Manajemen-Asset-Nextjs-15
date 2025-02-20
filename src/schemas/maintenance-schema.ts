@@ -22,3 +22,9 @@ export const scheduleMaintenanceSchema = z.object({
 export const editMaintenanceSchema = scheduleMaintenanceSchema.extend({
   id: z.number(),
 });
+
+export const updateMaintenanceStatusSchema = z.object({
+  maintenance_status: z.nativeEnum(MaintenanceStatus),
+  notes: z.string(),
+  id: z.coerce.number(),
+});

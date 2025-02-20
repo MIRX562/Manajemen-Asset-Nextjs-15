@@ -91,7 +91,7 @@ export const fullMaintenanceColumns: ColumnDef<{
       <DataTableRowActions
         row={row}
         onDelete={deleteMaintenance}
-        viewRoute="/locations"
+        viewRoute="/maintenance"
       />
     ),
   },

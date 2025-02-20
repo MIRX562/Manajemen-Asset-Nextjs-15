@@ -20,16 +20,18 @@ import {
   BoxIcon,
   UserIcon,
   ClockIcon,
+  NotebookText,
 } from "lucide-react";
 import { Inventory, MaintenanceStatus } from "@prisma/client";
 import Link from "next/link";
+import UpdateMaintenaceForm from "./_components/form-update";
 
 interface Maintenance {
-  id: string;
+  id: number;
   asset: {
     name: string;
     status: string;
-    type_id: string;
+    type_id: number;
     purchase_date: string;
     lifecycle_stage: string;
     initial_value: number;
@@ -44,7 +46,7 @@ interface Maintenance {
   status: MaintenanceStatus;
   notes: string;
   inventoryItems: Array<{
-    inventory_id: string;
+    inventory_id: number;
     quantity_used: number;
     inventory: Inventory;
   }>;
@@ -95,7 +97,7 @@ export default function MaintenanceDetailView({
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-full">
+        <Card className="col-span-full lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center">
               <WrenchIcon className="mr-2 h-5 w-5" />
@@ -130,7 +132,26 @@ export default function MaintenanceDetailView({
           </CardContent>
         </Card>
 
-        <Card className="col-span-full md:col-span-1 lg:col-span-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <ClockIcon className="mr-2 h-5 w-5" />
+              Timestamps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label>Created At</Label>
+              <p>{formatDate(maintenance.created_at)}</p>
+            </div>
+            <div>
+              <Label>Updated At</Label>
+              <p>{formatDate(maintenance.updated_at)}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <BoxIcon className="mr-2 h-5 w-5" />
@@ -205,25 +226,6 @@ export default function MaintenanceDetailView({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <ClockIcon className="mr-2 h-5 w-5" />
-              Timestamps
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Created At</Label>
-              <p>{formatDate(maintenance.created_at)}</p>
-            </div>
-            <div>
-              <Label>Updated At</Label>
-              <p>{formatDate(maintenance.updated_at)}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-full md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center">
               <BoxIcon className="mr-2 h-5 w-5" />
               Inventory Items Used
             </CardTitle>
@@ -237,6 +239,22 @@ export default function MaintenanceDetailView({
                 </li>
               ))}
             </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-full">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <NotebookText className="mr-2 h-5 w-5" />
+              Maintenace Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <UpdateMaintenaceForm
+              maintenance_status={maintenance.status}
+              notes={maintenance.notes}
+              id={maintenance.id}
+            />
           </CardContent>
         </Card>
       </div>
