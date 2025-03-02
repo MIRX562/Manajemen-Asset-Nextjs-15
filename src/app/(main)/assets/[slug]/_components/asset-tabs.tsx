@@ -23,8 +23,8 @@ interface AssetTabsProps {
 
 export default function AssetTabs({ assetData }: AssetTabsProps) {
   return (
-    <Tabs defaultValue="location" className="space-y-4">
-      <TabsList>
+    <Tabs defaultValue="location" className="space-y-4 flex flex-col w-full">
+      <TabsList className="mx-auto">
         <TabsTrigger value="location">Location History</TabsTrigger>
         <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         <TabsTrigger value="checkinout">Check In/Out</TabsTrigger>

@@ -32,9 +32,8 @@ import {
   ClipboardList,
   PackageSearch,
   Users,
-  Download,
 } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 
 const reportTypes = [
   {
@@ -85,13 +84,6 @@ export default function ReportsPage() {
           Generate and customize various reports based on available data
           schemas.
         </p>
-        <div className="flex gap-4">
-          <Button>Create New Report</Button>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export All
-          </Button>
-        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -108,8 +100,14 @@ export default function ReportsPage() {
     </div>
   );
 }
+type ReportCard = {
+  title: string;
+  description: string;
+  icon: ReactNode;
+  model: string;
+};
 
-function ReportCard({ title, description, icon, model }) {
+function ReportCard({ title, description, icon, model }: ReportCard) {
   return (
     <Card className="hover:shadow-lg transition-shadow duration-300">
       <CardHeader>
@@ -141,7 +139,7 @@ function ReportCard({ title, description, icon, model }) {
   );
 }
 
-function ReportCustomizationForm({ model }) {
+function ReportCustomizationForm({ model }: { model: string }) {
   const fields = getFieldsForModel(model);
 
   return (
@@ -223,7 +221,7 @@ function FieldCheckbox({ id, label }) {
   );
 }
 
-function getFieldsForModel(model) {
+function getFieldsForModel(model: string) {
   switch (model) {
     case "Asset":
       return [

@@ -5,7 +5,7 @@ import { z } from "zod"; // Optional schema validation
 // Define the request body schema for validation (optional)
 const LoginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string(),
 });
 
 export async function POST(req: Request) {

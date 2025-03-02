@@ -10,6 +10,13 @@ generator client {
   binaryTargets = ["linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
+//enums
+enum Role {
+  ADMIN
+  INVENTARIS
+  TEKNISI
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   username   String   @unique
@@ -22,18 +29,13 @@ model User {
   // Relasi
   activityLogs  ActivityLog[]
   maintenances  Maintenance[]    @relation("UserMaintenance")
-  notifications Notifications[]
   Session       Session[]
   CheckInOut    CheckInOut[]
 
   @@map("users")
 }
 
-enum Role {
-  ADMIN
-  INVENTARIS
-  TEKNISI
-}
+
 
 model Employee {
   id         Int      @id @default(autoincrement())
@@ -237,7 +239,6 @@ enum CheckInOutStatus {
   DIPINJAM
   DIKEMBALIKAN
   JATUH_TEMPO
-  
 }
 
 model ActivityLog {
@@ -265,12 +266,8 @@ model Notifications {
   user_id    Int
   message    String
   type       NotificationType
-  is_read    Boolean          @default(false)
   created_at DateTime         @default(now())
   updated_at DateTime         @updatedAt
-
-  // Relasi
-  user User @relation(fields: [user_id], references: [id])
 
   @@map("notifications")
 }
@@ -278,8 +275,6 @@ model Notifications {
 enum NotificationType {
   PEMELIHARAAN
   STOK_RENDAH
-  CHECKOUT_TERLAMBAT
-  STATUS_ASET
 }
 
 model Session {

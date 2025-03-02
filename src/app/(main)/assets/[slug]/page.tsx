@@ -12,13 +12,13 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const slug = await params.slug;
+  const slug = params.slug;
   const id = parseInt(searchParams.id);
 
   const data = await getAssetById(id);
 
   return (
-    <div className="container flex flex-col gap-4 mt-4">
+    <div className="flex flex-col gap-4 mt-4">
       <h1 className="text-3xl font-bold">{decodeURI(slug)}</h1>
       <AssetOverview assetData={data} />
       <AssetTabs assetData={data} />

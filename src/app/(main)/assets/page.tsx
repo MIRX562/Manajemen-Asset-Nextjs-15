@@ -1,4 +1,4 @@
-import { getAllAssets, getAssetData } from "@/actions/assets-actions";
+import { getAllAssets } from "@/actions/assets-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { assetColumns } from "./_components/collumn";
@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { AssetStatusChart } from "../assets/_components/asset-status-chart";
 import { RecentCheckouts } from "../assets/_components/recent-checkouts";
 import AssetStats from "./_components/metrics";
 
@@ -23,7 +22,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AssetsPage() {
   const data = await getAllAssets();
-  const metric = await getAssetData();
   return (
     <div className="flex flex-col w-full py-4 gap-4">
       <div className="w-full flex flex-col md:flex-row gap-2">
@@ -42,28 +40,7 @@ export default async function AssetsPage() {
       </div>
 
       <AssetStats />
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Asset Status Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <AssetStatusChart data={metric} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3 ">
-          <CardHeader>
-            <CardTitle>Recent Check-Outs</CardTitle>
-            <CardDescription>
-              Latest assets checked out from the system
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="max-h-[300px] overflow-auto">
-            <RecentCheckouts />
-          </CardContent>
-        </Card>
-      </div>
+      <RecentCheckouts />
 
       <div className="space-y-2 pb-4">
         <h1 className="text-2xl font-bold">All Assets</h1>
