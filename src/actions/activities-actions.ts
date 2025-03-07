@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 export async function createActivityLog(data: {
@@ -64,11 +65,12 @@ export async function getActivityLogsByUserId(user_id: number) {
   });
 }
 
-export async function getActivityLogById(id: number) {
-  return await prisma.activityLog.findUnique({
-    where: { id },
-    include: {
-      user: true,
-    },
+export async function getUserActivityLog() {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    return null;
+  }
+  return await prisma.activityLog.findMany({
+    where: { user_id: user.id },
   });
 }

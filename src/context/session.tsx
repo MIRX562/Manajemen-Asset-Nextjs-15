@@ -1,6 +1,5 @@
 "use client";
 
-import { getCurrentUser } from "@/actions/get-current-user";
 import { getCurrentSession } from "@/lib/auth";
 import { User } from "@prisma/client";
 import React, {
@@ -11,33 +10,36 @@ import React, {
   ReactNode,
 } from "react";
 
-// Define the user type based on your server action's return type
-
-// Define the context value type
 interface UserContextValue {
   user: User | null;
   loading: boolean;
 }
 
-// Create the context
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
-// Props for the provider
 interface UserProviderProps {
   children: ReactNode;
 }
 
-// Create a provider component
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== "undefined") {
+      const cachedUser = sessionStorage.getItem("user");
+      return cachedUser ? JSON.parse(cachedUser) : null;
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(!user);
 
   useEffect(() => {
+    if (user) return; // If user is already cached, skip fetching
+
     async function fetchUser() {
       setLoading(true);
       try {
         const { user } = await getCurrentSession();
         setUser(user);
+        sessionStorage.setItem("user", JSON.stringify(user)); // Cache in sessionStorage
       } catch (error) {
         console.error("Error fetching user:", error);
         setUser(null);
@@ -47,7 +49,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     fetchUser();
-  }, []);
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, loading }}>
@@ -56,7 +58,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   );
 };
 
-// Custom hook to use the UserContext
 export const useUser = (): UserContextValue => {
   const context = useContext(UserContext);
   if (!context) {

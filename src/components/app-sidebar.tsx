@@ -3,10 +3,8 @@
 import * as React from "react";
 import {
   Archive,
-  Bell,
   BookA,
   Box,
-  Clipboard,
   FileText,
   GalleryVerticalEnd,
   MapPin,

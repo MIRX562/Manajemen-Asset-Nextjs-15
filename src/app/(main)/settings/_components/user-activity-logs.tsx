@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { getUserActivityLog } from "@/actions/activities-actions";
 import {
   Card,
   CardContent,
@@ -6,10 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { formatDate } from "@/lib/utils";
 import { FileText } from "lucide-react";
 import React from "react";
 
-export default function UserActivityLogs() {
+export default async function UserActivityLogs() {
+  const activities = await getUserActivityLog();
+  if (!activities) {
+    return null;
+  }
   return (
     <Card className="col-span-full">
       <CardHeader>
@@ -19,56 +24,16 @@ export default function UserActivityLogs() {
       </CardHeader>
       <CardContent className="max-h-[400px] overflow-auto mb-4">
         <ul className="space-y-2">
-          <li className="bg-secondary p-2 rounded">
-            DELETE - MAINTENANCE - 17 - 2024-12-09 20:57:57
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            UPDATE - ASSET - 23 - 2024-12-08 15:30:22
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            CREATE - USER - 5 - 2024-12-07 09:15:43
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            DELETE - MAINTENANCE - 17 - 2024-12-09 20:57:57
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            UPDATE - ASSET - 23 - 2024-12-08 15:30:22
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            CREATE - USER - 5 - 2024-12-07 09:15:43
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            DELETE - MAINTENANCE - 17 - 2024-12-09 20:57:57
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            UPDATE - ASSET - 23 - 2024-12-08 15:30:22
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            CREATE - USER - 5 - 2024-12-07 09:15:43
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            DELETE - MAINTENANCE - 17 - 2024-12-09 20:57:57
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            UPDATE - ASSET - 23 - 2024-12-08 15:30:22
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            CREATE - USER - 5 - 2024-12-07 09:15:43
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            DELETE - MAINTENANCE - 17 - 2024-12-09 20:57:57
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            UPDATE - ASSET - 23 - 2024-12-08 15:30:22
-          </li>
-          <li className="bg-secondary p-2 rounded">
-            CREATE - USER - 5 - 2024-12-07 09:15:43
-          </li>
+          {activities.length == 0 && <p>no activity yet</p>}
+          {activities?.map((activity) => (
+            <li key={activity.id} className="bg-secondary p-2 rounded">
+              {activity.action} - {activity.target_type}:{activity.target_id} -{" "}
+              {formatDate(activity.timestamp.toString())}
+            </li>
+          ))}
         </ul>
       </CardContent>
-      <CardFooter>
-        <Button variant="link">View All Logs</Button>
-      </CardFooter>
+      <CardFooter></CardFooter>
     </Card>
   );
 }

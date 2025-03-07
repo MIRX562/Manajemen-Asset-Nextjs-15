@@ -26,4 +26,4 @@ jobs:
       - run: npm ci --legacy-peer-dep
       - run: npx prisma generate
       - run: npm run build
-      - run: 'touch .env && echo DATABASE_URL: "postgresql://neondb_owner:UZlt2fH0QEud@ep-raspy-haze-a59x6v9m.us-east-2.aws.neon.tech/neondb?sslmode=require" NODE_ENV="Production" >> .env'
+      - run: 'touch .env && echo DATABASE_URL="postgresql://neondb_owner:UZlt2fH0QEud@ep-raspy-haze-a59x6v9m.us-east-2.aws.neon.tech/neondb?sslmode=require" >> .env && echo NODE_ENV="Production" >> .env'

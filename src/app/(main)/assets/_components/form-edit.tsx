@@ -106,7 +106,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
               name="type_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Language</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -128,7 +128,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0">
                       <Command>
-                        <CommandInput placeholder="Search language..." />
+                        <CommandInput placeholder="Search type..." />
                         <CommandList>
                           <CommandEmpty>No language found.</CommandEmpty>
                           <CommandGroup>
@@ -156,9 +156,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                       </Command>
                     </PopoverContent>
                   </Popover>
-                  <FormDescription>
-                    This is the language that will be used in the dashboard.
-                  </FormDescription>
+                  <FormDescription>Asset type.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

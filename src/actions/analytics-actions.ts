@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/db";
 import { calculateDepreciation } from "@/lib/utils";
-import { endOfMonth, format, startOfMonth, subYears } from "date-fns";
+import { endOfMonth, startOfMonth, subYears } from "date-fns";
 
 export async function getDashboardSummary() {
   const [

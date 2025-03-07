@@ -5,16 +5,7 @@ import { assetColumns } from "./_components/collumn";
 import InsertDataDialog from "@/components/table/insertDataButton";
 import AddAssetForm from "./_components/form-add";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
 import { RecentCheckouts } from "../assets/_components/recent-checkouts";
 import AssetStats from "./_components/metrics";
 

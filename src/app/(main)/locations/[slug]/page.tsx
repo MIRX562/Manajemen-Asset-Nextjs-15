@@ -9,7 +9,6 @@ import {
   BuildingIcon,
   FileTextIcon,
 } from "lucide-react";
-import { assetColumns } from "../../assets/_components/collumn";
 import { getLocationById } from "@/actions/location-actions";
 import {
   assetLocationHistoryColumns,
@@ -26,7 +25,7 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const slug = await params.slug;
+  const slug = params.slug;
   const id = parseInt(searchParams.id);
 
   const data = await getLocationById(id);

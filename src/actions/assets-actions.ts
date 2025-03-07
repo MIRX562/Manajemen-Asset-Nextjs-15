@@ -163,11 +163,16 @@ export const getAllAssets = async () => {
   try {
     const assets = await prisma.asset.findMany({
       include: {
-        type: true,
-        locationHistory: true,
-        maintenances: true,
-        checkInOuts: true,
-        assetLifecycles: true,
+        assetLifecycles: {
+          select: {
+            notes: true,
+          },
+        },
+        locationHistory: {
+          select: {
+            location_id: true,
+          },
+        },
       },
     });
     return assets;
