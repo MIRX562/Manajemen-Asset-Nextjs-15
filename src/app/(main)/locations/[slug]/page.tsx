@@ -15,6 +15,7 @@ import {
   simplifiedInventoryColumns,
 } from "./_components/collumn";
 
+export const dynamic = "force-dynamic";
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 

@@ -6,6 +6,8 @@ import { getAllLocations } from "@/actions/location-actions";
 import AddLocationForm from "./_components/form-add";
 import LocationHeader from "./_components/metrics";
 
+export const dynamic = "force-dynamic";
+
 export default async function LocationPage() {
   const data = await getAllLocations();
   return (

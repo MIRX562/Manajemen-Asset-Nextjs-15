@@ -5,6 +5,8 @@ import { employeeColumns } from "./_components/collumn";
 import InsertDataDialog from "@/components/table/insertDataButton";
 import AddEmployeeForm from "./_components/form-add";
 
+export const dynamic = "force-dynamic";
+
 export default async function page() {
   const data = await prisma.employee.findMany({});
 

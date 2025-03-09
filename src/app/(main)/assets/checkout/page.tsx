@@ -14,6 +14,8 @@ import { getAvailableAssets } from "@/actions/assets-actions";
 import { getAllEMployeesDropdown } from "@/actions/employee-actions";
 import CheckoutMetrics from "./_components/metrics";
 
+export const dynamic = "force-dynamic";
+
 export default async function page() {
   const data = await getActiveCheckInOuts();
   const assets = await getAvailableAssets();

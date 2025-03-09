@@ -13,6 +13,8 @@ import ScheduleMaintenanceForm from "../_components/form-schedule";
 import { getAvailableAssets } from "@/actions/assets-actions";
 import { getAvailableInventoryItems } from "@/actions/inventory-actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function MaintenancePage() {
   const data = await getScheduledMaintenance();
   const assets = await getAvailableAssets();

@@ -2,6 +2,7 @@ import { getAssetById } from "@/actions/assets-actions";
 import AssetOverview from "./_components/asset-overview";
 import AssetTabs from "./_components/asset-tabs";
 
+export const dynamic = "force-dynamic";
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 

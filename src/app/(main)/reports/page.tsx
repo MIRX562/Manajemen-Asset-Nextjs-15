@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { Fragment, ReactNode } from "react";
 
+export const dynamic = "force-dynamic";
+
 const reportTypes = [
   {
     title: "Asset Reports",

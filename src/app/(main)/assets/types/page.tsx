@@ -5,6 +5,8 @@ import { assetTypeColumns } from "./_components/collumn";
 import InsertDataDialog from "@/components/table/insertDataButton";
 import AddAssetTypeForm from "./_components/form-add";
 
+export const dynamic = "force-dynamic";
+
 export default async function page() {
   const data = await getAllAssetTypes();
 

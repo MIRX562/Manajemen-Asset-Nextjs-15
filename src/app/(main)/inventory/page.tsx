@@ -6,6 +6,8 @@ import InventoryMetrics from "./_components/metrics";
 import RecentUpdatesWidget from "./_components/recent-updates";
 import QuickActionsInventory from "./_components/quick-actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function InventoryPage() {
   const data = await getAllInventoryItems();
   return (

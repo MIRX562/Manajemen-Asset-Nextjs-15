@@ -5,6 +5,8 @@ import { UpcomingMaintenanceTable } from "@/app/(main)/dashboard/_components/upc
 import { PortfolioChart } from "./_components/portfolio-charts";
 import { getAssetValuationOverYear } from "@/actions/analytics-actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const chartData = await getAssetValuationOverYear();
   return (

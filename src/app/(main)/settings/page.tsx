@@ -7,6 +7,8 @@ import UserNotification from "./_components/user-notification";
 import UserActivityLogs from "./_components/user-activity-logs";
 import ResetPasswordForm from "./_components/form-reset-password";
 
+export const dynamic = "force-dynamic";
+
 export default async function UserProfileBento() {
   const { user } = await getCurrentSession();
   if (!user) {

@@ -1,5 +1,7 @@
 // import { notFound } from "next/navigation"; // For handling invalid slugs
 
+export const dynamic = "force-dynamic";
+
 export default async function SlugPage({
   params,
 }: {

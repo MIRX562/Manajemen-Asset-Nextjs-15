@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import CheckInForm from "./_component/form-checkin";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const data = await getActiveCheckInOuts();
   const assets = await getAllActiveCheckoutsForm();
