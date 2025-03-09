@@ -12,8 +12,7 @@ jobs:
       DATABASE_URL: "postgresql://neondb_owner:UZlt2fH0QEud@ep-raspy-haze-a59x6v9m.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
     steps:
-      - run: git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY .
-      - run: git checkout $GITHUB_REF_NAME
+      - uses: actions/checkout@v4
       - run: npm ci --legacy-peer-deps
       - run: npx prisma generate
       - run: bun run build
