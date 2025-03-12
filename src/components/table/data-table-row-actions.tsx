@@ -102,7 +102,11 @@ export function DataTableRowActions<TData>({
                   action: {
                     label: "Delete",
                     onClick: () => {
-                      onDelete(data);
+                      toast.promise(onDelete(data), {
+                        loading: "deleting item...",
+                        error: (err) => err.message,
+                        success: "Item deleted",
+                      });
                       router.refresh();
                     },
                   },

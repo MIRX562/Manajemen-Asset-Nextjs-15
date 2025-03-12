@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  ArchiveRestore,
-  Download,
-  PlusCircle,
-  PlusCircleIcon,
-} from "lucide-react";
+import { ArchiveRestore, Download, PlusCircleIcon } from "lucide-react";
 import React from "react";
 import AddInventoryForm from "./form-add";
 import {
@@ -16,17 +11,14 @@ import {
 
 export default function QuickActionsInventory() {
   return (
-    <div className="grid grid-cols-3 md:grid-cols-1 gap-4">
-      <Button
-        variant="outline"
-        className="shadow-md flex text-xl items-center justify-between font-medium gap-2 w-full h-full"
-      >
-        <ArchiveRestore /> Restock Item
-      </Button>
+    <div className="h-full flex md:flex-col justify-between gap-4">
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="h-full text-xl font-medium justify-between">
-            <PlusCircleIcon size={40} />
+          <Button
+            variant="outline"
+            className="shadow-md h-fit flex flex-col text-xl font-medium justify-start "
+          >
+            <PlusCircleIcon />
             Add Item
           </Button>
         </DialogTrigger>
@@ -35,12 +27,34 @@ export default function QuickActionsInventory() {
           <AddInventoryForm />
         </DialogContent>
       </Dialog>
-      <Button
-        variant="outline"
-        className="shadow-md flex text-xl items-center justify-between font-medium gap-2 w-full h-full"
-      >
-        <Download /> Export Items
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="shadow-md h-fit flex flex-col text-xl items-center font-medium"
+          >
+            <ArchiveRestore /> Restock
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle>Add Inventory</DialogTitle>
+          <AddInventoryForm />
+        </DialogContent>
+      </Dialog>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="shadow-md h-fit flex flex-col text-xl items-center font-medium"
+          >
+            <Download /> Use Item
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle>Add Inventory</DialogTitle>
+          <AddInventoryForm />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

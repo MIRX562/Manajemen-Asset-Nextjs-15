@@ -19,3 +19,4 @@ jobs:
       - run: |
           echo "DATABASE_URL=${{ env.DATABASE_URL }}" >> .env
           echo "NODE_ENV=Production" >> .env
+      - run: pm2 restart am

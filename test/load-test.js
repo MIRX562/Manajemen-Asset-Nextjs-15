@@ -4,11 +4,11 @@ import { check, sleep } from "k6";
 
 export let options = {
   vus: 100, // Number of virtual users
-  duration: "30s", // Test duration
+  duration: "5m", // Test duration
 };
 
 export default function () {
-  let res = http.get("https://test.mirx.my.id/"); // Replace with your target URL
+  let res = http.get("https://test.mirx.my.id/auth"); // Replace with your target URL
   check(res, {
     "status is 200": (r) => r.status === 200,
     "response time is < 500ms": (r) => r.timings.duration < 500,

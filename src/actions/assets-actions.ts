@@ -60,7 +60,6 @@ export const editAsset = async (
   lifecycleNotes?: string
 ) => {
   const value = editAssetSchema.parse(data);
-  console.log(value);
 
   try {
     // Update the asset itself
@@ -155,7 +154,8 @@ export const deleteAsset = async (data: z.infer<typeof deleteAssetSchema>) => {
       where: { id: value.id },
     });
   } catch (error) {
-    throw new Error("Failed to delete asset");
+    console.error(error);
+    throw new Error("Asset is already associated to other data, cannot delete");
   }
 };
 

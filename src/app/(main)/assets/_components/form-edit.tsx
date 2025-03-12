@@ -81,7 +81,10 @@ export default function EditAssetForm({ data }: { data: FormData }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4 max-h-[80svh] overflow-auto"
+      >
         {/* Asset Name */}
         <FormField
           control={form.control}

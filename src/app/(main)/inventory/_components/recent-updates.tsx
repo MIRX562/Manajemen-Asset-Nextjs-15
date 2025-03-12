@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function RecentUpdatesWidget() {
+export default function MostUsedItems() {
   const recentUpdates = [
     {
       id: 1,

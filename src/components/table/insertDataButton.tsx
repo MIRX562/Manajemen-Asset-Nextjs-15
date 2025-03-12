@@ -29,7 +29,7 @@ export default function InsertDataDialog({
           {triggerButtonText}
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[80svh] overflow-auto">
         <DialogTitle>{triggerButtonText}</DialogTitle>
         {children}
       </DialogContent>

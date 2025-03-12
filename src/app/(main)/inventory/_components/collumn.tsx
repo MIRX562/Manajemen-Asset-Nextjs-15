@@ -15,7 +15,7 @@ export const inventoryColumns: ColumnDef<{
   reorder_level: number;
   unit_price: number;
   location?: { name: string } | null;
-  location_id: number;
+  location_id: number | null;
   created_at: Date;
   updated_at: Date;
 }>[] = [
@@ -53,7 +53,7 @@ export const inventoryColumns: ColumnDef<{
   {
     accessorKey: "reorder_level",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Reorder Level" />
+      <DataTableColumnHeader column={column} title="Reorder" />
     ),
     cell: ({ row }) => <div>{row.getValue("reorder_level")}</div>,
   },
@@ -75,16 +75,6 @@ export const inventoryColumns: ColumnDef<{
       ) : (
         <div>Unassigned</div>
       ),
-  },
-  {
-    accessorKey: "created_at",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
-    ),
-    cell: ({ row }) => (
-      <div>{new Date(row.getValue("created_at")).toLocaleDateString()}</div>
-    ),
-    enableSorting: true,
   },
   {
     id: "actions",
