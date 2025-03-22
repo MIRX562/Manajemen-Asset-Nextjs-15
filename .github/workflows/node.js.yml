@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: bun ci --legacy-peer-deps
+      - uses: oven-sh/setup-bun@v2
+      - run: |
+          echo "DATABASE_URL=${{ env.DATABASE_URL }}" >> .env
+          echo "NODE_ENV=production" >> .env
+      - run: bun install
       - run: bun x prisma db push
       - run: bun x prisma db seed
       - run: bun x prisma generate
       - run: bun run build
-      - run: |
-          echo "DATABASE_URL=${{ env.DATABASE_URL }}" >> .env
-          echo "NODE_ENV=Production" >> .env
-      - run: pm2 restart am
