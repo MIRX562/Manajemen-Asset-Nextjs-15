@@ -261,13 +261,8 @@ async function main() {
         data: {
           user_id: faker.helpers.arrayElement(users).id,
           message: faker.lorem.sentence(),
-          type: faker.helpers.arrayElement([
-            "PEMELIHARAAN",
-            "STOK_RENDAH",
-            "CHECKOUT_TERLAMBAT",
-            "STATUS_ASET",
-          ]),
-          is_read: faker.datatype.boolean(),
+          type: faker.helpers.arrayElement(["PEMELIHARAAN", "STOK_RENDAH"]),
+          // is_read: faker.datatype.boolean(),
         },
       })
     )

@@ -9,6 +9,7 @@ import { type Session, Role } from "@prisma/client";
 import prisma from "./db";
 import { cookies } from "next/headers";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 
 /**
  * Hashes a plaintext password before storing it in the database.
@@ -49,7 +50,7 @@ export async function createSession(
   const session: Session = {
     id: sessionId,
     user_id: userId,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
   };
   await prisma.session.create({
     data: session,
@@ -90,8 +91,8 @@ export async function validateSessionToken(
     await prisma.session.delete({ where: { id: sessionId } });
     return { session: null, user: null };
   }
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
-    session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 22) {
+    session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
     await prisma.session.update({
       where: {
         id: session.id,
@@ -160,10 +161,21 @@ export const getCurrentSession = cache(
   async (): Promise<SessionValidationResult> => {
     const cookieStore = await cookies();
     const token = cookieStore.get("session")?.value ?? null;
-    if (token === null) {
+
+    if (!token) {
+      // Remove the cookie if the token is missing
+      cookieStore.delete("session");
       return { session: null, user: null };
     }
+
     const result = await validateSessionToken(token);
+
+    if (!result.session || !result.user) {
+      // If session is invalid, remove the cookie
+      cookieStore.delete("session");
+      redirect("/auth");
+    }
+
     return result;
   }
 );

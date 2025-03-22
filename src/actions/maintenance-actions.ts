@@ -70,6 +70,9 @@ export async function getAllMaintenances() {
           include: { inventory: true },
         },
       },
+      orderBy: {
+        scheduled_date: "desc",
+      },
     });
   } catch (error) {
     console.error(
@@ -146,7 +149,37 @@ export async function updateMaintenanceStatus(
 ) {
   const { id, maintenance_status, notes } = data;
   try {
-    return await prisma.maintenance.update({
+    if (maintenance_status == "SELESAI") {
+      await prisma.$transaction(async (tx) => {
+        await tx.maintenance.update({
+          where: { id },
+          data: {
+            notes,
+            status: maintenance_status,
+          },
+        });
+
+        const inventoryItems = await tx.maintenanceInventory.findMany({
+          where: {
+            maintenance_id: id,
+          },
+          select: {
+            inventory_id: true,
+            quantity_used: true,
+          },
+        });
+
+        await Promise.all(
+          inventoryItems.map((item) =>
+            tx.inventory.update({
+              where: { id: item.inventory_id },
+              data: { quantity: { decrement: item.quantity_used } },
+            })
+          )
+        );
+      });
+    }
+    await prisma.maintenance.update({
       where: { id },
       data: {
         notes,

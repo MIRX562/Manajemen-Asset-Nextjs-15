@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.VSCodeCounter
 
 # next.js
 /.next/
@@ -23,6 +24,7 @@
 # misc
 .DS_Store
 *.pem
+first-run-flag.txt
 
 # debug
 npm-debug.log*

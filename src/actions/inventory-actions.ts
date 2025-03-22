@@ -1,5 +1,7 @@
 "use server";
 import prisma from "@/lib/db";
+import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
 // Create a new inventory item
 export async function createInventoryItem(data: {
@@ -30,6 +32,7 @@ export async function getAllInventoryItems() {
           select: { name: true },
         },
       },
+      orderBy: { id: "asc" },
     });
   } catch (error) {
     console.error(
@@ -126,44 +129,95 @@ export async function updateInventoryItem(data: {
   }
 }
 
-type UseInventoryInput = {
-  inventoryId: number;
-  quantity: number;
-}[];
+const itemSchema = z.object({
+  item_ID: z.number(),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+});
 
-export const useInventory = async (items: UseInventoryInput) => {
-  return await prisma.$transaction(async (tx) => {
-    const results = [];
+const restockSchema = z.object({
+  items: z.array(itemSchema),
+});
 
-    for (const item of items) {
-      // Fetch the inventory item
-      const inventory = await tx.inventory.findUnique({
-        where: { id: item.inventoryId },
-        select: { quantity: true },
+export async function restockItem(data: z.infer<typeof restockSchema>) {
+  try {
+    const parsedData = restockSchema.parse(data);
+
+    await prisma.$transaction(
+      parsedData.items.map(({ item_ID, quantity }) =>
+        prisma.inventory.update({
+          where: { id: item_ID },
+          data: { quantity: { increment: quantity } },
+        })
+      )
+    );
+    for (const { item_ID, quantity } of parsedData.items) {
+      await createActivityLog({
+        action: `Restocked ${quantity} units`,
+        target_type: "INVENTORY",
+        target_id: item_ID,
       });
-
-      if (!inventory) {
-        throw new Error(`Inventory item with ID ${item.inventoryId} not found`);
-      }
-
-      if (inventory.quantity < item.quantity) {
-        throw new Error(
-          `Insufficient quantity for inventory ID ${item.inventoryId}. Requested: ${item.quantity}, Available: ${inventory.quantity}`
-        );
-      }
-
-      // Update the inventory quantity
-      const updatedInventory = await tx.inventory.update({
-        where: { id: item.inventoryId },
-        data: { quantity: { decrement: item.quantity } },
-      });
-
-      results.push(updatedInventory);
     }
 
-    return results;
-  });
-};
+    return { success: true, message: "Items restocked successfully" };
+  } catch (error) {
+    console.error("Restock error:", error);
+    throw new Error("Failed to restock items");
+  }
+}
+
+const consumeSchema = z.object({
+  items: z.array(itemSchema),
+});
+
+export async function consumeItem(data: z.infer<typeof consumeSchema>) {
+  try {
+    const parsedData = consumeSchema.parse(data);
+
+    const items = await prisma.inventory.findMany({
+      where: { id: { in: parsedData.items.map((item) => item.item_ID) } },
+      select: { id: true, quantity: true },
+    });
+
+    const insufficientStock = parsedData.items
+      .map((item) => {
+        const dbItem = items.find((db) => db.id === item.item_ID);
+        if (!dbItem || dbItem.quantity < item.quantity) {
+          return `- Item ID:${dbItem?.id ?? "Unknown Item"} (Requested: ${
+            item.quantity
+          }, Available: ${dbItem?.quantity ?? 0})`;
+        }
+        return null;
+      })
+      .filter(Boolean); // Remove null values
+
+    if (insufficientStock.length > 0) {
+      throw new Error(
+        `Insufficient stock for:\n${insufficientStock.join("\n")}`
+      );
+    }
+
+    await prisma.$transaction(
+      parsedData.items.map(({ item_ID, quantity }) =>
+        prisma.inventory.update({
+          where: { id: item_ID },
+          data: { quantity: { decrement: quantity } },
+        })
+      )
+    );
+    for (const { item_ID, quantity } of parsedData.items) {
+      await createActivityLog({
+        action: `Consumed ${quantity} units`,
+        target_type: "INVENTORY",
+        target_id: item_ID,
+      });
+    }
+
+    return { success: true, message: "Items consumed successfully" };
+  } catch (error) {
+    console.error("Consume error:", error);
+    throw error;
+  }
+}
 
 // Delete an inventory item
 export async function deleteInventoryItem(data: {

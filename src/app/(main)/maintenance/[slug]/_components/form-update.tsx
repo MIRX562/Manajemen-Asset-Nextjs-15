@@ -57,6 +57,7 @@ export default function UpdateMaintenaceForm(
         <FormField
           control={form.control}
           name="maintenance_status"
+          disabled={data.maintenance_status === "SELESAI"}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
@@ -89,6 +90,7 @@ export default function UpdateMaintenaceForm(
         <FormField
           control={form.control}
           name="notes"
+          disabled={data.maintenance_status === "SELESAI"}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Notes</FormLabel>
@@ -123,7 +125,9 @@ export default function UpdateMaintenaceForm(
             </FormItem>
           )}
         />
-        <Button type="submit">Update</Button>
+        <Button hidden={data.maintenance_status === "SELESAI"} type="submit">
+          Update
+        </Button>
       </form>
     </Form>
   );

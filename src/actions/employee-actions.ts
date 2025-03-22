@@ -98,6 +98,24 @@ export const getAllEMployeesDropdown = async () => {
 
     return employees;
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to fetch asset");
+  }
+};
+
+export const getEmployeeById = async (id: number) => {
+  try {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!employee) {
+      throw new Error("Employee not found!");
+    }
+    return employee;
+  } catch (error) {
+    console.error(error);
+    throw new Error("failed to fetch data");
   }
 };

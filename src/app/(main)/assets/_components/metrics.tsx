@@ -22,7 +22,7 @@ export default async function AssetStats() {
   });
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 w-full">
+    <div className="grid gap-4 grid-cols-2 w-full md:grid-cols-1 md:w-1/3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Assets</CardTitle>

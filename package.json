@@ -9,6 +9,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma":{
+    "seed":"bun ./prisma/seed.js"
+  },
   "dependencies": {
     "@faker-js/faker": "^9.2.0",
     "@hookform/resolvers": "^3.9.1",

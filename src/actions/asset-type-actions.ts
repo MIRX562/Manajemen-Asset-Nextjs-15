@@ -3,6 +3,7 @@
 import prisma from "@/lib/db";
 import { addAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
 export const createAssetType = async (
   data: z.infer<typeof addAssetTypeSchema>
@@ -14,8 +15,14 @@ export const createAssetType = async (
         ...value,
       },
     });
+    createActivityLog({
+      action: `Add new type: ${assetType.model}`,
+      target_type: "ASSET_TYPE",
+      target_id: assetType.id,
+    });
     return assetType;
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to create asset type");
   }
 };
@@ -81,6 +88,7 @@ export const getAllAssetTypes = async () => {
       include: {
         assets: true,
       },
+      orderBy: { id: "desc" },
     });
     return assetTypes;
   } catch (error) {

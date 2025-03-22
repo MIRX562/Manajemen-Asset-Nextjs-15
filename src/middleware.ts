@@ -28,11 +28,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       // Redirect to the login page if there's no session
       return NextResponse.redirect(new URL("/auth", request.url));
     }
+
     const response = NextResponse.next();
     // Extend the session expiration
     response.cookies.set("session", token, {
       path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24,
       sameSite: "lax",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

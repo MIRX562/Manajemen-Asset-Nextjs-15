@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({
           table={table}
           insertDataComponent={insertDataComponent}
         />
-        <div className="max-w-full overflow-x-auto rounded-md border">
+        <div className="max-w-full overflow-x-auto rounded-md border shadow-md">
           <Table className="table-auto text-sm">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

@@ -77,8 +77,7 @@ export default function AddAssetForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-2
-        "
+        className="flex flex-col gap-2"
       >
         {/* Asset Name */}
         <FormField
@@ -175,7 +174,7 @@ export default function AddAssetForm() {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >

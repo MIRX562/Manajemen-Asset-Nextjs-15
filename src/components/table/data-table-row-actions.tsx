@@ -44,7 +44,7 @@ export function DataTableRowActions<TData>({
             <Button
               variant="ghost"
               size="icon"
-              className="p-2"
+              className="p-2 text-chart-1"
               aria-label="View"
               onClick={() =>
                 router.push(
@@ -71,7 +71,7 @@ export function DataTableRowActions<TData>({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="p-2"
+                    className="p-2 text-chart-2"
                     aria-label="Edit"
                   >
                     <Pencil2Icon className="h-4 w-4" />

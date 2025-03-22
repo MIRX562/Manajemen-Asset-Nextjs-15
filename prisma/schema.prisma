@@ -7,7 +7,7 @@ datasource db {
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+  binaryTargets = ["native","linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
 //enums
@@ -197,6 +197,7 @@ enum MaintenanceStatus {
   DIJADWALKAN
   SELESAI
   TERTUNDA
+  DIBATALKAN
 }
 
 model MaintenanceInventory {
@@ -257,8 +258,10 @@ model ActivityLog {
 
 enum TargetType {
   ASSET
+  ASSET_TYPE
   INVENTORY
   MAINTENANCE
+  LOCATION
 }
 
 model Notifications {

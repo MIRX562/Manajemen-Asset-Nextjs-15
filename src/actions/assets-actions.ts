@@ -174,9 +174,13 @@ export const getAllAssets = async () => {
           },
         },
       },
+      orderBy: {
+        id: "desc",
+      },
     });
     return assets;
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to fetch assets");
   }
 };

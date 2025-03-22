@@ -40,14 +40,14 @@ export async function RecentCheckouts() {
   });
 
   return (
-    <Card className="pb-4">
+    <Card className="pb-1 md:w-2/3">
       <CardHeader>
         <CardTitle>Recent Check-Outs</CardTitle>
         <CardDescription>
           Latest assets checked out from the system
         </CardDescription>
       </CardHeader>
-      <CardContent className="max-h-[300px] overflow-auto">
+      <CardContent className="max-h-[380px] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>

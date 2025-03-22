@@ -63,7 +63,6 @@ export default function ScheduleMaintenanceForm({
   assets,
 }: FormProps) {
   const { mechanics } = useDropdownContext();
-  console.log(mechanics);
 
   const form = useForm<z.infer<typeof scheduleMaintenanceSchema>>({
     resolver: zodResolver(scheduleMaintenanceSchema),
@@ -365,7 +364,7 @@ export default function ScheduleMaintenanceForm({
                                   key={item.id}
                                   value={item.id.toString()}
                                 >
-                                  {item.name}, stock:{item.quantity}
+                                  {item.name} | stock:{item.quantity} |
                                 </SelectItem>
                               ))}
                             </SelectContent>

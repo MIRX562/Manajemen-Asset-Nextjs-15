@@ -29,9 +29,10 @@ export default async function AssetsPage() {
           </InsertDataDialog>
         </div>
       </div>
-
-      <AssetStats />
-      <RecentCheckouts />
+      <div className="flex flex-col md:flex-row gap-4">
+        <AssetStats />
+        <RecentCheckouts />
+      </div>
 
       <div className="space-y-2 pb-4">
         <h1 className="text-2xl font-bold">All Assets</h1>

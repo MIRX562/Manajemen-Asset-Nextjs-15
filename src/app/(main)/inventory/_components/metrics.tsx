@@ -1,33 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, AlertTriangle, DollarSign, Tags } from "lucide-react";
+import { getInventoryMetrics } from "@/actions/analytics-actions";
 
-export default function InventoryMetrics() {
-  // In a real application, these values would be fetched from an API
-  const metrics = [
+export default async function InventoryMetrics() {
+  const metrics = await getInventoryMetrics();
+
+  const metricData = [
     {
       title: "Total Inventory Items",
-      value: 1234,
+      value: metrics.totalItems,
       icon: Package,
-      color: "text-blue-500",
+      color: "text-chart-2",
     },
     {
       title: "Low Stock Alerts",
-      value: 23,
+      value: metrics.lowStockAlerts,
       icon: AlertTriangle,
-      color: "text-yellow-500",
+      color: "text-destructive",
     },
     {
       title: "Total Inventory Value",
-      value: "$123,456",
+      value: `Rp.${metrics.totalValue.toLocaleString()}`,
       icon: DollarSign,
-      color: "text-green-500",
+      color: "text-chart-3",
     },
-    { title: "Categories", value: 15, icon: Tags, color: "text-purple-500" },
+    {
+      title: "Categories",
+      value: metrics.categories,
+      icon: Tags,
+      color: "text-chart-4",
+    },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-      {metrics.map((metric) => (
+      {metricData.map((metric) => (
         <Card key={metric.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">

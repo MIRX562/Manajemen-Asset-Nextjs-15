@@ -153,6 +153,35 @@ export async function getCheckInOutsByUserId(user_id: number) {
     );
   }
 }
+
+// Get CheckInOut records by User ID
+export async function getCheckInOutsByEmployeeId(employee_id: number) {
+  try {
+    return await prisma.checkInOut.findMany({
+      where: { employee_id },
+      select: {
+        id: true,
+        check_out_date: true,
+        expected_return_date: true,
+        actual_return_date: true,
+        status: true,
+        asset: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[getCheckInOutsByUserId] Failed to retrieve records for employee ID ${employee_id}:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve CheckInOut records for the specified user. Please try again."
+    );
+  }
+}
 // Get CheckInOut records by User ID
 export async function getActiveCheckOuts() {
   try {

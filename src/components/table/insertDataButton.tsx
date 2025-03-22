@@ -29,9 +29,9 @@ export default function InsertDataDialog({
           {triggerButtonText}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80svh] overflow-auto">
+      <DialogContent>
         <DialogTitle>{triggerButtonText}</DialogTitle>
-        {children}
+        <div className="max-h-[80svh] overflow-y-scroll">{children}</div>
       </DialogContent>
     </Dialog>
   );

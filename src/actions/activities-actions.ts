@@ -1,15 +1,24 @@
 "use server";
 import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { TargetType } from "@prisma/client";
 
 export async function createActivityLog(data: {
-  user_id: number;
   action: string;
-  target_type: "ASSET" | "INVENTORY" | "MAINTENANCE";
+  target_type: TargetType;
   target_id: number;
 }) {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("Not Authorized");
+  }
   return await prisma.activityLog.create({
-    data,
+    data: {
+      user_id: user.id,
+      action: data.action,
+      target_type: data.target_type,
+      target_id: data.target_id,
+    },
   });
 }
 

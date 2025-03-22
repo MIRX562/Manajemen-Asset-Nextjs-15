@@ -1,24 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRecentInventoryActivities } from "@/actions/analytics-actions";
+import { formatDistanceToNow } from "date-fns";
 
-export default function MostUsedItems() {
-  const recentUpdates = [
-    {
-      id: 1,
-      item: "Widget A",
-      action: "Quantity updated",
-      timestamp: "2 hours ago",
-    },
-    {
-      id: 2,
-      item: "Gadget B",
-      action: "Added to inventory",
-      timestamp: "5 hours ago",
-    },
-    { id: 3, item: "Tool C", action: "Price updated", timestamp: "1 day ago" },
-  ];
+export default async function MostUsedItems() {
+  const recentUpdates = await getRecentInventoryActivities();
 
   return (
-    <Card className="h-[260px] flex flex-col col-span-2">
+    <Card className="h-[260px] flex flex-col col-span-2 pb-3">
       <CardHeader>
         <CardTitle>Recent Updates</CardTitle>
       </CardHeader>
@@ -31,7 +19,7 @@ export default function MostUsedItems() {
                 <p className="text-sm text-muted-foreground">{update.action}</p>
               </div>
               <span className="text-sm text-muted-foreground">
-                {update.timestamp}
+                {formatDistanceToNow(new Date(update.timestamp))}
               </span>
             </li>
           ))}

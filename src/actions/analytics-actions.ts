@@ -93,3 +93,68 @@ export async function getAssetValuationOverYear() {
     totalValue,
   }));
 }
+
+export async function getInventoryMetrics() {
+  const [totalItems, lowStockAlerts, totalValue, categories] =
+    await Promise.all([
+      prisma.inventory.count(), // Total inventory items
+      prisma.inventory.count({
+        where: { quantity: { lt: prisma.inventory.fields.reorder_level } }, // Low stock alerts
+      }),
+      prisma.inventory.aggregate({
+        _sum: { quantity: true, unit_price: true },
+      }), // Total inventory value
+      prisma.inventory.groupBy({
+        by: ["category"],
+        _count: { category: true },
+      }), // Unique categories count
+    ]);
+
+  return {
+    totalItems,
+    lowStockAlerts,
+    totalValue:
+      totalValue._sum.quantity && totalValue._sum.unit_price
+        ? totalValue._sum.quantity * totalValue._sum.unit_price
+        : 0,
+    categories: categories.length,
+  };
+}
+
+export async function getRecentInventoryActivities() {
+  // Step 1: Fetch activity logs related to INVENTORY
+  const activities = await prisma.activityLog.findMany({
+    where: { target_type: "INVENTORY" },
+    orderBy: { timestamp: "desc" },
+    take: 10, // Limit to recent 10 activities
+    select: {
+      id: true,
+      action: true,
+      target_id: true,
+      timestamp: true,
+    },
+  });
+
+  // Step 2: Extract unique inventory IDs to reduce DB calls
+  const inventoryIds = [
+    ...new Set(activities.map((activity) => activity.target_id)),
+  ];
+
+  // Step 3: Fetch inventory names in a single query
+  const inventories = await prisma.inventory.findMany({
+    where: { id: { in: inventoryIds } },
+    select: { id: true, name: true },
+  });
+
+  // Step 4: Map inventory names to activity logs
+  const inventoryMap = Object.fromEntries(
+    inventories.map((inv) => [inv.id, inv.name])
+  );
+
+  return activities.map((activity) => ({
+    id: activity.id,
+    item: inventoryMap[activity.target_id] || "Unknown Item",
+    action: activity.action,
+    timestamp: activity.timestamp.toISOString(), // Format timestamp
+  }));
+}
