@@ -1,15 +1,16 @@
 import { getDashboardSummary } from "@/actions/analytics-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Wrench, Truck, Users } from "lucide-react";
+import { Package, Wrench, Users, AlertCircle } from "lucide-react";
 
 interface Metric {
   title: string;
   value: number | string;
   change: string;
   icon: keyof typeof icons;
+  color: string;
 }
 
-const icons = { Package, Wrench, Truck, Users };
+const icons = { Package, Wrench, AlertCircle, Users };
 
 export async function Metrics() {
   const data = await getDashboardSummary(); // Fetch data using the server action
@@ -20,6 +21,7 @@ export async function Metrics() {
       value: data.totalAssets,
       change: `${data.utilizationRate.toFixed(2)}% utilization rate`,
       icon: "Package",
+      color: "text-chart-1",
     },
     {
       title: "Assets Checked Out",
@@ -28,6 +30,7 @@ export async function Metrics() {
         1
       )}% of total assets`,
       icon: "Users",
+      color: "text-chart-2",
     },
     {
       title: "Assets in Maintenance",
@@ -36,6 +39,7 @@ export async function Metrics() {
         1
       )}% of total assets`,
       icon: "Wrench",
+      color: "text-chart-3",
     },
     {
       title: "Low Stock Items",
@@ -44,7 +48,8 @@ export async function Metrics() {
         data.lowStockCount > 0
           ? "Requires immediate attention"
           : "All stock levels are sufficient",
-      icon: "Truck",
+      icon: "AlertCircle",
+      color: "text-chart-4",
     },
   ];
 
@@ -58,7 +63,7 @@ export async function Metrics() {
               <CardTitle className="text-sm font-medium">
                 {metric.title}
               </CardTitle>
-              <Icon className="h-4 w-4 text-muted-foreground" />
+              <Icon className={`h-4 w-4 ${metric.color}`} />
             </CardHeader>
             <CardContent className="pt-0">
               <div className="text-3xl font-bold">{metric.value}</div>

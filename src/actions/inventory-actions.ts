@@ -1,7 +1,9 @@
 "use server";
+
 import prisma from "@/lib/db";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { Inventory } from "@prisma/client";
 
 // Create a new inventory item
 export async function createInventoryItem(data: {
@@ -13,95 +15,18 @@ export async function createInventoryItem(data: {
   location_id: number;
 }) {
   try {
-    return await prisma.inventory.create({ data });
+    const item = await prisma.inventory.create({ data });
+    createActivityLog({
+      action: `Add new inventory: ${item.name}`,
+      target_type: "INVENTORY",
+      target_id: item.id,
+    });
   } catch (error) {
     console.error(
       "[createInventoryItem] Failed to create inventory item:",
       error
     );
     throw new Error("Failed to create inventory item. Please try again.");
-  }
-}
-
-// Get all inventory items
-export async function getAllInventoryItems() {
-  try {
-    return await prisma.inventory.findMany({
-      include: {
-        location: {
-          select: { name: true },
-        },
-      },
-      orderBy: { id: "asc" },
-    });
-  } catch (error) {
-    console.error(
-      "[getAllInventoryItems] Failed to retrieve inventory items:",
-      error
-    );
-    throw new Error("Failed to retrieve inventory items. Please try again.");
-  }
-}
-
-// Get inventory item by ID
-export async function getInventoryItemById(id: number) {
-  try {
-    const item = await prisma.inventory.findUnique({
-      where: { id },
-      include: {
-        location: true,
-      },
-    });
-    if (!item) {
-      throw new Error(`No inventory item found with ID: ${id}`);
-    }
-    return item;
-  } catch (error) {
-    console.error(
-      `[getInventoryItemById] Failed to retrieve item with ID ${id}:`,
-      error
-    );
-    throw new Error("Failed to retrieve the inventory item. Please try again.");
-  }
-}
-
-// Get all inventory items at a specific location
-export async function getInventoryItemsByLocation(location_id: number) {
-  try {
-    return await prisma.inventory.findMany({
-      where: { location_id },
-      include: {
-        location: true,
-      },
-    });
-  } catch (error) {
-    console.error(
-      `[getInventoryItemsByLocation] Failed to retrieve items for location ID ${location_id}:`,
-      error
-    );
-    throw new Error(
-      "Failed to retrieve inventory items for the specified location. Please try again."
-    );
-  }
-}
-
-export async function getAvailableInventoryItems() {
-  try {
-    return await prisma.inventory.findMany({
-      select: {
-        id: true,
-        name: true,
-        quantity: true,
-      },
-    });
-  } catch (error) {
-    console.error(
-      `[getAvailableInventoryItems] Failed to retrieve available items:`,
-      error
-    );
-    throw new Error(
-      "Failed to retrieve inventory items for the specified location. Please try again."
-    );
   }
 }
 
@@ -116,9 +41,14 @@ export async function updateInventoryItem(data: {
   location_id?: number;
 }) {
   try {
-    return await prisma.inventory.update({
+    const updatedItem = await prisma.inventory.update({
       where: { id: data.id },
       data,
+    });
+    createActivityLog({
+      action: `Updated inventory: ${updatedItem.name}`,
+      target_type: "INVENTORY",
+      target_id: updatedItem.id,
     });
   } catch (error) {
     console.error(
@@ -220,21 +150,15 @@ export async function consumeItem(data: z.infer<typeof consumeSchema>) {
 }
 
 // Delete an inventory item
-export async function deleteInventoryItem(data: {
-  id: number;
-  name: string;
-  category: string;
-  quantity: number;
-  reorder_level: number;
-  unit_price: number;
-  location?: { name: string } | null;
-  location_id: number;
-  created_at: Date;
-  updated_at: Date;
-}) {
+export async function deleteInventoryItem(data: Inventory) {
   try {
-    return await prisma.inventory.delete({
+    const deleted = await prisma.inventory.delete({
       where: { id: data.id },
+    });
+    createActivityLog({
+      action: `Deleted inventory : ${deleted.name}`,
+      target_type: "INVENTORY",
+      target_id: deleted.id,
     });
   } catch (error) {
     console.error(
@@ -242,6 +166,88 @@ export async function deleteInventoryItem(data: {
       error
     );
     throw new Error("Failed to delete the inventory item. Please try again.");
+  }
+}
+
+// Get all inventory items
+export async function getAllInventoryItems() {
+  try {
+    return await prisma.inventory.findMany({
+      include: {
+        location: {
+          select: { name: true },
+        },
+      },
+      orderBy: { id: "asc" },
+    });
+  } catch (error) {
+    console.error(
+      "[getAllInventoryItems] Failed to retrieve inventory items:",
+      error
+    );
+    throw new Error("Failed to retrieve inventory items. Please try again.");
+  }
+}
+
+// Get inventory item by ID
+export async function getInventoryItemById(id: number) {
+  try {
+    const item = await prisma.inventory.findUnique({
+      where: { id },
+      include: {
+        location: true,
+      },
+    });
+    if (!item) {
+      throw new Error(`No inventory item found with ID: ${id}`);
+    }
+    return item;
+  } catch (error) {
+    console.error(
+      `[getInventoryItemById] Failed to retrieve item with ID ${id}:`,
+      error
+    );
+    throw new Error("Failed to retrieve the inventory item. Please try again.");
+  }
+}
+
+// Get all inventory items at a specific location
+export async function getInventoryItemsByLocation(location_id: number) {
+  try {
+    return await prisma.inventory.findMany({
+      where: { location_id },
+      include: {
+        location: true,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[getInventoryItemsByLocation] Failed to retrieve items for location ID ${location_id}:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve inventory items for the specified location. Please try again."
+    );
+  }
+}
+
+export async function getAvailableInventoryItems() {
+  try {
+    return await prisma.inventory.findMany({
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[getAvailableInventoryItems] Failed to retrieve available items:`,
+      error
+    );
+    throw new Error(
+      "Failed to retrieve inventory items for the specified location. Please try again."
+    );
   }
 }
 

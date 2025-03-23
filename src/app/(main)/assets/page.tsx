@@ -29,6 +29,7 @@ export default async function AssetsPage() {
           </InsertDataDialog>
         </div>
       </div>
+
       <div className="flex flex-col md:flex-row gap-4">
         <AssetStats />
         <RecentCheckouts />

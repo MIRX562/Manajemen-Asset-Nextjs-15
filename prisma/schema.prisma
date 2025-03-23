@@ -58,7 +58,6 @@ model Asset {
   type_id         Int // Relasi ke Tipe Aset
   status          AssetStatus
   purchase_date   DateTime
-  lifecycle_stage LifecycleStage
   initial_value   Float // Initial cost of the asset
   salvage_value   Float // Estimated value at the end of its lifecycle
   useful_life     Int
@@ -262,6 +261,9 @@ enum TargetType {
   INVENTORY
   MAINTENANCE
   LOCATION
+  CHECKOUT
+  EMPLOYEE
+  USER
 }
 
 model Notifications {

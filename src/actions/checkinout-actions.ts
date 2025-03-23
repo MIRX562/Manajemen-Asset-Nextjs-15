@@ -1,18 +1,72 @@
 "use server";
+
 import { CheckOutForm } from "@/app/(main)/assets/checkout/_components/form-checkout";
 import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { createActivityLog } from "./activities-actions";
 
-// Create a CheckInOut record
-export async function createCheckInOut(data: {
-  asset_id: number;
-  user_id: number;
-  check_out_date: Date;
-  expected_return_date: Date;
-  status: "DIPINJAM" | "DIKEMBALIKAN";
-}) {
+export async function checkoutAsset(data: CheckOutForm) {
+  if (!data) {
+    throw new Error("no data recieved");
+  }
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("not authorized");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // Create checkout record
+    const checkout = await tx.checkInOut.create({
+      data: {
+        asset_id: data.asset_id,
+        user_id: user.id,
+        employee_id: data.employee_id,
+        check_out_date: data.check_out_date,
+        expected_return_date: data.expected_return_date,
+        status: "DIPINJAM",
+      },
+    });
+
+    // Update asset status (optional)
+    await tx.asset.update({
+      where: { id: data.asset_id },
+      data: { status: "TIDAK_AKTIF" },
+    });
+
+    // Log activity
+    await tx.activityLog.create({
+      data: {
+        user_id: user.id,
+        action: "Checkout Asset",
+        target_type: "ASSET",
+        target_id: data.asset_id,
+        timestamp: new Date(),
+      },
+    });
+
+    return checkout;
+  });
+}
+
+export async function checkIn(data: { id: number; actual_return_date: Date }) {
+  if (!data) {
+    throw Error;
+  }
   try {
-    return await prisma.checkInOut.create({ data });
+    const checkIn = await prisma.checkInOut.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        actual_return_date: data.actual_return_date,
+        status: "DIKEMBALIKAN",
+      },
+    });
+    createActivityLog({
+      action: `CheckIn asset`,
+      target_type: "CHECKOUT",
+      target_id: checkIn.id,
+    });
   } catch (error) {
     console.error(
       "[createCheckInOut] Failed to create CheckInOut record:",
@@ -22,26 +76,55 @@ export async function createCheckInOut(data: {
   }
 }
 
-export async function checkIn(data: { id: number; actual_return_date: Date }) {
-  if (!data) {
-    throw Error;
+// Update a CheckInOut record
+export async function updateCheckInOut(
+  id: number,
+  data: {
+    actual_return_date?: Date;
+    status?: "DIPINJAM" | "DIKEMBALIKAN";
   }
+) {
   try {
-    await prisma.checkInOut.update({
-      where: {
-        id: data.id,
-      },
-      data: {
-        actual_return_date: data.actual_return_date,
-        status: "DIKEMBALIKAN",
-      },
+    const update = await prisma.checkInOut.update({
+      where: { id },
+      data,
+    });
+
+    createActivityLog({
+      action: `Update checkout`,
+      target_type: "CHECKOUT",
+      target_id: update.id,
     });
   } catch (error) {
     console.error(
-      "[createCheckInOut] Failed to create CheckInOut record:",
+      `[updateCheckInOut] Failed to update CheckInOut record with ID ${id}:`,
       error
     );
-    throw new Error("Failed to create CheckInOut record. Please try again.");
+    throw new Error(
+      "Failed to update the CheckInOut record. Please try again."
+    );
+  }
+}
+
+// Delete a CheckInOut record
+export async function deleteCheckInOut(id: number) {
+  try {
+    await prisma.checkInOut.delete({
+      where: { id },
+    });
+    createActivityLog({
+      action: `Deleted checkout`,
+      target_type: "CHECKOUT",
+      target_id: id,
+    });
+  } catch (error) {
+    console.error(
+      `[deleteCheckInOut] Failed to delete CheckInOut record with ID ${id}:`,
+      error
+    );
+    throw new Error(
+      "Failed to delete the CheckInOut record. Please try again."
+    );
   }
 }
 
@@ -202,47 +285,6 @@ export async function getActiveCheckOuts() {
   }
 }
 
-// Update a CheckInOut record
-export async function updateCheckInOut(
-  id: number,
-  data: {
-    actual_return_date?: Date;
-    status?: "DIPINJAM" | "DIKEMBALIKAN";
-  }
-) {
-  try {
-    return await prisma.checkInOut.update({
-      where: { id },
-      data,
-    });
-  } catch (error) {
-    console.error(
-      `[updateCheckInOut] Failed to update CheckInOut record with ID ${id}:`,
-      error
-    );
-    throw new Error(
-      "Failed to update the CheckInOut record. Please try again."
-    );
-  }
-}
-
-// Delete a CheckInOut record
-export async function deleteCheckInOut(id: number) {
-  try {
-    return await prisma.checkInOut.delete({
-      where: { id },
-    });
-  } catch (error) {
-    console.error(
-      `[deleteCheckInOut] Failed to delete CheckInOut record with ID ${id}:`,
-      error
-    );
-    throw new Error(
-      "Failed to delete the CheckInOut record. Please try again."
-    );
-  }
-}
-
 // Get active CheckInOuts (currently borrowed)
 export async function getActiveCheckInOuts() {
   try {
@@ -386,46 +428,3 @@ export const getCheckoutMetrics = async () => {
     checkoutsInProgress,
   };
 };
-
-export async function checkoutAsset(data: CheckOutForm) {
-  if (!data) {
-    throw new Error("no data recieved");
-  }
-  const { user } = await getCurrentSession();
-  if (!user) {
-    throw new Error("not authorized");
-  }
-
-  return await prisma.$transaction(async (tx) => {
-    // Create checkout record
-    const checkout = await tx.checkInOut.create({
-      data: {
-        asset_id: data.asset_id,
-        user_id: user.id,
-        employee_id: data.employee_id,
-        check_out_date: data.check_out_date,
-        expected_return_date: data.expected_return_date,
-        status: "DIPINJAM",
-      },
-    });
-
-    // Update asset status (optional)
-    await tx.asset.update({
-      where: { id: data.asset_id },
-      data: { status: "TIDAK_AKTIF" },
-    });
-
-    // Log activity
-    await tx.activityLog.create({
-      data: {
-        user_id: user.id,
-        action: "Checkout Asset",
-        target_type: "ASSET",
-        target_id: data.asset_id,
-        timestamp: new Date(),
-      },
-    });
-
-    return checkout;
-  });
-}

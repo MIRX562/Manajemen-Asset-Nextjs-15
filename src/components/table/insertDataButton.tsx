@@ -24,7 +24,7 @@ export default function InsertDataDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-2 h-8">
+        <Button size="sm" className="gap-2 h-8 shadow-md">
           <PlusCircle className="h-4 w-4" />
           {triggerButtonText}
         </Button>

@@ -1,5 +1,6 @@
 "use server";
-import { validateSessionToken } from "@/lib/auth"; // Assuming validateSessionToken is from your auth file
+
+import { validateSessionToken } from "@/lib/auth";
 
 export async function getCurrentUser() {
   const cookie = document.cookie

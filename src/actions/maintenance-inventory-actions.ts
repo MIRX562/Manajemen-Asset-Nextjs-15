@@ -1,34 +1,17 @@
 "use server";
+
 import prisma from "@/lib/db";
 import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
 import { LifecycleStage } from "@prisma/client";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
-// Create a MaintenanceInventory record
-export async function createMaintenanceInventory(data: {
-  maintenance_id: number;
-  inventory_id: number;
-  quantity_used: number;
-}) {
-  try {
-    return await prisma.maintenanceInventory.create({ data });
-  } catch (error) {
-    console.error(
-      "[createMaintenanceInventory] Failed to create MaintenanceInventory record:",
-      error
-    );
-    throw new Error(
-      "Unable to create MaintenanceInventory record. Please try again."
-    );
-  }
-}
-//
 export async function scheduleMaintenance(
   data: z.infer<typeof scheduleMaintenanceSchema>
 ) {
   try {
     // Validate the data against the schema
-    const validatedData = await scheduleMaintenanceSchema.parse(data);
+    const validatedData = scheduleMaintenanceSchema.parse(data);
 
     // Perform the creation within a transaction
     return await prisma.$transaction(async (tx) => {
@@ -57,15 +40,6 @@ export async function scheduleMaintenance(
         });
       }
 
-      await tx.asset.update({
-        where: {
-          id: data.asset_id,
-        },
-        data: {
-          lifecycle_stage: LifecycleStage.PERBAIKAN,
-        },
-      });
-
       await tx.assetLifecycle.create({
         data: {
           asset_id: validatedData.asset_id,
@@ -74,7 +48,11 @@ export async function scheduleMaintenance(
           notes: validatedData.notes,
         },
       });
-
+      createActivityLog({
+        action: `Maintenance scheduled : ${maintenance.id}`,
+        target_type: "MAINTENANCE",
+        target_id: maintenance.id,
+      });
       return maintenance;
     });
   } catch (error) {

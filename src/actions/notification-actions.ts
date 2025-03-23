@@ -1,4 +1,5 @@
 "use server";
+
 import prisma from "@/lib/db";
 import { notificationEmitter } from "@/lib/eventEmitter";
 import { NotificationType } from "@prisma/client";

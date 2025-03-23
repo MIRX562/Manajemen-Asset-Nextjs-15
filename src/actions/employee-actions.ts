@@ -7,6 +7,7 @@ import {
 } from "@/schemas/employee-schema";
 import { Prisma, Employee } from "@prisma/client";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
 export const addEmployee = async (data: z.infer<typeof addEmployeeSchema>) => {
   try {
@@ -22,6 +23,12 @@ export const addEmployee = async (data: z.infer<typeof addEmployeeSchema>) => {
 
     const newEmployee = await prisma.employee.create({
       data: value,
+    });
+
+    createActivityLog({
+      action: `Add new employee: ${newEmployee.name}`,
+      target_type: "EMPLOYEE",
+      target_id: newEmployee.id,
     });
     return newEmployee;
   } catch (error) {
@@ -51,6 +58,12 @@ export const editEmployee = async (
       },
       data: value,
     });
+
+    createActivityLog({
+      action: `Updated employee: ${updatedEmployee.name}`,
+      target_type: "EMPLOYEE",
+      target_id: updatedEmployee.id,
+    });
     return updatedEmployee;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -76,6 +89,11 @@ export const deleteEmployee = async (data: Employee) => {
       where: {
         id: data.id,
       },
+    });
+    createActivityLog({
+      action: `Deleted employee`,
+      target_type: "EMPLOYEE",
+      target_id: data.id,
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

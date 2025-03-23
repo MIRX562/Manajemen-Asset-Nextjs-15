@@ -1,15 +1,25 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import { User } from "@prisma/client";
+import { Role } from "@prisma/client";
 import EditUserForm from "./form-edit";
 import { deleteUser } from "@/actions/user-actions";
+import { Badge } from "@/components/ui/badge";
 
-export const userColumns: ColumnDef<User>[] = [
+interface Data {
+  id: number;
+  username: string;
+  role: Role;
+  email: string;
+  Session: {
+    id: string;
+  }[];
+}
+
+export const userColumns: ColumnDef<Data>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -83,6 +93,21 @@ export const userColumns: ColumnDef<User>[] = [
             {row.getValue("role")}
           </span>
         </div>
+      );
+    },
+  },
+  {
+    id: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const isOnline = row.original.Session.length > 0;
+
+      return (
+        <Badge variant={isOnline ? "secondary" : "destructive"}>
+          {isOnline ? "Online" : "Offline"}
+        </Badge>
       );
     },
   },

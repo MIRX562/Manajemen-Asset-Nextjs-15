@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/db";
 import { Location, LocationType } from "@prisma/client";
+import { createActivityLog } from "./activities-actions";
 
 // Create a new location
 export async function createLocation(data: {
@@ -9,10 +10,64 @@ export async function createLocation(data: {
   type: LocationType;
 }) {
   try {
-    return await prisma.location.create({ data });
+    const newLocation = await prisma.location.create({ data });
+    createActivityLog({
+      action: `Add new location : ${newLocation.name}`,
+      target_type: "LOCATION",
+      target_id: newLocation.id,
+    });
+    return { success: true, message: "Location successfully added" };
   } catch (error) {
     console.error("[createLocation] Failed to create location:", error);
     throw new Error("Failed to create location. Please try again.");
+  }
+}
+
+// Update a location
+export async function updateLocation(data: {
+  name?: string;
+  address?: string;
+  type?: LocationType;
+  id: number;
+}) {
+  try {
+    const updated = await prisma.location.update({
+      where: { id: data.id },
+      data,
+    });
+    createActivityLog({
+      action: `Updated location : ${updated.name}`,
+      target_type: "LOCATION",
+      target_id: updated.id,
+    });
+    return { success: true, message: "Location successfully added" };
+  } catch (error) {
+    console.error(
+      `[updateLocation] Failed to update location with ID ${data.id}:`,
+      error
+    );
+    throw new Error("Failed to update the location. Please try again.");
+  }
+}
+
+// Delete a location
+export async function deleteLocation(data: Location) {
+  try {
+    await prisma.location.delete({
+      where: { id: data.id },
+    });
+    createActivityLog({
+      action: `Updated location : ${data.name}`,
+      target_type: "LOCATION",
+      target_id: data.id,
+    });
+    return { success: true, message: "Location successfully added" };
+  } catch (error) {
+    console.error(
+      `[deleteLocation] Failed to delete location with ID ${data.id}:`,
+      error
+    );
+    throw new Error("Failed to delete the location. Please try again.");
   }
 }
 
@@ -59,42 +114,6 @@ export async function getLocationById(id: number) {
       error
     );
     throw new Error("Failed to retrieve the location. Please try again.");
-  }
-}
-
-// Update a location
-export async function updateLocation(data: {
-  name?: string;
-  address?: string;
-  type?: "GUDANG" | "KANTOR" | "DATA_CENTER";
-  id: number;
-}) {
-  try {
-    return await prisma.location.update({
-      where: { id: data.id },
-      data,
-    });
-  } catch (error) {
-    console.error(
-      `[updateLocation] Failed to update location with ID ${data.id}:`,
-      error
-    );
-    throw new Error("Failed to update the location. Please try again.");
-  }
-}
-
-// Delete a location
-export async function deleteLocation(data: Location) {
-  try {
-    return await prisma.location.delete({
-      where: { id: data.id },
-    });
-  } catch (error) {
-    console.error(
-      `[deleteLocation] Failed to delete location with ID ${data.id}:`,
-      error
-    );
-    throw new Error("Failed to delete the location. Please try again.");
   }
 }
 

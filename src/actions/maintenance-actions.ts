@@ -1,8 +1,95 @@
 "use server";
+
 import prisma from "@/lib/db";
 import { updateMaintenanceStatusSchema } from "@/schemas/maintenance-schema";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
+
+// Update a maintenance record
+export async function updateMaintenanceStatus(
+  data: z.infer<typeof updateMaintenanceStatusSchema>
+) {
+  const { id, maintenance_status, notes } = data;
+  try {
+    if (maintenance_status == "SELESAI") {
+      await prisma.$transaction(async (tx) => {
+        await tx.maintenance.update({
+          where: { id },
+          data: {
+            notes,
+            status: maintenance_status,
+          },
+        });
+
+        const inventoryItems = await tx.maintenanceInventory.findMany({
+          where: {
+            maintenance_id: id,
+          },
+          select: {
+            inventory_id: true,
+            quantity_used: true,
+          },
+        });
+
+        await Promise.all(
+          inventoryItems.map((item) =>
+            tx.inventory.update({
+              where: { id: item.inventory_id },
+              data: { quantity: { decrement: item.quantity_used } },
+            })
+          )
+        );
+      });
+    }
+
+    await prisma.maintenance.update({
+      where: { id },
+      data: {
+        notes,
+        status: maintenance_status,
+      },
+    });
+
+    createActivityLog({
+      action: `Maintenance ${
+        maintenance_status == "SELESAI" ? "done" : "updated"
+      } : ${id}`,
+      target_type: "MAINTENANCE",
+      target_id: id,
+    });
+  } catch (error) {
+    console.error(
+      `[updateMaintenance] Failed to update maintenance record with ID ${id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to update the maintenance record. Please try again."
+    );
+  }
+}
+
+// Delete a maintenance record
+export async function deleteMaintenance(data: any) {
+  try {
+    await prisma.maintenance.delete({
+      where: { id: data.id },
+    });
+    createActivityLog({
+      action: `Maintenance done : ${data.id}`,
+      target_type: "MAINTENANCE",
+      target_id: data.id,
+    });
+  } catch (error) {
+    console.error(
+      `[deleteMaintenance] Failed to delete maintenance record with ID ${data.id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to delete the maintenance record. Please try again."
+    );
+  }
+}
 
 // Get upcoming maintenance tasks
 export async function getUpcomingMaintenance() {
@@ -37,25 +124,6 @@ export async function getUpcomingMaintenance() {
     throw new Error(
       "Unable to fetch upcoming maintenance tasks. Please try again."
     );
-  }
-}
-
-// Create a new maintenance record
-export async function createMaintenance(data: {
-  asset_id: number;
-  mechanic_id: number;
-  scheduled_date: Date;
-  status: "DIJADWALKAN" | "SELESAI" | "TERTUNDA";
-  notes?: string;
-}) {
-  try {
-    return await prisma.maintenance.create({ data });
-  } catch (error) {
-    console.error(
-      "[createMaintenance] Failed to create maintenance record:",
-      error
-    );
-    throw new Error("Unable to create maintenance record. Please try again.");
   }
 }
 
@@ -139,78 +207,6 @@ export async function getMaintenancesByMechanicId(mechanic_id: number) {
     );
     throw new Error(
       "Unable to fetch maintenance records for the specified mechanic. Please try again."
-    );
-  }
-}
-
-// Update a maintenance record
-export async function updateMaintenanceStatus(
-  data: z.infer<typeof updateMaintenanceStatusSchema>
-) {
-  const { id, maintenance_status, notes } = data;
-  try {
-    if (maintenance_status == "SELESAI") {
-      await prisma.$transaction(async (tx) => {
-        await tx.maintenance.update({
-          where: { id },
-          data: {
-            notes,
-            status: maintenance_status,
-          },
-        });
-
-        const inventoryItems = await tx.maintenanceInventory.findMany({
-          where: {
-            maintenance_id: id,
-          },
-          select: {
-            inventory_id: true,
-            quantity_used: true,
-          },
-        });
-
-        await Promise.all(
-          inventoryItems.map((item) =>
-            tx.inventory.update({
-              where: { id: item.inventory_id },
-              data: { quantity: { decrement: item.quantity_used } },
-            })
-          )
-        );
-      });
-    }
-    await prisma.maintenance.update({
-      where: { id },
-      data: {
-        notes,
-        status: maintenance_status,
-      },
-    });
-  } catch (error) {
-    console.error(
-      `[updateMaintenance] Failed to update maintenance record with ID ${id}:`,
-      error
-    );
-    throw new Error(
-      "Unable to update the maintenance record. Please try again."
-    );
-  }
-}
-
-// Delete a maintenance record
-export async function deleteMaintenance(data: any) {
-  console.log(data);
-  try {
-    return await prisma.maintenance.delete({
-      where: { id: data.id },
-    });
-  } catch (error) {
-    console.error(
-      `[deleteMaintenance] Failed to delete maintenance record with ID ${data.id}:`,
-      error
-    );
-    throw new Error(
-      "Unable to delete the maintenance record. Please try again."
     );
   }
 }

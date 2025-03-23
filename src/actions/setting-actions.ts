@@ -1,6 +1,7 @@
 "use server";
 import { getCurrentSession, hashPassword } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { createActivityLog } from "./activities-actions";
 
 interface ResetPassword {
   current_password: string;
@@ -27,6 +28,11 @@ export async function resetPassword(data: ResetPassword) {
       data: {
         password: hashedPassword,
       },
+    });
+    createActivityLog({
+      action: `Maintenance done : ${user.id}`,
+      target_type: "USER",
+      target_id: user.id,
     });
     return { success: true, message: "password successfully changed!" };
   } catch (error) {

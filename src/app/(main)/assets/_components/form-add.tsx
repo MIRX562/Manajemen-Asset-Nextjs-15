@@ -61,7 +61,6 @@ export default function AddAssetForm() {
 
   async function onSubmit(values: z.infer<typeof createAssetSchema>) {
     try {
-      console.log({ values });
       toast.promise(createAsset(values), {
         loading: "Creating Asset...",
         success: "Asset created successfully!",

@@ -1,8 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { calculateDepreciation } from "@/lib/utils";
-import { endOfMonth, startOfMonth, subYears } from "date-fns";
+import { eachMonthOfInterval, format, subMonths } from "date-fns";
 
 export async function getDashboardSummary() {
   const [
@@ -31,63 +30,73 @@ export async function getDashboardSummary() {
   };
 }
 
-export async function getAssetValuationOverYear() {
-  // Define the range (last 12 months)
-  const startDate = subYears(new Date(), 1);
-  const endDate = new Date();
+function calculateDepreciation(
+  initial: number,
+  salvage: number,
+  life: number,
+  yearsUsed: number
+) {
+  if (yearsUsed >= life) return salvage;
+  return initial - ((initial - salvage) / life) * yearsUsed;
+}
 
-  // Fetch assets within the range
+export async function getAssetValuationOverYear() {
+  const endDate = new Date();
+  const startDate = subMonths(endDate, 11); // Last 12 months
+  const months = eachMonthOfInterval({ start: startDate, end: endDate });
+
+  // Fetch assets & their latest DIHAPUS lifecycle change (if exists)
   const assets = await prisma.asset.findMany({
     where: {
-      purchase_date: {
-        gte: startOfMonth(startDate),
-        lte: endOfMonth(endDate),
-      },
+      purchase_date: { lte: endDate },
     },
     select: {
+      id: true,
       initial_value: true,
       salvage_value: true,
       useful_life: true,
       purchase_date: true,
+      assetLifecycles: {
+        where: { stage: "DIHAPUS" },
+        orderBy: { change_date: "desc" },
+        take: 1, // Get latest DIHAPUS change date
+        select: { change_date: true },
+      },
     },
   });
 
-  // Calculate valuation by month
-  const valuationsByMonth = {};
-  assets.forEach((asset) => {
-    const purchaseDate = new Date(asset.purchase_date);
-    for (
-      let year = startDate.getFullYear();
-      year <= endDate.getFullYear();
-      year++
-    ) {
-      for (let month = 0; month < 12; month++) {
-        const currentMonth = new Date(year, month);
-        if (currentMonth < purchaseDate || currentMonth > endDate) continue;
-
-        // Calculate years used
-        const yearsUsed =
-          currentMonth.getFullYear() -
-          purchaseDate.getFullYear() +
-          (currentMonth.getMonth() - purchaseDate.getMonth()) / 12;
-
-        // Calculate depreciated value
-        const depreciatedValue = calculateDepreciation(
-          asset.initial_value,
-          asset.salvage_value,
-          asset.useful_life,
-          yearsUsed
-        );
-
-        // Group by month string
-        const monthKey = currentMonth; // Full date with day
-        valuationsByMonth[monthKey] =
-          (valuationsByMonth[monthKey] || 0) + depreciatedValue;
-      }
-    }
+  // Prepare valuation map
+  const valuationsByMonth: Record<string, number> = {};
+  months.forEach((month) => {
+    valuationsByMonth[format(month, "yyyy-MM")] = 0;
   });
 
-  // Format data for line chart
+  assets.forEach((asset) => {
+    const purchaseDate = new Date(asset.purchase_date);
+    const dihapusDate = asset.assetLifecycles.length
+      ? new Date(asset.assetLifecycles[0].change_date)
+      : null;
+
+    months.forEach((month) => {
+      if (month < purchaseDate || (dihapusDate && month > dihapusDate)) return;
+
+      const yearsUsed =
+        month.getFullYear() -
+        purchaseDate.getFullYear() +
+        (month.getMonth() - purchaseDate.getMonth()) / 12;
+
+      const depreciatedValue = calculateDepreciation(
+        asset.initial_value,
+        asset.salvage_value,
+        asset.useful_life,
+        yearsUsed
+      );
+
+      const monthKey = format(month, "yyyy-MM");
+      valuationsByMonth[monthKey] += depreciatedValue;
+    });
+  });
+
   return Object.entries(valuationsByMonth).map(([month, totalValue]) => ({
     month,
     totalValue,

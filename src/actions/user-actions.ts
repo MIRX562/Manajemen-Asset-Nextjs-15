@@ -5,6 +5,7 @@ import prisma from "@/lib/db";
 import { addUserSchema, editUserSchema } from "@/schemas/user-schema";
 import { Prisma, User } from "@prisma/client";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
 export const addUser = async (data: z.infer<typeof addUserSchema>) => {
   try {
@@ -26,6 +27,11 @@ export const addUser = async (data: z.infer<typeof addUserSchema>) => {
         password: hashedPassword,
         role: value.role,
       },
+    });
+    createActivityLog({
+      action: `Add new user: ${newUser.username}`,
+      target_type: "USER",
+      target_id: newUser.id,
     });
     return newUser;
   } catch (error) {
@@ -57,6 +63,11 @@ export const editUser = async (data: z.infer<typeof editUserSchema>) => {
         role: value.role,
       },
     });
+    createActivityLog({
+      action: `Updated user: ${updatedUser.username}`,
+      target_type: "USER",
+      target_id: updatedUser.id,
+    });
     return updatedUser;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -82,6 +93,11 @@ export const deleteUser = async (data: User) => {
       where: {
         id: data.id,
       },
+    });
+    createActivityLog({
+      action: `Deleted user: : ${data.username}`,
+      target_type: "USER",
+      target_id: data.id,
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

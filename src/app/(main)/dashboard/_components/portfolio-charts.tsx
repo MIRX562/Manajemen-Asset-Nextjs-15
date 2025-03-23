@@ -22,11 +22,11 @@ const chartConfig = {
   views: {
     label: "Total value",
   },
-  desktop: {
+  highest: {
     label: "Highest",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
+  lowest: {
     label: "Lowest",
     color: "hsl(var(--chart-2))",
   },
@@ -68,7 +68,7 @@ export function PortfolioChart({
         <div className="flex">
           <div className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-l sm:border-t-0 sm:px-8 sm:py-6">
             <span className="text-lg text-muted-foreground">
-              {chartConfig.desktop.label}
+              {chartConfig.highest.label}
             </span>
             <span className="text-lg font-bold leading-none">
               {formatCurrency(highest)}
@@ -76,7 +76,7 @@ export function PortfolioChart({
           </div>
           <div className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-l sm:border-t-0 sm:px-8 sm:py-6">
             <span className="text-lg text-muted-foreground">
-              {chartConfig.mobile.label}
+              {chartConfig.lowest.label}
             </span>
             <span className="text-lg font-bold leading-none">
               {formatCurrency(lowest)}
@@ -125,7 +125,7 @@ export function PortfolioChart({
                 />
               }
             />
-            <Bar dataKey="totalValue" fill={`var(--color-desktop)`} />
+            <Bar dataKey="totalValue" fill={`var(--color-highest)`} />
           </BarChart>
         </ChartContainer>
       </CardContent>

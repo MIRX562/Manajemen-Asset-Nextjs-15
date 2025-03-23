@@ -7,6 +7,7 @@ import {
   editAssetSchema,
 } from "@/schemas/asset-schema";
 import { z } from "zod";
+import { createActivityLog } from "./activities-actions";
 
 export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
   const value = createAssetSchema.parse(data);
@@ -22,7 +23,6 @@ export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
         initial_value: value.initial_value,
         salvage_value: value.salvage_value,
         useful_life: value.useful_life,
-        lifecycle_stage: value.lifecycle_stage,
       },
     });
 
@@ -45,6 +45,12 @@ export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
           data.lifecycle_notes ||
           `Asset created with stage: ${value.lifecycle_stage}`,
       },
+    });
+
+    createActivityLog({
+      action: `Add new asset: ${asset.name}`,
+      target_type: "ASSET",
+      target_id: asset.id,
     });
 
     return asset;
@@ -70,7 +76,6 @@ export const editAsset = async (
         type_id: value.type_id,
         status: value.status,
         purchase_date: value.purchase_date,
-        lifecycle_stage: value.lifecycle_stage,
         initial_value: value.initial_value,
         salvage_value: value.salvage_value,
         useful_life: value.useful_life,
@@ -140,6 +145,12 @@ export const editAsset = async (
       }
     }
 
+    createActivityLog({
+      action: `Updated asset: ${asset.name}`,
+      target_type: "ASSET",
+      target_id: asset.id,
+    });
+
     return asset;
   } catch (error) {
     console.error(`[editAsset] Error:`, error);
@@ -152,6 +163,11 @@ export const deleteAsset = async (data: z.infer<typeof deleteAssetSchema>) => {
   try {
     await prisma.asset.delete({
       where: { id: value.id },
+    });
+    createActivityLog({
+      action: `Deleted asset#${data.id}`,
+      target_type: "ASSET",
+      target_id: data.id,
     });
   } catch (error) {
     console.error(error);
@@ -166,6 +182,7 @@ export const getAllAssets = async () => {
         assetLifecycles: {
           select: {
             notes: true,
+            stage: true,
           },
         },
         locationHistory: {
@@ -236,6 +253,7 @@ export const getAssetByType = async (type_id: number) => {
     throw new Error("Failed to fetch asset");
   }
 };
+
 export const getAvailableAssets = async () => {
   try {
     const availableAssets = await prisma.asset.findMany({

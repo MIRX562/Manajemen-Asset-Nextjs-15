@@ -45,8 +45,14 @@ export const editAssetType = async (
         description: value.description,
       },
     });
+    createActivityLog({
+      action: `updated type: ${assetType.model}`,
+      target_type: "ASSET_TYPE",
+      target_id: assetType.id,
+    });
     return assetType;
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to update asset type");
   }
 };
@@ -63,7 +69,13 @@ export const deleteAssetType = async (
     await prisma.assetType.delete({
       where: { id: value.id },
     });
+    createActivityLog({
+      action: `Deleted type: ${data.id}`,
+      target_type: "ASSET_TYPE",
+      target_id: data.id,
+    });
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to delete asset type");
   }
 };

@@ -55,6 +55,8 @@ export default function EditAssetForm({ data }: { data: FormData }) {
     resolver: zodResolver(editAssetSchema),
     defaultValues: {
       ...data,
+      lifecycle_stage:
+        data.assetLifecycles?.[data.assetLifecycles.length - 1]?.stage ?? "",
       location_id:
         data.locationHistory?.[data.locationHistory.length - 1]?.location_id ??
         undefined, // Get the location from history
@@ -159,7 +161,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                       </Command>
                     </PopoverContent>
                   </Popover>
-                  <FormDescription>Asset type.</FormDescription>
+                  <FormDescription>Asset&apos;s type.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -179,7 +181,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -212,8 +214,8 @@ export default function EditAssetForm({ data }: { data: FormData }) {
         </div>
 
         {/* Status and Lifecycle Stage */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-6">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-1">
             <FormField
               control={form.control}
               name="status"
@@ -244,7 +246,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
             />
           </div>
 
-          <div className="col-span-6">
+          <div className="col-span-1">
             <FormField
               control={form.control}
               name="lifecycle_stage"
@@ -274,11 +276,30 @@ export default function EditAssetForm({ data }: { data: FormData }) {
               )}
             />
           </div>
+
+          <div className="col-span-1">
+            <FormField
+              control={form.control}
+              name="useful_life"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Useful Life (years)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Estimated useful duration in years
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Financial Details */}
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="col-span-1">
             <FormField
               control={form.control}
               name="initial_value"
@@ -295,7 +316,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
             />
           </div>
 
-          <div className="col-span-4">
+          <div className="col-span-1">
             <FormField
               control={form.control}
               name="salvage_value"
@@ -306,26 +327,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                     <Input type="number" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Estimated value at the end of its lifecycle
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="useful_life"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Useful Life</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Estimated useful duration in years
+                    value at the end of lifecycle
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -357,7 +359,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>where the items is stored</FormDescription>
+              <FormDescription>where the asset is stored</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -373,7 +375,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                 <Textarea className="resize-none" {...field} />
               </FormControl>
               <FormDescription>
-                Note for the current asset condition
+                Note for the current asset status, usage, condition, etc...
               </FormDescription>
               <FormMessage />
             </FormItem>
