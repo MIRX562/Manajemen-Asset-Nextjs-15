@@ -42,9 +42,9 @@ export default function EditInventoryForm({ data }: MyFormProp) {
   async function onSubmit(data: z.infer<typeof updateInventorySchema>) {
     try {
       await toast.promise(updateInventoryItem(data), {
-        loading: "creating new inventory item...",
-        success: "new item created",
-        error: "failed to create new item",
+        loading: "Updating inventory item...",
+        success: "Item updated",
+        error: "failed to update item",
       });
       router.refresh();
     } catch (error) {

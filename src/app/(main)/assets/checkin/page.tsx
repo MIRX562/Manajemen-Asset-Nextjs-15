@@ -17,7 +17,7 @@ export default async function Page() {
   const assets = await getAllActiveCheckoutsForm();
   return (
     <div className="flex flex-col w-full pt-4 space-y-4">
-      <div className="flex w-full items-center justify-between">
+      <div className="flex flex-col md:flex-row w-full md:items-center justify-between">
         <h1 className="text-3xl font-bold">Active Checkouts</h1>
         <Dialog>
           <DialogTrigger asChild>

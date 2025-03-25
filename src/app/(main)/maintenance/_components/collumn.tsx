@@ -60,13 +60,13 @@ export const fullMaintenanceColumns: ColumnDef<{
     ),
     cell: ({ row }) => <div>{row.getValue("status")}</div>,
   },
-  {
-    accessorKey: "notes",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Notes" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("notes") ?? "No Notes"}</div>,
-  },
+  // {
+  //   accessorKey: "notes",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Notes" />
+  //   ),
+  //   cell: ({ row }) => <div>{row.getValue("notes") ?? "No Notes"}</div>,
+  // },
   {
     accessorKey: "inventoryItems",
     header: ({ column }) => (

@@ -32,7 +32,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { AssetStatus, LifecycleStage } from "@prisma/client";
-import { editAssetSchema } from "@/schemas/asset-schema";
+import { AssetDetail, editAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownContext } from "@/context/dropdown";
 import { editAsset } from "@/actions/assets-actions";
 import { useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 type FormData = z.infer<typeof editAssetSchema>;
 
-export default function EditAssetForm({ data }: { data: FormData }) {
+export default function EditAssetForm({ data }: { data: AssetDetail }) {
   const { assetTypes, locations } = useDropdownContext();
   const router = useRouter();
   const form = useForm<FormData>({
@@ -58,7 +58,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
       lifecycle_stage:
         data.assetLifecycles?.[data.assetLifecycles.length - 1]?.stage ?? "",
       location_id:
-        data.locationHistory?.[data.locationHistory.length - 1]?.location_id ??
+        data.locationHistory?.[data.locationHistory.length - 1]?.location.id ??
         undefined, // Get the location from history
       lifecycle_notes:
         data.assetLifecycles?.[data.assetLifecycles.length - 1]?.notes ?? "",
@@ -67,7 +67,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
 
   async function onSubmit(values: FormData) {
     try {
-      await toast.promise(
+      toast.promise(
         editAsset(values, values.location_id, values.lifecycle_notes),
         {
           loading: "Updatin Asset...",
@@ -85,7 +85,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4 max-h-[80svh] overflow-auto"
+        className="flex flex-col gap-4 px-1"
       >
         {/* Asset Name */}
         <FormField
@@ -213,8 +213,7 @@ export default function EditAssetForm({ data }: { data: FormData }) {
           </div>
         </div>
 
-        {/* Status and Lifecycle Stage */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="col-span-1">
             <FormField
               control={form.control}
@@ -249,37 +248,6 @@ export default function EditAssetForm({ data }: { data: FormData }) {
           <div className="col-span-1">
             <FormField
               control={form.control}
-              name="lifecycle_stage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Lifecycle Stage</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value?.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select lifecycle stage" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.values(LifecycleStage).map((stage) => (
-                        <SelectItem key={stage} value={stage}>
-                          {stage}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>Current lifecycle stage</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-1">
-            <FormField
-              control={form.control}
               name="useful_life"
               render={({ field }) => (
                 <FormItem>
@@ -297,7 +265,6 @@ export default function EditAssetForm({ data }: { data: FormData }) {
           </div>
         </div>
 
-        {/* Financial Details */}
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-1">
             <FormField
@@ -305,11 +272,11 @@ export default function EditAssetForm({ data }: { data: FormData }) {
               name="initial_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Initial Value</FormLabel>
+                  <FormLabel>Initial Value (Rp)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
-                  <FormDescription>Initial cost of the asset</FormDescription>
+                  <FormDescription>Purchase cost of the asset</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -322,12 +289,12 @@ export default function EditAssetForm({ data }: { data: FormData }) {
               name="salvage_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Salvage Value</FormLabel>
+                  <FormLabel>Salvage Value (Rp)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
                   <FormDescription>
-                    value at the end of lifecycle
+                    value at the end of useful life
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -360,6 +327,35 @@ export default function EditAssetForm({ data }: { data: FormData }) {
                 </SelectContent>
               </Select>
               <FormDescription>where the asset is stored</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="lifecycle_stage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lifecycle Stage</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value?.toString()}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select lifecycle stage" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Object.values(LifecycleStage).map((stage) => (
+                    <SelectItem key={stage} value={stage}>
+                      {stage}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>Current lifecycle stage</FormDescription>
               <FormMessage />
             </FormItem>
           )}

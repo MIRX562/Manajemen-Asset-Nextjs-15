@@ -25,10 +25,10 @@ export default function AssetTabs({ assetData }: AssetTabsProps) {
   return (
     <Tabs defaultValue="location" className="space-y-4 flex flex-col w-full">
       <TabsList className="mx-auto">
-        <TabsTrigger value="location">Location History</TabsTrigger>
-        <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
-        <TabsTrigger value="checkinout">Check In/Out</TabsTrigger>
-        <TabsTrigger value="lifecycle">Lifecycle</TabsTrigger>
+        <TabsTrigger value="location">Locations</TabsTrigger>
+        <TabsTrigger value="maintenance">Maintenances</TabsTrigger>
+        <TabsTrigger value="checkinout">CheckOuts</TabsTrigger>
+        <TabsTrigger value="lifecycle">Lifecycles</TabsTrigger>
       </TabsList>
 
       {/* Location Tab */}
@@ -83,7 +83,7 @@ export default function AssetTabs({ assetData }: AssetTabsProps) {
           <CardContent>
             {assetData.maintenances && assetData.maintenances.length > 0 ? (
               <ul className="space-y-4">
-                {assetData.maintenances.map((maintenance: Maintenance) => (
+                {assetData.maintenances.map((maintenance) => (
                   <li
                     key={maintenance.id}
                     className="flex items-center space-x-4"
@@ -117,7 +117,7 @@ export default function AssetTabs({ assetData }: AssetTabsProps) {
           <CardContent>
             {assetData.checkInOuts && assetData.checkInOuts.length > 0 ? (
               <ul className="space-y-4">
-                {assetData.checkInOuts.map((checkInOut: CheckInOut) => (
+                {assetData.checkInOuts.map((checkInOut) => (
                   <li
                     key={checkInOut.id}
                     className="flex items-center space-x-4"
@@ -130,8 +130,14 @@ export default function AssetTabs({ assetData }: AssetTabsProps) {
                           : "Checked In"}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        User: {checkInOut.user.username} | Date:{" "}
-                        {formatDate(checkInOut.updated_at)}
+                        Checked-out by: {checkInOut.user.username}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Checked-out to: {checkInOut.employee.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {" "}
+                        From: {formatDate(checkInOut.updated_at)}
                       </p>
                     </div>
                   </li>

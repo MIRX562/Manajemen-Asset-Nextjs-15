@@ -1,68 +1,79 @@
 "use client";
 
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
-  InfoIcon,
   WrenchIcon,
   BoxIcon,
-  UserIcon,
-  ClockIcon,
   NotebookText,
+  Edit,
 } from "lucide-react";
-import { Inventory, MaintenanceStatus } from "@prisma/client";
+import { MaintenanceStatus } from "@prisma/client";
 import Link from "next/link";
 import UpdateMaintenaceForm from "./_components/form-update";
+import { formatDate } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  EditAssetMechanicForm,
+  EditInventoryForm,
+} from "./_components/form-change";
 
 interface Maintenance {
   id: number;
   asset: {
+    id: number;
     name: string;
     status: string;
-    type_id: number;
-    purchase_date: string;
-    lifecycle_stage: string;
-    initial_value: number;
-    salvage_value: number;
+    type: {
+      model: string;
+    };
   };
   mechanic: {
+    id: number;
     username: string;
-    role: string;
     email: string;
   };
-  scheduled_date: string;
+  scheduled_date: Date;
   status: MaintenanceStatus;
-  notes: string;
+  notes: string | null;
   inventoryItems: Array<{
     inventory_id: number;
     quantity_used: number;
-    inventory: Inventory;
+    inventory: {
+      name: string;
+    };
   }>;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
+
+type FormProps = {
+  inventoryItems: {
+    id: number;
+    name: string;
+    quantity: number;
+  }[];
+  assets: {
+    id: number;
+    name: string;
+  }[];
+};
 
 export default function MaintenanceDetailView({
   maintenance,
+  data,
 }: {
   maintenance: Maintenance;
+  data: FormProps;
 }) {
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "PPP");
-  };
-
   const getStatusColor = (status: MaintenanceStatus) => {
     switch (status) {
       case MaintenanceStatus.DIJADWALKAN:
@@ -78,12 +89,28 @@ export default function MaintenanceDetailView({
     }
   };
 
+  const initialAssetMechanic = {
+    id: maintenance.id,
+    asset_id: maintenance.asset.id,
+    mechanic_id: maintenance.mechanic.id,
+  };
+
+  const initialInventory = {
+    id: maintenance.id,
+    inventory: maintenance.inventoryItems,
+  };
+
   return (
-    <div className="px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <Button asChild variant="outline" className="flex items-center">
+    <div className="px-2 py-3">
+      <div className="mb-2 flex items-center gap-4">
+        <Button
+          asChild
+          variant="outline"
+          size="icon"
+          className="flex items-center"
+        >
           <Link href="/maintenance">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to List
+            <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <h1 className="text-3xl font-bold">Maintenance Details</h1>
@@ -96,139 +123,124 @@ export default function MaintenanceDetailView({
         </Badge>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-full lg:col-span-2">
-          <CardHeader>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-2 ">
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
               <WrenchIcon className="mr-2 h-5 w-5" />
-              Basic Maintenance Details
+              Maintenance Details
             </CardTitle>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  size="icon"
+                  className={`${
+                    maintenance.status == MaintenanceStatus.SELESAI
+                      ? "hidden"
+                      : ""
+                  }`}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>Edit maintenance</DialogTitle>
+                <div className="max-h-[80svh] overflow-y-scroll">
+                  <EditAssetMechanicForm
+                    assets={data.assets}
+                    initialData={initialAssetMechanic}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {/* Basic Maintenance Info */}
             <div>
               <Label>Maintenance ID</Label>
-              <p>{maintenance.id}</p>
+              <p className="text-muted-foreground">{maintenance.id}</p>
             </div>
             <div>
               <Label>Asset Name</Label>
-              <p>{maintenance.asset.name}</p>
+              <p className="text-muted-foreground">{maintenance.asset.name}</p>
             </div>
             <div>
               <Label>Asset Status</Label>
-              <p>{maintenance.asset.status}</p>
+              <p className="text-muted-foreground">
+                {maintenance.asset.status}
+              </p>
             </div>
+            <div>
+              <Label>Asset Type</Label>
+              <p className="text-muted-foreground">
+                {maintenance.asset.type.model}
+              </p>
+            </div>
+
             <div>
               <Label>Mechanic Name</Label>
-              <p>{maintenance.mechanic.username}</p>
+              <p className="text-muted-foreground">
+                {maintenance.mechanic.username}
+              </p>
             </div>
             <div>
-              <Label>Mechanic Role</Label>
-              <p>{maintenance.mechanic.role}</p>
+              <Label>Mechanic Email</Label>
+              <p className="text-muted-foreground">
+                {maintenance.mechanic.email}
+              </p>
             </div>
+
             <div>
               <Label>Scheduled Date</Label>
-              <p>{formatDate(maintenance.scheduled_date)}</p>
+              <p className="text-muted-foreground">
+                {formatDate(maintenance.scheduled_date.toLocaleString())}
+              </p>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <ClockIcon className="mr-2 h-5 w-5" />
-              Timestamps
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
             <div>
               <Label>Created At</Label>
-              <p>{formatDate(maintenance.created_at)}</p>
+              <p className="text-muted-foreground">
+                {formatDate(maintenance.created_at.toLocaleString())}
+              </p>
             </div>
             <div>
               <Label>Updated At</Label>
-              <p>{formatDate(maintenance.updated_at)}</p>
+              <p className="text-muted-foreground">
+                {formatDate(maintenance.updated_at.toLocaleString())}
+              </p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <BoxIcon className="mr-2 h-5 w-5" />
-              Asset Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Asset Name</Label>
-              <p>{maintenance.asset.name}</p>
-            </div>
-            <div>
-              <Label>Asset Type ID</Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center">
-                      <p className="text-gray-700 mr-2">
-                        {maintenance.asset.type_id}
-                      </p>
-                      <InfoIcon className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Unique identifier for the asset type</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <div>
-              <Label>Purchase Date</Label>
-              <p>{formatDate(maintenance.asset.purchase_date)}</p>
-            </div>
-            <div>
-              <Label>Lifecycle Stage</Label>
-              <p>{maintenance.asset.lifecycle_stage}</p>
-            </div>
-            <div>
-              <Label>Initial Value</Label>
-              <p>${maintenance.asset.initial_value.toLocaleString()}</p>
-            </div>
-            <div>
-              <Label>Salvage Value</Label>
-              <p>${maintenance.asset.salvage_value.toLocaleString()}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <UserIcon className="mr-2 h-5 w-5" />
-              Mechanic Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Username</Label>
-              <p>{maintenance.mechanic.username}</p>
-            </div>
-            <div>
-              <Label>Role</Label>
-              <p>{maintenance.mechanic.role}</p>
-            </div>
-            <div>
-              <Label>Email</Label>
-              <p>{maintenance.mechanic.email}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
               <BoxIcon className="mr-2 h-5 w-5" />
               Inventory Items Used
             </CardTitle>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  size="icon"
+                  className={`${
+                    maintenance.status == MaintenanceStatus.SELESAI
+                      ? "hidden"
+                      : ""
+                  }`}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>Edit maintenance</DialogTitle>
+                <div className="max-h-[80svh] overflow-y-scroll">
+                  <EditInventoryForm
+                    initialData={initialInventory}
+                    inventoryItems={data.inventoryItems}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -254,6 +266,7 @@ export default function MaintenanceDetailView({
               maintenance_status={maintenance.status}
               notes={maintenance.notes}
               id={maintenance.id}
+              asset_id={maintenance.asset.id}
             />
           </CardContent>
         </Card>

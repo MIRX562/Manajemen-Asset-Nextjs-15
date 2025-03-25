@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { TrashIcon, Eye } from "lucide-react";
+import { TrashIcon, Eye, Edit } from "lucide-react";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -83,8 +83,13 @@ export function DataTableRowActions<TData>({
               </TooltipContent>
             </Tooltip>
             <DialogContent>
-              <DialogTitle>Edit</DialogTitle>
-              <EditComponent data={data} />
+              <DialogTitle className="flex gap-4 items-center">
+                <Edit />
+                Edit
+              </DialogTitle>
+              <div className="max-h-[80svh] overflow-y-scroll">
+                <EditComponent data={data} />
+              </div>
             </DialogContent>
           </Dialog>
         )}

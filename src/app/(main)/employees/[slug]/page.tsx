@@ -1,7 +1,6 @@
 import { getCheckInOutsByEmployeeId } from "@/actions/checkinout-actions";
 import { getEmployeeById } from "@/actions/employee-actions";
 import { DataTable } from "@/components/table/data-table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +13,6 @@ import { formatDistanceToNow } from "date-fns";
 import { ArrowLeft, BriefcaseBusiness, Edit, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { employeeCheckoutHistoryColumns } from "./collumn";
-import InsertDataDialog from "@/components/table/insertDataButton";
 import EditEmployeeForm from "../_components/form-edit";
 import {
   Dialog,
@@ -40,18 +38,20 @@ export default async function Page(props: {
 
   return (
     <div className="flex flex-col gap-4 mt-4">
-      <div className="mb-2 flex items-center justify-between">
-        <Button
-          asChild
-          variant="outline"
-          size="icon"
-          className="flex items-center justify-center"
-        >
-          <Link href="/employees">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold">{data.name}</h1>
+      <div className="mb-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className="flex items-center justify-center"
+          >
+            <Link href="/employees">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl md:text-3xl font-bold">{data.name}</h1>
+        </div>
         <Dialog>
           <DialogTrigger asChild>
             <Button className="gap-2">

@@ -133,8 +133,24 @@ export async function getAllCheckInOuts() {
   try {
     return await prisma.checkInOut.findMany({
       include: {
-        asset: true,
-        user: true,
+        asset: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        employee: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        id: "desc",
       },
     });
   } catch (error) {
@@ -306,6 +322,9 @@ export async function getActiveCheckInOuts() {
             name: true,
           },
         },
+      },
+      orderBy: {
+        id: "desc",
       },
     });
   } catch (error) {

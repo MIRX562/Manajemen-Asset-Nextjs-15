@@ -74,7 +74,11 @@ export async function deleteLocation(data: Location) {
 // Get all locations
 export async function getAllLocations() {
   try {
-    return await prisma.location.findMany();
+    return await prisma.location.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
   } catch (error) {
     console.error("[getAllLocations] Failed to retrieve locations:", error);
     throw new Error("Failed to retrieve locations. Please try again.");

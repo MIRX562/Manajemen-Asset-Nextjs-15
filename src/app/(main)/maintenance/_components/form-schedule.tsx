@@ -45,6 +45,7 @@ import { MaintenanceStatus } from "@prisma/client";
 import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
 import { scheduleMaintenance } from "@/actions/maintenance-inventory-actions";
 import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
 
 type FormProps = {
   inventoryItems: {
@@ -80,6 +81,7 @@ export default function ScheduleMaintenanceForm({
 
   function onSubmit(values: z.infer<typeof scheduleMaintenanceSchema>) {
     try {
+      console.log(values);
       toast.promise(scheduleMaintenance(values), {
         loading: "Adding new Maintenance...",
         success: "New maintenance is scheduled",
@@ -96,14 +98,14 @@ export default function ScheduleMaintenanceForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-8"
+        className="flex flex-col md:flex-row gap-8"
       >
         <div className="space-y-4">
           <FormField
             control={form.control}
             name="asset_id"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col w-full">
                 <FormLabel>Asset</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -163,7 +165,7 @@ export default function ScheduleMaintenanceForm({
             control={form.control}
             name="mechanic_id"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col w-full">
                 <FormLabel>Mechanic</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -235,7 +237,7 @@ export default function ScheduleMaintenanceForm({
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -317,7 +319,10 @@ export default function ScheduleMaintenanceForm({
             )}
           />
         </div>
-        <div className="w-full col-span-full md:col-span-1 space-y-2">
+
+        <Separator className="md:hidden" />
+
+        <div className="w-full md:col-span-1 space-y-2">
           <div className="flex items-center w-full justify-between">
             <div>
               <FormLabel>Inventory Items</FormLabel>
@@ -326,7 +331,6 @@ export default function ScheduleMaintenanceForm({
             <Button
               type="button"
               onClick={() => append({ item_id: "", quantity: 1 })}
-              className="mt-4"
             >
               <PlusCircle />
               Add Item
@@ -406,6 +410,8 @@ export default function ScheduleMaintenanceForm({
             ))}
           </div>
         </div>
+
+        <Separator className="md:hidden" />
 
         <Button type="submit" className="ml-auto">
           Submit

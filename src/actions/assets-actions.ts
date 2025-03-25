@@ -179,15 +179,54 @@ export const getAllAssets = async () => {
   try {
     const assets = await prisma.asset.findMany({
       include: {
-        assetLifecycles: {
+        type: {
           select: {
-            notes: true,
-            stage: true,
+            model: true,
           },
         },
         locationHistory: {
           select: {
-            location_id: true,
+            id: true,
+            assigned_date: true,
+            release_date: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        maintenances: {
+          select: {
+            id: true,
+            status: true,
+            scheduled_date: true,
+          },
+        },
+        checkInOuts: {
+          select: {
+            id: true,
+            updated_at: true,
+            status: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
+            employee: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        assetLifecycles: {
+          select: {
+            id: true,
+            stage: true,
+            change_date: true,
+            notes: true,
           },
         },
       },
@@ -207,23 +246,61 @@ export const getAssetById = async (id: number) => {
     const asset = await prisma.asset.findUnique({
       where: { id },
       include: {
-        type: true,
+        type: {
+          select: {
+            model: true,
+          },
+        },
         locationHistory: {
-          include: {
-            location: true,
+          select: {
+            id: true,
+            assigned_date: true,
+            release_date: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
-        maintenances: true,
+        maintenances: {
+          select: {
+            id: true,
+            status: true,
+            scheduled_date: true,
+          },
+        },
         checkInOuts: {
-          include: {
-            user: true,
+          select: {
+            id: true,
+            updated_at: true,
+            status: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
+            employee: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
-        assetLifecycles: true,
+        assetLifecycles: {
+          select: {
+            id: true,
+            stage: true,
+            change_date: true,
+            notes: true,
+          },
+        },
       },
     });
     return asset;
   } catch (error) {
+    console.error(error);
     throw new Error("Failed to fetch asset");
   }
 };
@@ -267,6 +344,39 @@ export const getAvailableAssets = async () => {
             },
           },
         },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return availableAssets;
+  } catch (error) {
+    throw new Error("Failed to fetch asset");
+  }
+};
+
+export const getAvailableAssetsIncludeId = async (id: number) => {
+  try {
+    const availableAssets = await prisma.asset.findMany({
+      where: {
+        OR: [
+          {
+            status: "AKTIF",
+            NOT: {
+              checkInOuts: {
+                some: {
+                  actual_return_date: null,
+                  status: "DIPINJAM",
+                },
+              },
+            },
+          },
+          {
+            id, // Ensure the given asset ID is always included
+          },
+        ],
       },
       select: {
         id: true,

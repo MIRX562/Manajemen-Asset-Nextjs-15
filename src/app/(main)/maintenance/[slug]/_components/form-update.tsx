@@ -38,7 +38,6 @@ export default function UpdateMaintenaceForm(
   const router = useRouter();
   function onSubmit(values: z.infer<typeof updateMaintenanceStatusSchema>) {
     try {
-      console.log(values);
       toast.promise(updateMaintenanceStatus(values), {
         loading: "updating maintenance status...",
         success: "status updated",
@@ -53,7 +52,7 @@ export default function UpdateMaintenaceForm(
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="maintenance_status"
@@ -61,7 +60,12 @@ export default function UpdateMaintenaceForm(
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={data.maintenance_status === "SELESAI"}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a verified email to display" />
@@ -114,20 +118,22 @@ export default function UpdateMaintenaceForm(
           name="id"
           render={({ field }) => (
             <FormItem hidden>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Id</FormLabel>
               <FormControl>
                 <Input placeholder="shadcn" disabled type="number" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button hidden={data.maintenance_status === "SELESAI"} type="submit">
-          Update
-        </Button>
+
+        <div
+          className={`${
+            data.maintenance_status == MaintenanceStatus.SELESAI ? "hidden" : ""
+          } flex w-full justify-end`}
+        >
+          <Button type="submit">Update</Button>
+        </div>
       </form>
     </Form>
   );

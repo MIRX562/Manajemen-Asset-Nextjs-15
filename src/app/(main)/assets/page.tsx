@@ -22,7 +22,7 @@ export default async function AssetsPage() {
             <Link href="/assets/checkin">Check-In Asset</Link>
           </Button>
           <Button size="sm" className="gap-2 h-8" asChild>
-            <Link href="/checkout">Check-Out Asset</Link>
+            <Link href="/assets/checkout">Check-Out Asset</Link>
           </Button>
           <InsertDataDialog triggerButtonText="Add Asset">
             <AddAssetForm />

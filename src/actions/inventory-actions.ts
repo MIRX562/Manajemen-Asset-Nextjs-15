@@ -178,7 +178,9 @@ export async function getAllInventoryItems() {
           select: { name: true },
         },
       },
-      orderBy: { id: "asc" },
+      orderBy: {
+        updated_at: "desc",
+      },
     });
   } catch (error) {
     console.error(

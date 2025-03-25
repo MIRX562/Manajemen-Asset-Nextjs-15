@@ -1,4 +1,4 @@
-import { getActiveCheckInOuts } from "@/actions/checkinout-actions";
+import { getAllCheckInOuts } from "@/actions/checkinout-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { activeCheckoutsColumns } from "./_components/collumn";
@@ -17,7 +17,7 @@ import CheckoutMetrics from "./_components/metrics";
 export const dynamic = "force-dynamic";
 
 export default async function page() {
-  const data = await getActiveCheckInOuts();
+  const data = await getAllCheckInOuts();
   const assets = await getAvailableAssets();
   const employees = await getAllEMployeesDropdown();
   return (

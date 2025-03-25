@@ -30,7 +30,7 @@ export async function resetPassword(data: ResetPassword) {
       },
     });
     createActivityLog({
-      action: `Maintenance done : ${user.id}`,
+      action: `Password changed user: ${user.username}`,
       target_type: "USER",
       target_id: user.id,
     });

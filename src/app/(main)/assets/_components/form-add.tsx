@@ -76,7 +76,7 @@ export default function AddAssetForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-2 px-1"
       >
         {/* Asset Name */}
         <FormField
@@ -213,11 +213,11 @@ export default function AddAssetForm() {
               name="initial_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Initial Value</FormLabel>
+                  <FormLabel>Initial Value (Rp)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
-                  <FormDescription>Initial cost of the asset</FormDescription>
+                  <FormDescription>Purchase cost of the asset</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -230,12 +230,12 @@ export default function AddAssetForm() {
               name="salvage_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Salvage Value</FormLabel>
+                  <FormLabel>Salvage Value (Rp)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Estimated value at the end of its lifecycle
+                    value at the end of its useful life
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -249,7 +249,7 @@ export default function AddAssetForm() {
               name="useful_life"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Useful Life</FormLabel>
+                  <FormLabel>Useful Life (years)</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>

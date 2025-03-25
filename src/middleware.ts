@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     // Extend the session expiration
     response.cookies.set("session", token, {
       path: "/",
-      maxAge: 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60 * 24,
       sameSite: "lax",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

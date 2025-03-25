@@ -7,8 +7,9 @@ import { Asset } from "@prisma/client"; // Replace with your Asset schema import
 import { deleteAsset } from "@/actions/assets-actions";
 import EditAssetForm from "./form-edit";
 import { calculateCurrentValue, formatCurrency } from "@/lib/utils";
+import { AssetDetail } from "@/schemas/asset-schema";
 
-export const assetColumns: ColumnDef<Asset>[] = [
+export const assetColumns: ColumnDef<AssetDetail>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (

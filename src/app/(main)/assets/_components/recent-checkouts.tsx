@@ -36,6 +36,11 @@ export async function RecentCheckouts() {
           username: true,
         },
       },
+      employee: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -52,7 +57,8 @@ export async function RecentCheckouts() {
           <TableHeader>
             <TableRow>
               <TableHead>Asset</TableHead>
-              <TableHead>User</TableHead>
+              <TableHead>By</TableHead>
+              <TableHead>To</TableHead>
               <TableHead>Check-Out Date</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -62,6 +68,7 @@ export async function RecentCheckouts() {
               <TableRow key={checkout.id}>
                 <TableCell>{checkout.asset?.name}</TableCell>
                 <TableCell>{checkout.user?.username}</TableCell>
+                <TableCell>{checkout.employee?.name}</TableCell>
                 <TableCell>
                   {new Date(checkout.check_out_date).toLocaleDateString()}
                 </TableCell>

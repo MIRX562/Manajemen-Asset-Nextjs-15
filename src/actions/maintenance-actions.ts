@@ -1,18 +1,85 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { updateMaintenanceStatusSchema } from "@/schemas/maintenance-schema";
+import {
+  editAssetMechanicSchema,
+  editInventorySchema,
+  updateMaintenanceStatusSchema,
+} from "@/schemas/maintenance-schema";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+
+export async function updateAssetMechanic(
+  data: z.infer<typeof editAssetMechanicSchema>
+) {
+  try {
+    await prisma.maintenance.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        asset_id: data.asset_id,
+        mechanic_id: data.mechanic_id,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[updateMaintenanceAssetMechanic] Failed to update maintenance record with ID ${data.id}:`,
+      error
+    );
+    throw new Error(
+      "Unable to update the maintenance record. Please try again."
+    );
+  }
+}
+export async function updateInventory(
+  data: z.infer<typeof editInventorySchema>
+) {
+  try {
+    const validatedData = editInventorySchema.parse(data);
+
+    const { id, inventory } = validatedData;
+
+    // Update inventory records
+    await prisma.maintenanceInventory.deleteMany({
+      where: { maintenance_id: id },
+    });
+
+    await prisma.maintenanceInventory.createMany({
+      data: inventory.map((item) => ({
+        maintenance_id: id,
+        inventory_id: item.inventory_id,
+        quantity_used: item.quantity_used,
+      })),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(
+      `[updateInventory] Failed to update inventory for maintenance ID ${data.id}:`,
+      error
+    );
+    throw new Error("Unable to update inventory. Please try again.");
+  }
+}
 
 // Update a maintenance record
 export async function updateMaintenanceStatus(
   data: z.infer<typeof updateMaintenanceStatusSchema>
 ) {
-  const { id, maintenance_status, notes } = data;
+  const { id, maintenance_status, notes, asset_id } = data;
   try {
     if (maintenance_status == "SELESAI") {
+      await prisma.assetLifecycle.create({
+        data: {
+          stage: "DIGUNAKAN",
+          change_date: new Date(),
+          asset_id: asset_id,
+          notes: "Selesai di perbaiki",
+        },
+      });
+
       await prisma.$transaction(async (tx) => {
         await tx.maintenance.update({
           where: { id },
@@ -156,10 +223,41 @@ export async function getMaintenanceById(id: number) {
   try {
     const maintenance = await prisma.maintenance.findUnique({
       where: { id },
-      include: {
-        asset: true,
-        mechanic: true,
-        inventoryItems: { include: { inventory: true } },
+      select: {
+        id: true,
+        notes: true,
+        scheduled_date: true,
+        status: true,
+        created_at: true,
+        updated_at: true,
+        asset: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            type: {
+              select: {
+                model: true,
+              },
+            },
+          },
+        },
+        mechanic: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        inventoryItems: {
+          include: {
+            inventory: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
     if (!maintenance) {

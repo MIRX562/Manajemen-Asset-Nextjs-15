@@ -19,7 +19,7 @@ export default function QuickActionsInventory({
   formData: Item[];
 }) {
   return (
-    <div className="h-full flex md:flex-col justify-between">
+    <div className="w-full md:h-full flex md:flex-col items-center justify-between">
       <Dialog>
         <DialogTrigger asChild>
           <Button className="bg-chart-1 shadow-md h-fit flex flex-col text-xl font-medium p-3">

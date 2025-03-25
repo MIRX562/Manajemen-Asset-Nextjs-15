@@ -18,7 +18,7 @@ import { redirect } from "next/navigation";
  * @returns {Promise<string>} - The hashed password.
  */
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 10; // This is the cost factor for bcrypt
+  const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   return hashedPassword;
 }
@@ -91,7 +91,7 @@ export async function validateSessionToken(
     await prisma.session.delete({ where: { id: sessionId } });
     return { session: null, user: null };
   }
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 22) {
+  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 20) {
     session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
     await prisma.session.update({
       where: {
@@ -163,16 +163,14 @@ export const getCurrentSession = cache(
     const token = cookieStore.get("session")?.value ?? null;
 
     if (!token) {
-      // Remove the cookie if the token is missing
-      cookieStore.delete("session");
+      cookieStore.set("session", "", { expires: new Date(0) });
       return { session: null, user: null };
     }
 
     const result = await validateSessionToken(token);
 
     if (!result.session || !result.user) {
-      // If session is invalid, remove the cookie
-      cookieStore.delete("session");
+      cookieStore.set("session", "", { expires: new Date(0) });
       redirect("/auth");
     }
 
@@ -218,36 +216,28 @@ export const login = async (email: string, password: string) => {
 export async function logout(): Promise<void> {
   const cookieStore = cookies();
 
-  // Get session cookie value
   const sessionToken = (await cookieStore).get("session")?.value;
 
-  // If no session token, no need to proceed
   if (!sessionToken) return;
 
-  // Calculate session ID from the token
   const sessionId = await calculateSessionId(sessionToken);
 
-  // Attempt to delete session from the database
   try {
     await prisma.session.delete({
       where: { id: sessionId },
     });
   } catch (error) {
     console.log("Error deleting session from database:", error);
-    // Continue to clear cookies regardless of delete success or failure
   }
 
-  // Clear all cookies
-  const allCookies = await (await cookieStore).getAll(); // Get all cookies
+  const allCookies = await (await cookieStore).getAll();
 
-  // Iterate over all cookies and clear them
   for (const cookie of allCookies) {
-    // Set each cookie to expire immediately
     (await cookieStore).set(cookie.name, "", {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 0, // Expire immediately
+      maxAge: 0,
       path: "/",
     });
   }
@@ -297,7 +287,6 @@ export async function registerAndRefresh(
   email: string,
   password: string
 ): Promise<void> {
-  // Check if user with the provided email already exists
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -306,10 +295,8 @@ export async function registerAndRefresh(
     throw new Error("User with this email already exists");
   }
 
-  // Hash the password
   const hashedPassword = await hashPassword(password);
 
-  // Create the first admin user
   const newUser = await prisma.user.create({
     data: {
       username,
@@ -319,7 +306,6 @@ export async function registerAndRefresh(
     },
   });
 
-  // Generate and set the session
   const token = generateSessionToken();
   const session = await createSession(await token, newUser.id);
   await setSessionTokenCookie(await token, session.expiresAt);

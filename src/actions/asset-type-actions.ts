@@ -4,10 +4,15 @@ import prisma from "@/lib/db";
 import { addAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
 export const createAssetType = async (
   data: z.infer<typeof addAssetTypeSchema>
 ) => {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("Not Authorized");
+  }
   const value = addAssetTypeSchema.parse(data);
   try {
     const assetType = await prisma.assetType.create({
@@ -34,6 +39,10 @@ const editAssetTypeSchema = addAssetTypeSchema.extend({
 export const editAssetType = async (
   data: z.infer<typeof editAssetTypeSchema>
 ) => {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("Not Authorized");
+  }
   const value = editAssetTypeSchema.parse(data);
   try {
     const assetType = await prisma.assetType.update({
@@ -64,6 +73,10 @@ const deleteAssetTypeSchema = z.object({
 export const deleteAssetType = async (
   data: z.infer<typeof deleteAssetTypeSchema>
 ) => {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    throw new Error("Not Authorized");
+  }
   const value = deleteAssetTypeSchema.parse(data);
   try {
     await prisma.assetType.delete({

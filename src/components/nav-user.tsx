@@ -85,14 +85,14 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="/settings" className="flex gap-2 items-center">
+              <Link href="/settings" className="flex gap-2 items-center w-full">
                 <Settings />
                 Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <button
-                className="flex gap-2 items-center"
+                className="flex gap-2 items-center w-full"
                 onClick={async () => {
                   await logout();
                   window.location.reload();
