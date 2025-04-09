@@ -5,6 +5,7 @@ import { getAllInventoryItems } from "@/actions/inventory-actions";
 import InventoryMetrics from "./_components/metrics";
 import RecentUpdatesWidget from "./_components/recent-updates";
 import QuickActionsInventory from "./_components/quick-actions";
+import prisma from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

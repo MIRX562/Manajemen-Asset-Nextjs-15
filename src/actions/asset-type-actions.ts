@@ -113,7 +113,7 @@ export const getAllAssetTypes = async () => {
       include: {
         assets: true,
       },
-      orderBy: { id: "desc" },
+      orderBy: { updated_at: "desc" },
     });
     return assetTypes;
   } catch (error) {

@@ -6,7 +6,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import {
   Dialog,
   DialogContent,
@@ -15,16 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BarChart,
   FileSpreadsheet,
@@ -33,7 +22,10 @@ import {
   PackageSearch,
   Users,
 } from "lucide-react";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
+import AssetReportForm from "./_components/asset-report-form";
+import MaintenanceReportForm from "./_components/maintenance-report-form";
+import InventoryReportForm from "./_components/inventory-report-form";
 
 export const dynamic = "force-dynamic";
 
@@ -57,24 +49,24 @@ const reportTypes = [
     icon: <PackageSearch className="h-8 w-8" />,
     model: "Inventory",
   },
-  {
-    title: "Check-In/Out Reports",
-    description: "Asset usage and return records, late returns analysis.",
-    icon: <ClipboardList className="h-8 w-8" />,
-    model: "CheckInOut",
-  },
-  {
-    title: "Activity Logs",
-    description: "User actions, including CREATE, UPDATE, and DELETE events.",
-    icon: <FileText className="h-8 w-8" />,
-    model: "ActivityLog",
-  },
-  {
-    title: "Employee Reports",
-    description: "Performance and activity summary, assigned assets and tasks.",
-    icon: <Users className="h-8 w-8" />,
-    model: "Employee",
-  },
+  // {
+  //   title: "Check-In/Out Reports",
+  //   description: "Asset usage and return records, late returns analysis.",
+  //   icon: <ClipboardList className="h-8 w-8" />,
+  //   model: "CheckInOut",
+  // },
+  // {
+  //   title: "Activity Logs",
+  //   description: "User actions, including CREATE, UPDATE, and DELETE events.",
+  //   icon: <FileText className="h-8 w-8" />,
+  //   model: "ActivityLog",
+  // },
+  // {
+  //   title: "Employee Reports",
+  //   description: "Performance and activity summary, assigned assets and tasks.",
+  //   icon: <Users className="h-8 w-8" />,
+  //   model: "Employee",
+  // },
 ];
 
 export default function ReportsPage() {
@@ -142,156 +134,20 @@ function ReportCard({ title, description, icon, model }: ReportCard) {
 }
 
 function ReportCustomizationForm({ model }: { model: string }) {
-  const fields = getFieldsForModel(model);
-
-  return (
-    <form className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="date-range">Date Range</Label>
-        <DatePickerWithRange />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="status-filter">Status Filter</Label>
-        <Select>
-          <SelectTrigger id="status-filter">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {getStatusOptionsForModel(model).map((status) => (
-              <SelectItem key={status} value={status.toLowerCase()}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label>Fields to Include</Label>
-        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-          <div className="space-y-2">
-            {fields.map((field) => (
-              <FieldCheckbox key={field} id={`field-${field}`} label={field} />
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="sort-by">Sort By</Label>
-        <Select>
-          <SelectTrigger id="sort-by">
-            <SelectValue placeholder="Select sorting option" />
-          </SelectTrigger>
-          <SelectContent>
-            {fields.map((field) => (
-              <Fragment key={field}>
-                <SelectItem value={`${field}-asc`}>
-                  {field} (Ascending)
-                </SelectItem>
-                <SelectItem value={`${field}-desc`}>
-                  {field} (Descending)
-                </SelectItem>
-              </Fragment>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="export-format">Export Format</Label>
-        <Select>
-          <SelectTrigger id="export-format">
-            <SelectValue placeholder="Select export format" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pdf">PDF</SelectItem>
-            <SelectItem value="excel">Excel</SelectItem>
-            <SelectItem value="csv">CSV</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <Button className="w-full">Generate and Export Report</Button>
-    </form>
-  );
-}
-
-function FieldCheckbox({ id, label }) {
-  return (
-    <div className="flex items-center space-x-2">
-      <Checkbox id={id} />
-      <Label htmlFor={id}>{label}</Label>
-    </div>
-  );
-}
-
-function getFieldsForModel(model: string) {
   switch (model) {
     case "Asset":
-      return [
-        "id",
-        "name",
-        "type_id",
-        "status",
-        "purchase_date",
-        "lifecycle_stage",
-        "initial_value",
-        "salvage_value",
-        "useful_life",
-      ];
+      return <AssetReportForm />;
     case "Maintenance":
-      return [
-        "id",
-        "asset_id",
-        "mechanic_id",
-        "scheduled_date",
-        "status",
-        "notes",
-      ];
+      return <MaintenanceReportForm />;
     case "Inventory":
-      return [
-        "id",
-        "name",
-        "category",
-        "quantity",
-        "reorder_level",
-        "unit_price",
-        "location_id",
-      ];
-    case "CheckInOut":
-      return [
-        "id",
-        "asset_id",
-        "user_id",
-        "employee_id",
-        "check_out_date",
-        "expected_return_date",
-        "actual_return_date",
-        "status",
-      ];
-    case "ActivityLog":
-      return [
-        "id",
-        "user_id",
-        "action",
-        "target_type",
-        "target_id",
-        "timestamp",
-      ];
-    case "Employee":
-      return ["id", "name", "department", "phone", "email"];
+      return <InventoryReportForm />;
+    // case "CheckInOut":
+    //   return <CheckInOutReportForm />;
+    // case "ActivityLog":
+    //   return <ActivityLogReportForm />;
+    // case "Employee":
+    //   return <EmployeeReportForm />;
     default:
-      return [];
-  }
-}
-
-function getStatusOptionsForModel(model) {
-  switch (model) {
-    case "Asset":
-      return ["AKTIF", "TIDAK_AKTIF", "RUSAK"];
-    case "Maintenance":
-      return ["DIJADWALKAN", "SELESAI", "TERTUNDA"];
-    case "CheckInOut":
-      return ["DIPINJAM", "DIKEMBALIKAN", "JATUH_TEMPO"];
-    default:
-      return [];
+      return null;
   }
 }

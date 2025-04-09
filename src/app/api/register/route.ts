@@ -6,7 +6,7 @@ import { markFirstRunComplete } from "@/lib/firstRun";
 const RegisterSchema = z.object({
   username: z.string(),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(6),
 });
 
 export async function POST(req: Request) {

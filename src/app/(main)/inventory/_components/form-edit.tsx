@@ -26,6 +26,8 @@ import { updateInventorySchema } from "@/schemas/inventory-schema";
 import { Inventory } from "@prisma/client";
 import { updateInventoryItem } from "@/actions/inventory-actions";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import SuggestionInput from "@/components/ui/sugestion-input";
 
 interface MyFormProp {
   data: Inventory;
@@ -39,9 +41,30 @@ export default function EditInventoryForm({ data }: MyFormProp) {
     defaultValues: data,
   });
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/api/inventory/categories");
+        const data = await response.json();
+        setCategories(
+          data.map((item: { category: string }) => ({
+            label: item.category,
+            value: item.category,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    }
+
+    fetchCategories();
+  }, []);
+
   async function onSubmit(data: z.infer<typeof updateInventorySchema>) {
     try {
-      await toast.promise(updateInventoryItem(data), {
+      toast.promise(updateInventoryItem(data), {
         loading: "Updating inventory item...",
         success: "Item updated",
         error: "failed to update item",
@@ -54,7 +77,7 @@ export default function EditInventoryForm({ data }: MyFormProp) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
           name="name"
@@ -77,7 +100,11 @@ export default function EditInventoryForm({ data }: MyFormProp) {
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Input placeholder="" type="" {...field} />
+                <SuggestionInput
+                  suggestions={categories}
+                  placeholder="Select or type a category"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>category the items belongs to</FormDescription>
               <FormMessage />

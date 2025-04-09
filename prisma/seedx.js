@@ -113,12 +113,6 @@ async function main() {
           type_id: faker.helpers.arrayElement(assetTypes).id,
           status: faker.helpers.arrayElement(["AKTIF", "TIDAK_AKTIF", "RUSAK"]),
           purchase_date: faker.date.past(10),
-          lifecycle_stage: faker.helpers.arrayElement([
-            "BARU",
-            "DIGUNAKAN",
-            "PERBAIKAN",
-            "DIHAPUS",
-          ]),
           initial_value: initialValue,
           salvage_value: salvageValue,
           useful_life: usefulLife,

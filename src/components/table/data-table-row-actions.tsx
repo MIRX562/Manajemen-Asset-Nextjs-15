@@ -103,11 +103,11 @@ export function DataTableRowActions<TData>({
               className="p-2 text-destructive"
               aria-label="Delete"
               onClick={() =>
-                toast.warning("Delete this item?", {
+                toast.warning("Delete data", {
                   action: {
                     label: "Delete",
                     onClick: () => {
-                      toast.promise(onDelete(data), {
+                      toast.promise(onDelete(data.id), {
                         loading: "deleting item...",
                         error: (err) => err.message,
                         success: "Item deleted",
@@ -115,6 +115,8 @@ export function DataTableRowActions<TData>({
                       router.refresh();
                     },
                   },
+                  description: "Are you sure you want to delete this item?",
+                  position: "bottom-right",
                 })
               }
             >

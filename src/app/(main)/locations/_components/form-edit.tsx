@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { editLocationSchema } from "@/schemas/location-schema";
-import { createLocation, updateLocation } from "@/actions/location-actions";
+import { updateLocation } from "@/actions/location-actions";
 import { useRouter } from "next/navigation";
 import { LocationType } from "@prisma/client";
 
@@ -53,7 +53,7 @@ export default function EditLocationForm({ data }: MyFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
           name="name"

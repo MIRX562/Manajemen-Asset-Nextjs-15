@@ -25,17 +25,26 @@ import { useDropdownContext } from "@/context/dropdown";
 import { createInventorySchema } from "@/schemas/inventory-schema";
 import { useRouter } from "next/navigation";
 import { createInventoryItem } from "@/actions/inventory-actions";
+import SuggestionInput from "@/components/ui/sugestion-input";
 
-export default function AddInventoryForm() {
+export default function AddInventoryForm({
+  sugestion,
+}: {
+  sugestion: { category: string }[];
+}) {
   const router = useRouter();
   const { locations } = useDropdownContext();
   const form = useForm<z.infer<typeof createInventorySchema>>({
     resolver: zodResolver(createInventorySchema),
   });
+  const categorySugestion = sugestion.map((item) => ({
+    label: item.category,
+    value: item.category,
+  }));
 
   async function onSubmit(data: z.infer<typeof createInventorySchema>) {
     try {
-      await toast.promise(createInventoryItem(data), {
+      toast.promise(createInventoryItem(data), {
         loading: "creating new inventory item...",
         success: "new item created",
         error: "failed to create new item",
@@ -71,7 +80,11 @@ export default function AddInventoryForm() {
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Input placeholder="" type="" {...field} />
+                <SuggestionInput
+                  suggestions={categorySugestion}
+                  placeholder="Select or type a category"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>category the items belongs to</FormDescription>
               <FormMessage />

@@ -9,18 +9,22 @@ export async function createActivityLog(data: {
   target_type: TargetType;
   target_id: number;
 }) {
-  const { user } = await getCurrentSession();
-  if (!user) {
-    throw new Error("Not Authorized");
+  try {
+    const { user } = await getCurrentSession();
+    console.log(user);
+    if (!user) throw new Error("Not Authorized");
+
+    return await prisma.activityLog.create({
+      data: {
+        user_id: user.id,
+        action: data.action,
+        target_type: data.target_type,
+        target_id: data.target_id,
+      },
+    });
+  } catch (error) {
+    console.error(error);
   }
-  return await prisma.activityLog.create({
-    data: {
-      user_id: user.id,
-      action: data.action,
-      target_type: data.target_type,
-      target_id: data.target_id,
-    },
-  });
 }
 
 export async function getRecentActivities() {

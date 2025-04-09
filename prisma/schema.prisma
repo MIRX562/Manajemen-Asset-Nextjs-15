@@ -54,8 +54,8 @@ model Employee {
 
 model Asset {
   id              Int            @id @default(autoincrement())
-  name            String
   type_id         Int // Relasi ke Tipe Aset
+  name            String
   status          AssetStatus
   purchase_date   DateTime
   initial_value   Float // Initial cost of the asset
@@ -65,7 +65,7 @@ model Asset {
   updated_at      DateTime       @updatedAt
 
   // Relasi
-  type            AssetType              @relation(fields: [type_id], references: [id])
+  type            AssetType              @relation(fields: [type_id], references: [id],onDelete: Restrict)
   locationHistory AssetLocationHistory[]
   maintenances    Maintenance[]
   checkInOuts     CheckInOut[]
@@ -99,7 +99,7 @@ model AssetLifecycle {
   updated_at  DateTime       @updatedAt
 
   // Relasi
-  asset Asset @relation(fields: [asset_id], references: [id])
+  asset Asset @relation(fields: [asset_id], references: [id],onDelete: Cascade)
 
   @@map("asset_lifecycles")
 }
@@ -148,8 +148,8 @@ model AssetLocationHistory {
   updated_at    DateTime  @updatedAt
 
   // Relasi
-  asset    Asset    @relation(fields: [asset_id], references: [id])
-  location Location @relation(fields: [location_id], references: [id])
+  asset    Asset    @relation(fields: [asset_id], references: [id],onDelete: Cascade)
+  location Location @relation(fields: [location_id], references: [id], onDelete: Restrict)
 
   @@index([asset_id, location_id])
   @@map("asset_location_histories")
@@ -167,7 +167,7 @@ model Inventory {
   updated_at    DateTime @updatedAt
 
   // Relasi
-  location         Location?              @relation(fields: [location_id], references: [id])
+  location         Location?              @relation(fields: [location_id], references: [id], onDelete: Restrict)
   maintenanceItems MaintenanceInventory[]
 
   @@map("inventories")
@@ -184,7 +184,7 @@ model Maintenance {
   updated_at     DateTime          @updatedAt
 
   // Relasi
-  asset          Asset                  @relation(fields: [asset_id], references: [id])
+  asset          Asset                  @relation(fields: [asset_id], references: [id], onDelete: Cascade)
   mechanic       User                   @relation("UserMaintenance", fields: [mechanic_id], references: [id])
   inventoryItems MaintenanceInventory[]
 
@@ -228,7 +228,7 @@ model CheckInOut {
   updated_at           DateTime         @updatedAt
 
   // Relasi
-  asset    Asset    @relation(fields: [asset_id], references: [id])
+  asset    Asset    @relation(fields: [asset_id], references: [id],onDelete: Restrict)
   employee Employee @relation(fields: [employee_id], references: [id])
   user     User     @relation(fields: [user_id], references: [id])
 
@@ -250,7 +250,7 @@ model ActivityLog {
   timestamp   DateTime   @default(now())
 
   // Relasi
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id],onDelete: NoAction)
 
   @@map("activity_logs")
 }

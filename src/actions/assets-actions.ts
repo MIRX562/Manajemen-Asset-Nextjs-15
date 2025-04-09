@@ -1,17 +1,12 @@
 "use server";
 
 import prisma from "@/lib/db";
-import {
-  createAssetSchema,
-  deleteAssetSchema,
-  editAssetSchema,
-} from "@/schemas/asset-schema";
+import { createAssetSchema, editAssetSchema } from "@/schemas/asset-schema";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
 
 export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
   const value = createAssetSchema.parse(data);
-  console.log(value);
 
   try {
     const asset = await prisma.asset.create({
@@ -158,16 +153,15 @@ export const editAsset = async (
   }
 };
 
-export const deleteAsset = async (data: z.infer<typeof deleteAssetSchema>) => {
-  const value = deleteAssetSchema.parse(data);
+export const deleteAsset = async (id: number) => {
   try {
     await prisma.asset.delete({
-      where: { id: value.id },
+      where: { id },
     });
     createActivityLog({
-      action: `Deleted asset#${data.id}`,
+      action: `Deleted asset#${id}`,
       target_type: "ASSET",
-      target_id: data.id,
+      target_id: id,
     });
   } catch (error) {
     console.error(error);

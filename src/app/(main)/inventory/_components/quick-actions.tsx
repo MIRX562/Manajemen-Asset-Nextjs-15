@@ -10,31 +10,38 @@ import {
 } from "@/components/ui/dialog";
 import RestockForm from "./form-restock";
 import UseItemsForm from "./form-use";
+import prisma from "@/lib/db";
 
 type Item = { id: number; name: string; stock: number };
 
-export default function QuickActionsInventory({
+export default async function QuickActionsInventory({
   formData,
 }: {
   formData: Item[];
 }) {
+  const existingCategory = await prisma.inventory.findMany({
+    select: {
+      category: true,
+    },
+    distinct: ["category"],
+  });
   return (
-    <div className="w-full md:h-full flex md:flex-col items-center justify-between">
+    <div className="w-full md:h-full flex md:flex-col items-center justify-between ">
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="bg-chart-1 shadow-md h-fit flex flex-col text-xl font-medium p-3">
+          <Button className="bg-primary text-white shadow-md h-fit flex flex-col text-xl font-medium p-3 w-full">
             <PlusCircleIcon />
             Add Item
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogTitle>Add Inventory</DialogTitle>
-          <AddInventoryForm />
+          <AddInventoryForm sugestion={existingCategory} />
         </DialogContent>
       </Dialog>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="bg-chart-2 shadow-md h-fit flex flex-col text-xl items-center font-medium p-3">
+          <Button className="bg-chart-2 text-white shadow-md h-fit flex flex-col text-xl items-center font-medium p-3 w-full">
             <ArchiveRestore /> Restock
           </Button>
         </DialogTrigger>
@@ -45,7 +52,7 @@ export default function QuickActionsInventory({
       </Dialog>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="bg-chart-5 shadow-md h-fit flex flex-col text-xl items-center font-medium p-3">
+          <Button className="bg-chart-5 text-white shadow-md h-fit flex flex-col text-xl items-center font-medium p-3 w-full">
             <Download /> Use Item
           </Button>
         </DialogTrigger>

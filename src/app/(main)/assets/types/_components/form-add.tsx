@@ -1,4 +1,5 @@
 "use client";
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,22 +19,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { addAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { createAssetType } from "@/actions/asset-type-actions";
 import { useRouter } from "next/navigation";
+import SuggestionInput from "@/components/ui/sugestion-input";
 
-export default function AddAssetTypeForm() {
+export default function AddAssetTypeForm({
+  existingCategories,
+  existingManufacturers,
+}: {
+  existingCategories: { category: string }[];
+  existingManufacturers: { manufacturer: string }[];
+}) {
   const router = useRouter();
   const form = useForm<z.infer<typeof addAssetTypeSchema>>({
     resolver: zodResolver(addAssetTypeSchema),
-    defaultValues: {
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
   });
+
+  const categorySuggestions = existingCategories.map((item) => ({
+    label: item.category,
+    value: item.category,
+  }));
+
+  const manufacturerSuggestions = existingManufacturers.map((item) => ({
+    label: item.manufacturer,
+    value: item.manufacturer,
+  }));
 
   async function onSubmit(data: z.infer<typeof addAssetTypeSchema>) {
     try {
-      await toast.promise(createAssetType(data), {
+      toast.promise(createAssetType(data), {
         loading: "Adding asset type...",
-        success: "asset type added successfully!",
+        success: "Asset type added successfully!",
         error: (err) => err.message || "Failed to add asset type",
       });
       router.refresh();
@@ -44,7 +58,7 @@ export default function AddAssetTypeForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
           name="model"
@@ -67,11 +81,13 @@ export default function AddAssetTypeForm() {
             <FormItem>
               <FormLabel>Manufacturer</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" type="" {...field} />
+                <SuggestionInput
+                  suggestions={manufacturerSuggestions}
+                  placeholder="Select or type a category"
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
-                The company that b=make the item
-              </FormDescription>
+              <FormDescription>The company that make the item</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -84,7 +100,11 @@ export default function AddAssetTypeForm() {
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Input placeholder="Laptop, Phone, etc." type="" {...field} />
+                <SuggestionInput
+                  suggestions={categorySuggestions}
+                  placeholder="Select or type a category"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>Category of the item</FormDescription>
               <FormMessage />

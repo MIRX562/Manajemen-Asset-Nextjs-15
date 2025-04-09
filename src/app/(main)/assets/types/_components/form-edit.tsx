@@ -1,4 +1,5 @@
 "use client";
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +20,8 @@ import { editAssetTypeSchema } from "@/schemas/asset-type-schema";
 import { AssetType } from "@prisma/client";
 import { editAssetType } from "@/actions/asset-type-actions";
 import { useRouter } from "next/navigation";
+import SuggestionInput from "@/components/ui/sugestion-input";
+import { useEffect, useState } from "react";
 
 interface MyFormProps {
   data: AssetType;
@@ -31,11 +34,49 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
     defaultValues: data,
   });
 
+  const [categories, setCategories] = useState([]);
+  const [manufacturers, setManufacturers] = useState([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/api/asset-types/categories");
+        const data = await response.json();
+        setCategories(
+          data.map((item: { category: string }) => ({
+            label: item.category,
+            value: item.category,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    }
+
+    async function fetchManufacturers() {
+      try {
+        const response = await fetch("/api/asset-types/manufacturers");
+        const data = await response.json();
+        setManufacturers(
+          data.map((item: { manufacturer: string }) => ({
+            label: item.manufacturer,
+            value: item.manufacturer,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch manufacturers", error);
+      }
+    }
+
+    fetchCategories();
+    fetchManufacturers();
+  }, []);
+
   async function onSubmit(data: z.infer<typeof editAssetTypeSchema>) {
     try {
-      await toast.promise(editAssetType(data), {
+      toast.promise(editAssetType(data), {
         loading: "Updating asset type...",
-        success: "asset type updated successfully!",
+        success: "Asset type updated successfully!",
         error: (err) => err.message || "Failed to update asset type",
       });
       router.refresh();
@@ -46,7 +87,7 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-1">
         <FormField
           control={form.control}
           name="model"
@@ -69,11 +110,13 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
             <FormItem>
               <FormLabel>Manufacturer</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" type="" {...field} />
+                <SuggestionInput
+                  suggestions={manufacturers}
+                  placeholder="Select or type a manufacturer"
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
-                The company that b=make the item
-              </FormDescription>
+              <FormDescription>The company that makes the item</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -86,7 +129,11 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Input placeholder="Laptop, Phone, etc." type="" {...field} />
+                <SuggestionInput
+                  suggestions={categories}
+                  placeholder="Select or type a category"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>Category of the item</FormDescription>
               <FormMessage />
@@ -102,7 +149,7 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="usage scope, terms, etc.."
+                  placeholder="Usage scope, terms, etc."
                   className="resize-none"
                   {...field}
                 />
