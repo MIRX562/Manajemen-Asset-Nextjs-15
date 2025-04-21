@@ -1,16 +1,14 @@
 "use client";
 
-import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme(); // Use resolvedTheme to prevent mismatch during hydration
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
-  // Avoid rendering until the theme is initialized
   if (!resolvedTheme) {
-    return null; // You can return null or a loading spinner until the theme is resolved
+    return null;
   }
 
   const toggleTheme = () => {

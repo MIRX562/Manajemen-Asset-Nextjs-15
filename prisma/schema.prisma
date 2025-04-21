@@ -54,12 +54,12 @@ model Employee {
 
 model Asset {
   id              Int            @id @default(autoincrement())
-  type_id         Int // Relasi ke Tipe Aset
+  type_id         Int 
   name            String
   status          AssetStatus
   purchase_date   DateTime
-  initial_value   Float // Initial cost of the asset
-  salvage_value   Float // Estimated value at the end of its lifecycle
+  initial_value   Float 
+  salvage_value   Float 
   useful_life     Int
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt

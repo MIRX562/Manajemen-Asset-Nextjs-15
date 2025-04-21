@@ -167,3 +167,114 @@ export async function getRecentInventoryActivities() {
     timestamp: activity.timestamp.toISOString(), // Format timestamp
   }));
 }
+
+export async function getAssetTypeDistribution() {
+  const assetCategoryCounts = await prisma.asset.groupBy({
+    by: ["type_id"],
+    _count: { type_id: true },
+  });
+
+  const categories = await prisma.assetType.findMany({
+    where: { id: { in: assetCategoryCounts.map((item) => item.type_id) } },
+    select: { category: true },
+  });
+
+  const mergedCounts = categories.reduce(
+    (acc: Record<string, number>, category, index) => {
+      const count = assetCategoryCounts[index]?._count.type_id || 0;
+      if (acc[category.category]) {
+        acc[category.category] += count;
+      } else {
+        acc[category.category] = count;
+      }
+      return acc;
+    },
+    {}
+  );
+
+  const colorPalette = ["#3b82f6", "#16a34a", "#f59e0b", "#8b5cf6", "#6b7280"];
+
+  return Object.entries(mergedCounts).map(([name, value], index) => ({
+    name,
+    value,
+    fill: colorPalette[index % colorPalette.length],
+  }));
+}
+
+export async function getAssetLifecycleData() {
+  const lifecycleCounts = await prisma.assetLifecycle.groupBy({
+    by: ["stage"],
+    _count: { stage: true },
+  });
+
+  const colorMapping = {
+    BARU: "#3b82f6",
+    DIGUNAKAN: "#16a34a",
+    PERBAIKAN: "#f59e0b",
+    DIHAPUS: "#6b7280",
+  };
+
+  return lifecycleCounts.map((item) => ({
+    name: item.stage,
+    value: item._count.stage,
+    fill: colorMapping[item.stage],
+  }));
+}
+
+export async function getAssetStatusData() {
+  const assetStatusCounts = await prisma.asset.groupBy({
+    by: ["status"],
+    _count: { status: true },
+  });
+
+  const colorMapping = {
+    AKTIF: "#16a34a",
+    TIDAK_AKTIF: "#f59e0b",
+    RUSAK: "#dc2626",
+  };
+
+  return assetStatusCounts.map((item) => ({
+    name: item.status,
+    value: item._count.status,
+    fill: colorMapping[item.status],
+  }));
+}
+
+export async function getAssetLocationData() {
+  const locationCounts = await prisma.assetLocationHistory.groupBy({
+    by: ["location_id"],
+    _count: { location_id: true },
+  });
+
+  const locations = await prisma.location.findMany({
+    where: { id: { in: locationCounts.map((item) => item.location_id) } },
+    select: { id: true, type: true },
+  });
+
+  const groupedByType = locations.reduce(
+    (acc: Record<string, number>, location) => {
+      const count =
+        locationCounts.find((item) => item.location_id === location.id)?._count
+          .location_id || 0;
+      if (acc[location.type]) {
+        acc[location.type] += count;
+      } else {
+        acc[location.type] = count;
+      }
+      return acc;
+    },
+    {} as Record<keyof typeof colorMapping, number>
+  );
+
+  const colorMapping = {
+    GUDANG: "#8b5cf6",
+    KANTOR: "#ec4899",
+    DATA_CENTER: "#06b6d4",
+  };
+
+  return Object.entries(groupedByType).map(([type, value]) => ({
+    name: type,
+    value,
+    fill: colorMapping[type as keyof typeof colorMapping],
+  }));
+}

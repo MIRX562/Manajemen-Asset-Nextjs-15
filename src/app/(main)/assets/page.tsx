@@ -6,13 +6,21 @@ import InsertDataDialog from "@/components/table/insertDataButton";
 import AddAssetForm from "./_components/form-add";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { RecentCheckouts } from "../assets/_components/recent-checkouts";
-import AssetStats from "./_components/metrics";
+import AssetMetrics from "./_components/asset-metric";
+import {
+  getAssetValuationOverYear,
+  getAssetTypeDistribution,
+} from "@/actions/analytics-actions";
+import { PortfolioChart } from "../dashboard/_components/portfolio-charts";
+import { AssetTypeChart } from "./_components/asset-type-chart";
 
 export const dynamic = "force-dynamic";
 
 export default async function AssetsPage() {
   const data = await getAllAssets();
+  const chartData = await getAssetValuationOverYear();
+  const assetTypeData = await getAssetTypeDistribution();
+
   return (
     <div className="flex flex-col w-full py-4 gap-4">
       <div className="w-full flex flex-col md:flex-row gap-2">
@@ -30,7 +38,13 @@ export default async function AssetsPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4"></div>
+      <div className="flex flex-col gap-4">
+        <AssetMetrics />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <PortfolioChart data={chartData} />
+          <AssetTypeChart data={assetTypeData} />
+        </div>
+      </div>
 
       <div className="space-y-2 pb-4">
         <h1 className="text-2xl font-bold">All Assets</h1>
