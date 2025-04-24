@@ -1,7 +1,7 @@
 import { Metrics } from "@/app/(main)/dashboard/_components/metrics";
 import { RecentActivitiesTable } from "@/app/(main)/dashboard/_components/recent-activities";
 import { UpcomingMaintenanceTable } from "@/app/(main)/dashboard/_components/upcoming-maintenance";
-import OnlineUsers from "../assets/_components/active-users";
+import OnlineUsers from "./_components/active-users";
 import { AssetLifecycleChart } from "./_components/asset-lifecycle-chart";
 import { getAssetLifecycleData } from "@/actions/analytics-actions";
 import { AssetStatusChart } from "./_components/asset-status-chart";

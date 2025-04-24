@@ -33,7 +33,7 @@ export function AssetTypeChart({ data }: AssetTypeChartProps) {
               cx="40%"
               cy="50%"
               outerRadius={80}
-              innerRadius={10}
+              innerRadius={60}
               label={({ name, percent }) =>
                 `${name} ${(percent * 100).toFixed(0)}%`
               }

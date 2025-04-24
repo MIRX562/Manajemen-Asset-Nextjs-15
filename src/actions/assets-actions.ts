@@ -257,12 +257,16 @@ export const getAssetById = async (id: number) => {
               },
             },
           },
+          orderBy: { created_at: "desc" },
         },
         maintenances: {
           select: {
             id: true,
             status: true,
             scheduled_date: true,
+          },
+          orderBy: {
+            created_at: "desc",
           },
         },
         checkInOuts: {
@@ -281,6 +285,9 @@ export const getAssetById = async (id: number) => {
               },
             },
           },
+          orderBy: {
+            created_at: "desc",
+          },
         },
         assetLifecycles: {
           select: {
@@ -288,6 +295,9 @@ export const getAssetById = async (id: number) => {
             stage: true,
             change_date: true,
             notes: true,
+          },
+          orderBy: {
+            created_at: "desc",
           },
         },
       },

@@ -8,12 +8,15 @@ import {
   PackageIcon,
   BuildingIcon,
   FileTextIcon,
+  ArrowLeft,
 } from "lucide-react";
 import { getLocationById } from "@/actions/location-actions";
 import {
   assetLocationHistoryColumns,
   simplifiedInventoryColumns,
 } from "./_components/collumn";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 type Params = Promise<{ slug: string }>;
@@ -37,7 +40,21 @@ export default async function Page(props: {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-6">{decodeURI(slug)}</h1>
+      <div className="flex items-center gap-4">
+        <Button
+          asChild
+          variant="default"
+          size="icon"
+          className="flex items-center shadow-md"
+        >
+          <Link href="/locations">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <h1 className="text-xl md:text-3xl font-bold">
+          {decodeURI(slug)} - Details
+        </h1>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>

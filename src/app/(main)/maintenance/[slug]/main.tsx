@@ -101,13 +101,13 @@ export default function MaintenanceDetailView({
   };
 
   return (
-    <div className="px-2 py-3">
-      <div className="mb-2 flex items-center gap-4">
+    <div className="px-2 py-4 space-y-4">
+      <div className="flex items-center gap-4">
         <Button
           asChild
-          variant="outline"
+          variant="default"
           size="icon"
-          className="flex items-center"
+          className="flex items-center shadow-md"
         >
           <Link href="/maintenance">
             <ArrowLeft className="h-4 w-4" />

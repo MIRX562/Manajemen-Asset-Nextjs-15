@@ -5,8 +5,11 @@ import {
   LifeBuoyIcon,
   DollarSignIcon,
   TagIcon,
+  ArrowLeft,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 type Params = Promise<{ slug: string }>;
@@ -26,7 +29,21 @@ export default async function Page(props: {
 
   return (
     <div className="container flex flex-col gap-4 mt-4">
-      <h1 className="text-3xl font-bold">{decodeURI(slug)}</h1>
+      <div className="flex items-center gap-4">
+        <Button
+          asChild
+          variant="default"
+          size="icon"
+          className="flex items-center shadow-md"
+        >
+          <Link href="/inventory">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <h1 className="text-xl md:text-3xl font-bold">
+          {decodeURI(slug)} - Details
+        </h1>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

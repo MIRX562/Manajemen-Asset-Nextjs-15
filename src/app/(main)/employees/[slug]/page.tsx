@@ -42,9 +42,9 @@ export default async function Page(props: {
         <div className="flex items-center gap-2">
           <Button
             asChild
-            variant="outline"
+            variant="default"
             size="icon"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center shadow-md"
           >
             <Link href="/employees">
               <ArrowLeft className="h-4 w-4" />

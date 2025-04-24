@@ -46,7 +46,7 @@ export function NavAdmin({
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild tooltip={item.name}>
               <Link prefetch={true} href={item.url}>
-                <item.icon />
+                <item.icon className="text-primary" />
                 <span>{item.name}</span>
               </Link>
             </SidebarMenuButton>

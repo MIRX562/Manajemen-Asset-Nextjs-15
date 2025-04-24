@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DATABASE_URL: "postgresql://casaos:casaos@localhost:5432/"
+      DATABASE_URL: "postgresql://casaos:casaos@localhost:5432/am-kp"
 
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +19,6 @@ jobs:
           echo "NODE_ENV=production" >> .env
       - run: bun install
       - run: bun x prisma db push
-      - run: bun x prisma db seed
+      # - run: bun x prisma db seed
       - run: bun x prisma generate
       - run: bun run build

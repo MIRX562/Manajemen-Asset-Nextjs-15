@@ -17,13 +17,14 @@ export default async function OnlineUsers() {
   const onlineUsers = await prisma.user.findMany({
     where: {
       Session: {
-        some: {}, // Fetch users with active sessions
+        some: {},
       },
     },
     select: {
       id: true,
       username: true,
       email: true,
+      role: true,
     },
   });
 
@@ -47,10 +48,7 @@ export default async function OnlineUsers() {
             <div key={user.id} className="flex items-center gap-4 py-3">
               <div className="relative">
                 <Avatar>
-                  <AvatarImage
-                    src={"/placeholder.svg"} // Replace with actual avatar logic if available
-                    alt={user.username}
-                  />
+                  <AvatarImage src={"/placeholder.svg"} alt={user.username} />
                   <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
                 </Avatar>
               </div>
@@ -60,6 +58,7 @@ export default async function OnlineUsers() {
                 </p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
+              <Badge>{user.role}</Badge>
             </div>
           ))}
         </ScrollArea>

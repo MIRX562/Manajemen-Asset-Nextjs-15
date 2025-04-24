@@ -12,7 +12,7 @@ import RestockForm from "./form-restock";
 import UseItemsForm from "./form-use";
 import prisma from "@/lib/db";
 
-type Item = { id: number; name: string; stock: number };
+type Item = { id: number; name: string; quantity: number };
 
 export default async function QuickActionsInventory({
   formData,
@@ -29,7 +29,7 @@ export default async function QuickActionsInventory({
     <div className="w-full md:h-full flex md:flex-col items-center justify-between ">
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="bg-primary text-white shadow-md h-fit flex flex-col text-xl font-medium p-3 w-full">
+          <Button className="bg-chart-4 text-white shadow-md h-fit flex flex-col text-xl font-medium p-3 w-full">
             <PlusCircleIcon />
             Add Item
           </Button>
