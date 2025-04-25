@@ -95,6 +95,7 @@ export function NavUser() {
                 className="flex gap-2 items-center w-full"
                 onClick={async () => {
                   await logout();
+                  sessionStorage.removeItem("user");
                   window.location.reload();
                 }}
               >

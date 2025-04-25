@@ -1,4 +1,4 @@
-// RbacWrapper.tsx
+"use client";
 import { Role } from "@prisma/client";
 import React, { ReactNode } from "react";
 import AccessDenied from "./access-denied";

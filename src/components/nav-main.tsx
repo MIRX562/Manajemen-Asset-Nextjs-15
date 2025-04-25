@@ -33,7 +33,7 @@ export function NavMain({
     }[];
   }[];
 }) {
-  const currentPath = usePathname(); // Get the current pathname
+  const currentPath = usePathname();
   const user = useUser();
   const role = user.user?.role;
 

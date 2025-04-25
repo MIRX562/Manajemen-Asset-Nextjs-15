@@ -9,7 +9,6 @@ import bcrypt from "bcryptjs";
 import { type Session, Role } from "@prisma/client";
 import prisma from "./db";
 import { cookies } from "next/headers";
-import { cache } from "react";
 import { redirect } from "next/navigation";
 
 /**
@@ -47,7 +46,7 @@ export async function createSession(
   token: string,
   userId: number
 ): Promise<Session> {
-  const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+  const sessionId = await calculateSessionId(token);
   const session: Session = {
     id: sessionId,
     user_id: userId,
@@ -68,7 +67,7 @@ export async function createSession(
 export async function validateSessionToken(
   token: string
 ): Promise<SessionValidationResult> {
-  const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+  const sessionId = await calculateSessionId(token);
   const result = await prisma.session.findUnique({
     where: {
       id: sessionId,
@@ -158,26 +157,24 @@ export async function deleteSessionTokenCookie(): Promise<void> {
  *
  * @returns {Promise<SessionValidationResult>} The current session validation result.
  */
-export const getCurrentSession = cache(
-  async (): Promise<SessionValidationResult> => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("session")?.value ?? null;
+export const getCurrentSession = async (): Promise<SessionValidationResult> => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("session")?.value ?? null;
 
-    if (!token) {
-      cookieStore.set("session", "", { expires: new Date(0) });
-      return { session: null, user: null };
-    }
-
-    const result = await validateSessionToken(token);
-
-    if (!result.session || !result.user) {
-      cookieStore.set("session", "", { expires: new Date(0) });
-      redirect("/auth");
-    }
-
-    return result;
+  if (!token) {
+    cookieStore.set("session", "", { expires: new Date(0) });
+    return { session: null, user: null };
   }
-);
+
+  const result = await validateSessionToken(token);
+
+  if (!result.session || !result.user) {
+    cookieStore.set("session", "", { expires: new Date(0) });
+    redirect("/auth");
+  }
+
+  return result;
+};
 
 /**
  * Logs in the user by validating the password and creating a session.
@@ -218,7 +215,6 @@ export async function logout(): Promise<void> {
   const cookieStore = cookies();
 
   const sessionToken = (await cookieStore).get("session")?.value;
-
   if (!sessionToken) return;
 
   const sessionId = await calculateSessionId(sessionToken);
@@ -231,7 +227,7 @@ export async function logout(): Promise<void> {
     console.log("Error deleting session from database:", error);
   }
 
-  const allCookies = await (await cookieStore).getAll();
+  const allCookies = (await cookieStore).getAll();
 
   for (const cookie of allCookies) {
     (await cookieStore).set(cookie.name, "", {
