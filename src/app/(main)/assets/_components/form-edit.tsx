@@ -32,7 +32,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { AssetStatus, LifecycleStage } from "@prisma/client";
-import { editAssetSchema } from "@/schemas/asset-schema";
+import { AssetDetail, editAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownContext } from "@/context/dropdown";
 import { editAsset } from "@/actions/assets-actions";
 import { useRouter } from "next/navigation";
@@ -48,16 +48,17 @@ import { Textarea } from "@/components/ui/textarea";
 
 type FormData = z.infer<typeof editAssetSchema>;
 
-export default function EditAssetForm({
-  data,
-}: {
-  data: z.infer<typeof editAssetSchema>;
-}) {
+export default function EditAssetForm({ data }: { data: AssetDetail }) {
   const { assetTypes, locations } = useDropdownContext();
   const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(editAssetSchema),
-    defaultValues: data,
+    defaultValues: {
+      ...data,
+      location_id: data.locationHistory[0].location.id,
+      lifecycle_stage: data.assetLifecycles[0].stage,
+      lifecycle_notes: data.assetLifecycles[0].notes,
+    },
   });
 
   async function onSubmit(values: FormData) {

@@ -28,24 +28,6 @@ export default async function Page(props: {
 
   const data = await getAssetById(id);
 
-  if (!data) {
-    return null;
-  }
-
-  const formData = {
-    id: data.id,
-    name: data.name,
-    type_id: data.type_id,
-    status: data.status,
-    purchase_date: data.purchase_date,
-    lifecycle_stage: data.assetLifecycles[0].stage,
-    initial_value: data.initial_value,
-    salvage_value: data.salvage_value,
-    useful_life: data.useful_life,
-    location_id: data.locationHistory[0].location.id,
-    lifecycle_notes: data.assetLifecycles[0].notes,
-  };
-
   return (
     <div className="flex flex-col gap-4 mt-6">
       <div className="mb-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -66,7 +48,7 @@ export default async function Page(props: {
         </div>
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="gap-2 h-8 shadow-md">
+            <Button className="gap-2 shadow-md">
               <Edit className="h-4 w-4" />
               Edit Asset
             </Button>
@@ -74,7 +56,7 @@ export default async function Page(props: {
           <DialogContent>
             <DialogTitle>Edit Asset</DialogTitle>
             <div className="max-h-[80svh] overflow-y-scroll">
-              <EditAssetForm data={formData} />
+              <EditAssetForm data={data} />
             </div>
           </DialogContent>
         </Dialog>
