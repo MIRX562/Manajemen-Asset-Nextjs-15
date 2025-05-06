@@ -269,3 +269,27 @@ export async function getTotalUsageByInventory(inventory_id: number) {
     );
   }
 }
+
+export async function getInventoryMaintenanceUsage(inventory_id: number) {
+  try {
+    const data = await prisma.maintenanceInventory.findMany({
+      where: {
+        inventory_id,
+      },
+      select: {
+        maintenance: {
+          select: {
+            status: true,
+          },
+        },
+        quantity_used: true,
+        maintenance_id: true,
+        updated_at: true,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Unable to fetch inventory maintenance usage!");
+  }
+}

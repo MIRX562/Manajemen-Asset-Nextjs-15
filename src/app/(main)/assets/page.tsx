@@ -13,6 +13,7 @@ import {
 } from "@/actions/analytics-actions";
 import { PortfolioChart } from "../dashboard/_components/portfolio-charts";
 import { AssetTypeChart } from "./_components/asset-type-chart";
+import { Download, Upload } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +27,26 @@ export default async function AssetsPage() {
       <div className="w-full flex flex-col md:flex-row gap-2">
         <h1 className="text-3xl font-bold">Asset Management Overview</h1>
         <div className="flex justify-center items-center ml-auto gap-2">
-          <Button size="sm" className="gap-2 h-8" asChild>
-            <Link href="/assets/checkin">Check-In Asset</Link>
-          </Button>
-          <Button size="sm" className="gap-2 h-8" asChild>
-            <Link href="/assets/checkout">Check-Out Asset</Link>
-          </Button>
+          <Link href="/assets/checkin">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="gap-2 h-8 shadow-md"
+            >
+              <Download />
+              Check-In
+            </Button>
+          </Link>
+          <Link href="/assets/checkout">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="gap-2 h-8 shadow-md"
+            >
+              <Upload />
+              Check-Out
+            </Button>
+          </Link>
           <InsertDataDialog triggerButtonText="Add Asset">
             <AddAssetForm />
           </InsertDataDialog>

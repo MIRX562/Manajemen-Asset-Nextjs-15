@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:23-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -7,7 +7,8 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install -g bun
+RUN bun install
 
 # Build the application
 FROM base AS builder
@@ -18,17 +19,16 @@ COPY . .
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line if you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN npm run build
+RUN bun run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-# Uncomment the following line if you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -44,6 +44,6 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]

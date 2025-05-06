@@ -150,7 +150,9 @@ const SuggestionInput = forwardRef<HTMLInputElement, SuggestionInputProps>(
             <Command className="rounded-lg border shadow-md">
               <CommandList>
                 {filteredSuggestions.length === 0 ? (
-                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandEmpty>
+                    No results found. Current input will be used
+                  </CommandEmpty>
                 ) : (
                   <CommandGroup>
                     {filteredSuggestions.map((suggestion) => (

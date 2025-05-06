@@ -108,3 +108,43 @@ export const deleteUser = async (data: User) => {
     throw new Error("Failed to delete user: " + error.message);
   }
 };
+
+export async function getUserDetail(user_id: number) {
+  try {
+    const data = await prisma.user.findUnique({
+      where: {
+        id: user_id,
+      },
+      include: {
+        activityLogs: true,
+        CheckInOut: {
+          include: {
+            asset: {
+              select: {
+                name: true,
+              },
+            },
+            employee: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        maintenances: {
+          include: {
+            asset: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        Session: true,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}

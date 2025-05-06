@@ -10,6 +10,9 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getInventoryMaintenanceUsage } from "@/actions/maintenance-inventory-actions";
+import { DataTable } from "@/components/table/data-table";
+import { inventoryMaintenanceUsageColumns } from "./_components/collumn";
 
 export const dynamic = "force-dynamic";
 type Params = Promise<{ slug: string }>;
@@ -22,10 +25,12 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const slug = await params.slug;
+  const slug = params.slug;
   const id = parseInt(searchParams.id);
 
   const data = await getInventoryItemById(id);
+  const inventoryUsage = await getInventoryMaintenanceUsage(id);
+  console.log(inventoryUsage.flat());
 
   return (
     <div className="container flex flex-col gap-4 mt-4">
@@ -108,6 +113,10 @@ export default async function Page(props: {
         </Card>
       </div>
       <div className="text-2xl font-bold">Maintenance usage history (todo)</div>
+      <DataTable
+        columns={inventoryMaintenanceUsageColumns}
+        data={inventoryUsage}
+      />
     </div>
   );
 }
