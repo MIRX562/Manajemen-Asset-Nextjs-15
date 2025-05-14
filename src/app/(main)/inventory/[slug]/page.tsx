@@ -112,7 +112,7 @@ export default async function Page(props: {
           </CardContent>
         </Card>
       </div>
-      <div className="text-2xl font-bold">Maintenance usage history (todo)</div>
+      <div className="text-2xl font-bold">Maintenance usage history</div>
       <DataTable
         columns={inventoryMaintenanceUsageColumns}
         data={inventoryUsage}

@@ -8,7 +8,7 @@ import { activeCheckoutsColumns } from "../checkout/_components/collumn";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import CheckInForm from "./_component/form-checkin";
+import CheckInForm from "./_components/form-checkin";
 import AssetStats from "../_components/metrics";
 import { RecentCheckouts } from "../_components/recent-checkouts";
 

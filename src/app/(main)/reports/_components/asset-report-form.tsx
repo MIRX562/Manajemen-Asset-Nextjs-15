@@ -305,7 +305,7 @@ export default function MyForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Generate Report</Button>
         </form>
       </ScrollArea>
     </Form>

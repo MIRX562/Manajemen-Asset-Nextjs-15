@@ -234,7 +234,7 @@ export function CheckoutForm({ assets, employees }: CheckoutForm) {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    WHen the asset is checked out
+                    When the asset is checked out
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -288,7 +288,7 @@ export function CheckoutForm({ assets, employees }: CheckoutForm) {
             />
           </div>
         </div>
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Checkout</Button>
       </form>
     </Form>
   );

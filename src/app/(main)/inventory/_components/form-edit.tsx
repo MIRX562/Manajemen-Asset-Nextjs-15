@@ -193,7 +193,7 @@ export default function EditInventoryForm({ data }: MyFormProp) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Update Item</Button>
       </form>
     </Form>
   );

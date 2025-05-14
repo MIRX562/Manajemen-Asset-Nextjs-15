@@ -107,7 +107,7 @@ export default function ResetPasswordForm() {
             />
 
             <Button className="w-full" type="submit">
-              Change
+              Change Password
             </Button>
           </form>
         </Form>

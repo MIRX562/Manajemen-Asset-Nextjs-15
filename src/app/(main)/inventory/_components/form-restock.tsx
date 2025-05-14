@@ -190,7 +190,7 @@ export default function RestockForm({ items }: { items: Item[] }) {
         </Button>
 
         <Button type="submit" className="w-full">
-          Submit
+          Restock Item
         </Button>
       </form>
     </Form>

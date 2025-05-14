@@ -119,7 +119,7 @@ export default function EditEmployeeForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Update Employee</Button>
       </form>
     </Form>
   );

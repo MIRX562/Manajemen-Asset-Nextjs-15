@@ -274,7 +274,7 @@ export default function InventoryReportForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Generate Report</Button>
         </form>
       </ScrollArea>
     </Form>

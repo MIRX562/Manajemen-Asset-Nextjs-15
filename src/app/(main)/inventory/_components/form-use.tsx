@@ -197,7 +197,7 @@ export default function UseItemsForm({ items }: { items: Item[] }) {
         </Button>
 
         <Button type="submit" className="w-full">
-          Submit
+          Consume Item
         </Button>
       </form>
     </Form>

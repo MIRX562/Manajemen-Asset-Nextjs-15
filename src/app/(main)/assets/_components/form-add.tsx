@@ -372,7 +372,7 @@ export default function AddAssetForm() {
         />
 
         {/* Submit Button */}
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Add Asset</Button>
       </form>
     </Form>
   );

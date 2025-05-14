@@ -109,7 +109,7 @@ export default function EditUserForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Update User</Button>
       </form>
     </Form>
   );

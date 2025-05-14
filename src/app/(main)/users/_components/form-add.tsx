@@ -121,7 +121,7 @@ export default function AddUserForm() {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Add User</Button>
       </form>
     </Form>
   );

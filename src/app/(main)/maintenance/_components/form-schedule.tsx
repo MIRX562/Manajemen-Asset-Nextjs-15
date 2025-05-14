@@ -423,7 +423,7 @@ export default function ScheduleMaintenanceForm({
           <Separator className="md:hidden" />
         </div>
         <Button type="submit" className="ml-auto">
-          Submit
+          Schedule Maintenance
         </Button>
       </form>
     </Form>
