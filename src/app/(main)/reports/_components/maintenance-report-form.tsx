@@ -300,7 +300,9 @@ export default function MaintenanceReportForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Generate Report</Button>
+          <Button type="submit" className="w-full">
+            Generate Report
+          </Button>
         </form>
       </ScrollArea>
     </Form>

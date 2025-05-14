@@ -224,7 +224,7 @@ export async function logout(): Promise<void> {
       where: { id: sessionId },
     });
   } catch (error) {
-    console.log("Error deleting session from database:", error);
+    console.error("Error deleting session from database:", error);
   }
 
   const allCookies = (await cookieStore).getAll();

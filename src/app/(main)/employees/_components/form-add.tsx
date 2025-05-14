@@ -105,7 +105,9 @@ export default function AddEmployeeForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Add Employee</Button>
+        <Button type="submit" className="w-full">
+          Add Employee
+        </Button>
       </form>
     </Form>
   );

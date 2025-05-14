@@ -30,7 +30,6 @@ export default async function Page(props: {
 
   const data = await getInventoryItemById(id);
   const inventoryUsage = await getInventoryMaintenanceUsage(id);
-  console.log(inventoryUsage.flat());
 
   return (
     <div className="container flex flex-col gap-4 mt-4">

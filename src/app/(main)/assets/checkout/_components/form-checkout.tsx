@@ -288,7 +288,9 @@ export function CheckoutForm({ assets, employees }: CheckoutForm) {
             />
           </div>
         </div>
-        <Button type="submit">Checkout</Button>
+        <Button type="submit" className="w-full">
+          Checkout
+        </Button>
       </form>
     </Form>
   );

@@ -109,7 +109,9 @@ export default function EditUserForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Update User</Button>
+        <Button type="submit" className="w-full">
+          Update User
+        </Button>
       </form>
     </Form>
   );

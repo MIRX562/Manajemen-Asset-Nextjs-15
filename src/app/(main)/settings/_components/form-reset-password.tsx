@@ -36,7 +36,6 @@ export default function ResetPasswordForm() {
 
   function onSubmit(values: z.infer<typeof resetPasswordSchema>) {
     try {
-      console.log(values);
       toast.promise(resetPassword(values), {
         loading: "Updating password...",
         success: (data) => data?.message,

@@ -132,7 +132,9 @@ export default function UpdateMaintenaceForm(
             data.maintenance_status == MaintenanceStatus.SELESAI ? "hidden" : ""
           } flex w-full justify-end`}
         >
-          <Button type="submit">Update Maintenance Details</Button>
+          <Button type="submit" className="w-full">
+            Update Maintenance Details
+          </Button>
         </div>
       </form>
     </Form>

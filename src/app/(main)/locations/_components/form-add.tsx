@@ -112,7 +112,9 @@ export default function AddLocationForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Add Location</Button>
+        <Button type="submit" className="w-full">
+          Add Location
+        </Button>
       </form>
     </Form>
   );

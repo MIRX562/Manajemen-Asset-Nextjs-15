@@ -170,7 +170,9 @@ export default function AddInventoryForm({
             </FormItem>
           )}
         />
-        <Button type="submit">Add Item</Button>
+        <Button type="submit" className="w-full">
+          Add Item
+        </Button>
       </form>
     </Form>
   );

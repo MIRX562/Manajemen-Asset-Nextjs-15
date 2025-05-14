@@ -160,7 +160,9 @@ export default function CheckInForm({ data }: { data: CheckedOutAssets }) {
             </FormItem>
           )}
         />
-        <Button type="submit">Check In</Button>
+        <Button type="submit" className="w-full">
+          Check In
+        </Button>
       </form>
     </Form>
   );

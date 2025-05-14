@@ -36,7 +36,7 @@ export async function resetPassword(data: ResetPassword) {
     });
     return { success: true, message: "password successfully changed!" };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }

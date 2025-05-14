@@ -133,7 +133,6 @@ export default function AddAssetForm() {
                                 key={type.id}
                                 value={type.model}
                                 onSelect={() => {
-                                  console.log("Selected type", type.id); // Debug log
                                   form.setValue("type_id", type.id);
                                 }}
                               >
@@ -372,7 +371,9 @@ export default function AddAssetForm() {
         />
 
         {/* Submit Button */}
-        <Button type="submit">Add Asset</Button>
+        <Button type="submit" className="w-full">
+          Add Asset
+        </Button>
       </form>
     </Form>
   );

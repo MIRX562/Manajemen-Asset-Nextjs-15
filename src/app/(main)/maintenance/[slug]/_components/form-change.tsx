@@ -206,7 +206,9 @@ export function EditAssetMechanicForm({
           )}
         />
 
-        <Button type="submit">Save Changes</Button>
+        <Button type="submit" className="w-full">
+          Save Changes
+        </Button>
       </form>
     </Form>
   );
@@ -245,7 +247,6 @@ export function EditInventoryForm({
   });
 
   function onSubmit(values: z.infer<typeof editInventorySchema>) {
-    console.log(values);
     toast.promise(updateInventory(values), {
       loading: "Updating inventory...",
       success: "Inventory updated successfully",

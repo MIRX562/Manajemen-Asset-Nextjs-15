@@ -117,7 +117,9 @@ export default function EditLocationForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Update Location</Button>
+        <Button type="submit" className="w-full">
+          Update Location
+        </Button>
       </form>
     </Form>
   );

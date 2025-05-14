@@ -159,7 +159,9 @@ export default function EditAssetTypeForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Update Asset Type</Button>
+        <Button type="submit" className="w-full">
+          Update Asset Type
+        </Button>
       </form>
     </Form>
   );

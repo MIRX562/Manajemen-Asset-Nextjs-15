@@ -375,7 +375,9 @@ export default function EditAssetForm({ data }: { data: AssetDetail }) {
         />
 
         {/* Submit Button */}
-        <Button type="submit">Update Asset</Button>
+        <Button type="submit" className="w-full">
+          Update Asset
+        </Button>
       </form>
     </Form>
   );

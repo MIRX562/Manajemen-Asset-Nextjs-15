@@ -121,7 +121,9 @@ export default function AddUserForm() {
           )}
         />
 
-        <Button type="submit">Add User</Button>
+        <Button type="submit" className="w-full">
+          Add User
+        </Button>
       </form>
     </Form>
   );

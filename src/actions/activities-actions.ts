@@ -11,7 +11,6 @@ export async function createActivityLog(data: {
 }) {
   try {
     const { user } = await getCurrentSession();
-    console.log(user);
     if (!user) throw new Error("Not Authorized");
 
     return await prisma.activityLog.create({

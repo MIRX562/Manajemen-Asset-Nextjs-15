@@ -119,7 +119,9 @@ export default function EditEmployeeForm({ data }: MyFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Update Employee</Button>
+        <Button type="submit" className="w-full">
+          Update Employee
+        </Button>
       </form>
     </Form>
   );

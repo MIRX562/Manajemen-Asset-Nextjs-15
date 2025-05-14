@@ -130,7 +130,9 @@ export default function AddAssetTypeForm({
             </FormItem>
           )}
         />
-        <Button type="submit">Add Asset Type</Button>
+        <Button type="submit" className="w-full">
+          Add Asset Type
+        </Button>
       </form>
     </Form>
   );
