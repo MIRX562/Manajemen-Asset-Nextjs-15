@@ -43,6 +43,8 @@ export function NavMain({
       ? items.filter(
           (item) => item.title === "Dashboard" || item.title === "Maintenance"
         )
+      : role === "INVENTARIS"
+      ? items.filter((item) => item.title !== "Maintenance")
       : items;
 
   return (
