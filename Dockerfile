@@ -7,8 +7,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json* ./
-RUN npm install -g bun
-RUN bun install
+RUN npm install
 
 # Build the application
 FROM base AS builder
@@ -21,14 +20,13 @@ COPY . .
 # Uncomment the following line if you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN bun run build
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -46,4 +44,4 @@ EXPOSE 3000
 
 ENV PORT=3000
 
-CMD ["bun", "server.js"]
+CMD ["node", "server.js"]

@@ -28,6 +28,34 @@ async function main() {
     prisma.employee.deleteMany(),
   ]);
 
+  // Create default users
+  const defaultUsers = await Promise.all([
+    prisma.user.create({
+      data: {
+        username: "admin",
+        password: await hashPassword("Admin@123"),
+        role: "ADMIN",
+        email: "admin@example.com",
+      },
+    }),
+    prisma.user.create({
+      data: {
+        username: "inventaris",
+        password: await hashPassword("Inventaris@123"),
+        role: "INVENTARIS",
+        email: "inventaris@example.com",
+      },
+    }),
+    prisma.user.create({
+      data: {
+        username: "teknisi",
+        password: await hashPassword("Teknisi@123"),
+        role: "TEKNISI",
+        email: "teknisi@example.com",
+      },
+    }),
+  ]);
+
   // Create Employees
   const employees = await Promise.all(
     Array.from({ length: 10 }).map(() =>
@@ -48,9 +76,9 @@ async function main() {
     )
   );
 
-  // Create Users
-  const users = await Promise.all(
-    Array.from({ length: 15 }).map(async () =>
+  // Create additional random users
+  const randomUsers = await Promise.all(
+    Array.from({ length: 12 }).map(async () =>
       prisma.user.create({
         data: {
           username: faker.internet.userName(),
@@ -61,6 +89,9 @@ async function main() {
       })
     )
   );
+
+  // Combine default and random users
+  const users = [...defaultUsers, ...randomUsers];
 
   // Create Asset Types
   const assetTypes = await Promise.all(
