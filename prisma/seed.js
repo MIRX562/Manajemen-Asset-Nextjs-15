@@ -58,7 +58,7 @@ async function main() {
 
   // Create Employees
   const employees = await Promise.all(
-    Array.from({ length: 10 }).map(() =>
+    Array.from({ length: 15 }).map(() =>
       prisma.employee.create({
         data: {
           name: faker.person.fullName(),
@@ -223,7 +223,7 @@ async function main() {
 
   // Create Check In/Outs
   await Promise.all(
-    Array.from({ length: 10 }).map(() =>
+    Array.from({ length: 20 }).map(() =>
       prisma.checkInOut.create({
         data: {
           asset_id: faker.helpers.arrayElement(assets).id,
