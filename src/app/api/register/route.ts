@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { registerAndRefresh } from "@/lib/auth";
 import { z } from "zod";
-import { markFirstRunComplete } from "@/lib/firstRun";
 
 const RegisterSchema = z.object({
   username: z.string(),
@@ -17,8 +16,6 @@ export async function POST(req: Request) {
     const { email, password, username } = parsedBody;
 
     await registerAndRefresh(username, email, password);
-
-    await markFirstRunComplete();
 
     return NextResponse.json(
       { message: "User registered successfully, you are logged in." },
