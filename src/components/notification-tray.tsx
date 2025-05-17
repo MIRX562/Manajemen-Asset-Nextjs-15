@@ -1,100 +1,209 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { useEffect } from "react";
+import { Bell, Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { useNotificationStore } from "@/stores/notification-store";
+import { useUserStore } from "@/stores/user-store";
+import type { NotificationType } from "@prisma/client";
 
 interface Notification {
-  id: number;
-  message: string;
-  created_at: string;
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  type: NotificationType;
+  link: string;
 }
 
 export default function NotificationTray() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [open, setOpen] = useState(false);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const setNotifications = useNotificationStore(
+    (state) => state.setNotifications
+  );
+  const addNotifications = useNotificationStore(
+    (state) => state.addNotifications
+  );
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const clearAll = useNotificationStore((state) => state.clearAll);
+  const user = useUserStore((state) => state.user);
 
-  // Fetch notifications on first load
   useEffect(() => {
+    if (!user) return;
+    // Fetch notifications for the current user
     const fetchNotifications = async () => {
       const res = await fetch("/api/notifications");
-      const data = await res.json();
-      setNotifications(data);
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
     };
-
     fetchNotifications();
-
-    // Open SSE connection
+    // Listen for new notifications via SSE
     const eventSource = new EventSource("/api/notifications/stream");
-
     eventSource.onmessage = (event) => {
       const newNotification = JSON.parse(event.data);
-      setNotifications((prev) => [newNotification, ...prev]); // Add new ones to the top
+      // Only add if for this user
+      if (newNotification.user_id === user.id) {
+        addNotifications([newNotification]);
+      }
     };
-
     return () => {
       eventSource.close();
     };
-  }, []);
+  }, [user, setNotifications, addNotifications]);
 
-  // Get today's date in YYYY-MM-DD format
-  const today = new Date().toISOString().split("T")[0];
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  // Count only today's and newly received notifications
-  const todayNotificationCount = notifications.filter((n) =>
-    n.created_at.startsWith(today)
-  ).length;
+  const getTypeIcon = (type: NotificationType) => {
+    switch (type) {
+      case "INFO":
+        return <Info className="h-4 w-4 text-blue-500" />;
+      case "SUCCESS":
+        return <Check className="h-4 w-4 text-green-500" />;
+      case "WARNING":
+        return <Info className="h-4 w-4 text-amber-500" />;
+      case "ERROR":
+        return <Info className="h-4 w-4 text-red-500" />;
+      case "MESSAGE":
+        return <Info className="h-4 w-4 text-cyan-500" />;
+      case "SYSTEM":
+        return <Info className="h-4 w-4 text-gray-500" />;
+      case "MAINTENANCE":
+        return <Info className="h-4 w-4 text-indigo-500" />;
+      default:
+        return <Info className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative rounded-full">
           <Bell className="h-5 w-5" />
-          {todayNotificationCount > 0 && (
-            <span className="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white">
-              {todayNotificationCount}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+              {unreadCount}
             </span>
           )}
-          <span className="sr-only">Toggle notifications</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Notifications</h2>
-        </div>
-        <ScrollArea className="h-[300px]">
-          {notifications.length === 0 ? (
-            <p className="text-center text-muted-foreground p-4">
-              No notifications
-            </p>
-          ) : (
-            <ul className="divide-y">
-              {notifications.map((notification) => (
-                <li
-                  key={notification.id}
-                  className="p-4 transition-colors hover:bg-muted"
+      <PopoverContent className="w-80 p-0" align="end">
+        <Card className="border-0 shadow-none">
+          <CardHeader className="border-b py-3 px-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium">
+                Notifications
+              </CardTitle>
+              {unreadCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => markAllAsRead(user.id)}
+                  className="h-auto text-xs p-0 font-normal"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(notification.created_at).toLocaleTimeString()}
-                      </p>
+                  Mark all as read
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="max-h-[350px] overflow-y-auto p-0">
+            {notifications.length > 0 ? (
+              <div>
+                {[...notifications]
+                  .sort((a, b) =>
+                    a.is_read === b.is_read ? 0 : a.is_read ? 1 : -1
+                  )
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={cn(
+                        "flex items-start gap-3 p-4 border-b last:border-0 transition-colors cursor-pointer hover:bg-muted/70",
+                        !notification.is_read && "bg-muted/50"
+                      )}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest("button")) return;
+                        if (notification.link)
+                          window.location.href = notification.link;
+                        if (!notification.is_read) {
+                          markAsRead(notification.id);
+                          // Optionally: call API to mark as read
+                        }
+                      }}
+                    >
+                      <div className="mt-1">
+                        {getTypeIcon(notification.type)}
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium">
+                            {notification.message}
+                          </p>
+                          {!notification.is_read && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(notification.id);
+                              }}
+                            >
+                              <span className="sr-only">Mark as read</span>
+                              <Check className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                        {notification.link && (
+                          <p className="text-xs text-muted-foreground">
+                            {notification.link}
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(notification.created_at).toLocaleString()}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-6 text-center">
+                <Bell className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                <p className="text-sm font-medium">No notifications</p>
+                <p className="text-xs text-muted-foreground">
+                  You're all caught up!
+                </p>
+              </div>
+            )}
+          </CardContent>
+          {notifications.length > 0 && (
+            <CardFooter className="border-t p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs"
+                onClick={clearAll}
+              >
+                Clear all
+              </Button>
+            </CardFooter>
           )}
-        </ScrollArea>
+        </Card>
       </PopoverContent>
     </Popover>
   );

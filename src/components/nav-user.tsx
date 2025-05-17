@@ -19,12 +19,12 @@ import {
 import { logout } from "@/lib/auth"; // Assuming your auth function is here
 import { getInitials } from "@/lib/utils";
 import Link from "next/link";
-import { useUser } from "@/context/session";
+import { useUserStore } from "@/stores/user-store";
 import { Badge } from "./ui/badge";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
 
   if (!user) {
     return (

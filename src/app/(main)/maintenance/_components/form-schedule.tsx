@@ -40,12 +40,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useDropdownContext } from "@/context/dropdown";
+import { useDropdownStore } from "@/stores/dropdown-store";
 import { MaintenanceStatus } from "@prisma/client";
 import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
 import { scheduleMaintenance } from "@/actions/maintenance-inventory-actions";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { useEffect } from "react";
 
 type FormProps = {
   inventoryItems: {
@@ -63,7 +64,10 @@ export default function ScheduleMaintenanceForm({
   inventoryItems,
   assets,
 }: FormProps) {
-  const { mechanics } = useDropdownContext();
+  const mechanics = useDropdownStore((state) => state.mechanics);
+  const fetchDropdownData = useDropdownStore(
+    (state) => state.fetchDropdownData
+  );
 
   const form = useForm<z.infer<typeof scheduleMaintenanceSchema>>({
     resolver: zodResolver(scheduleMaintenanceSchema),
@@ -78,6 +82,10 @@ export default function ScheduleMaintenanceForm({
     control: form.control,
     name: "inventory",
   });
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, [fetchDropdownData]);
 
   function onSubmit(values: z.infer<typeof scheduleMaintenanceSchema>) {
     try {
@@ -368,7 +376,7 @@ export default function ScheduleMaintenanceForm({
                               <SelectTrigger>
                                 <SelectValue
                                   placeholder="Select an item"
-                                  value={field.value}
+                                  value={String(field.value ?? "")}
                                 />
                               </SelectTrigger>
                               <SelectContent>

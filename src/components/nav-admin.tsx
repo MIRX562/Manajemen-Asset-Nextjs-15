@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { Role } from "@prisma/client";
-import { useUser } from "@/context/session";
+import { useUserStore } from "@/stores/user-store";
+import type { User } from "@prisma/client";
 
 export function NavAdmin({
   items,
@@ -22,7 +23,7 @@ export function NavAdmin({
     icon: LucideIcon;
   }[];
 }) {
-  const { user } = useUser();
+  const user = useUserStore((state: { user: User | null }) => state.user);
   const role = user?.role;
   if (!role) {
     return (

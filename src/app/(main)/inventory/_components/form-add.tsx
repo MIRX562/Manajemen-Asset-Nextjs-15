@@ -21,11 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDropdownContext } from "@/context/dropdown";
+import { useDropdownStore } from "@/stores/dropdown-store";
 import { createInventorySchema } from "@/schemas/inventory-schema";
 import { useRouter } from "next/navigation";
 import { createInventoryItem } from "@/actions/inventory-actions";
 import SuggestionInput from "@/components/ui/sugestion-input";
+import { useEffect } from "react";
 
 export default function AddInventoryForm({
   sugestion,
@@ -33,7 +34,10 @@ export default function AddInventoryForm({
   sugestion: { category: string }[];
 }) {
   const router = useRouter();
-  const { locations } = useDropdownContext();
+  const locations = useDropdownStore((state) => state.locations);
+  const fetchDropdownData = useDropdownStore(
+    (state) => state.fetchDropdownData
+  );
   const form = useForm<z.infer<typeof createInventorySchema>>({
     resolver: zodResolver(createInventorySchema),
   });
@@ -41,6 +45,10 @@ export default function AddInventoryForm({
     label: item.category,
     value: item.category,
   }));
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, [fetchDropdownData]);
 
   async function onSubmit(data: z.infer<typeof createInventorySchema>) {
     try {

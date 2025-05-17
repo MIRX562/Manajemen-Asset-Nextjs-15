@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDropdownContext } from "@/context/dropdown";
+import { useDropdownStore } from "@/stores/dropdown-store";
 import { updateInventorySchema } from "@/schemas/inventory-schema";
 import { Inventory } from "@prisma/client";
 import { updateInventoryItem } from "@/actions/inventory-actions";
@@ -35,10 +35,16 @@ interface MyFormProp {
 
 export default function EditInventoryForm({ data }: MyFormProp) {
   const router = useRouter();
-  const { locations } = useDropdownContext();
+  const locations = useDropdownStore((state) => state.locations);
+  const fetchDropdownData = useDropdownStore(
+    (state) => state.fetchDropdownData
+  );
   const form = useForm<z.infer<typeof updateInventorySchema>>({
     resolver: zodResolver(updateInventorySchema),
-    defaultValues: data,
+    defaultValues: {
+      ...data,
+      location_id: data.location_id ?? undefined,
+    },
   });
 
   const [categories, setCategories] = useState([]);
@@ -61,6 +67,10 @@ export default function EditInventoryForm({ data }: MyFormProp) {
 
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, [fetchDropdownData]);
 
   async function onSubmit(data: z.infer<typeof updateInventorySchema>) {
     try {

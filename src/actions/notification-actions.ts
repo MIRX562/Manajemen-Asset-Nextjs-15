@@ -8,10 +8,11 @@ import { NotificationType } from "@prisma/client";
 export async function createNotification(
   userId: number,
   message: string,
-  type: NotificationType
+  type: NotificationType,
+  link: string
 ) {
   const notification = await prisma.notifications.create({
-    data: { user_id: userId, message, type },
+    data: { user_id: userId, message, type, link },
   });
 
   // Emit event when a new notification is created
@@ -20,10 +21,30 @@ export async function createNotification(
   return notification;
 }
 
-// Server Action: Fetch notifications
-export async function fetchNotifications() {
+// Server Action: Fetch notifications for a specific user
+export async function fetchNotifications(userId: number) {
   return await prisma.notifications.findMany({
-    orderBy: { created_at: "desc" },
+    where: { user_id: userId },
+    orderBy: [{ is_read: "asc" }, { created_at: "desc" }],
+  });
+}
+
+// Server Action: Mark notification as read
+export async function markNotificationAsRead(id: number) {
+  return await prisma.notifications.update({
+    where: { id },
+    data: { is_read: true },
+  });
+}
+export async function markAllNotificationAsRead(user_id: number) {
+  return await prisma.notifications.updateMany({
+    where: {
+      AND: {
+        user_id: user_id,
+        is_read: false,
+      },
+    },
+    data: { is_read: true },
   });
 }
 

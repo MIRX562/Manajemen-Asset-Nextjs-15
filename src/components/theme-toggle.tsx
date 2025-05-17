@@ -12,13 +12,17 @@ export function ThemeToggle() {
   }
 
   const toggleTheme = () => {
-    // Toggle between light and dark themes
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
   };
 
   return (
-    <Button variant="outline" size="icon" onClick={toggleTheme}>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="rounded-full"
+      onClick={toggleTheme}
+    >
       <Sun
         className={`h-[1.2rem] w-[1.2rem] transition-all ${
           theme === "dark" ? "hidden" : ""

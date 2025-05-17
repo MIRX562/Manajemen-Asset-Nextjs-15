@@ -22,4 +22,3 @@ jobs:
       - run: bun x prisma db seed
       - run: bun x prisma generate
       - run: bun run build
-      - run: pm2 restart asem

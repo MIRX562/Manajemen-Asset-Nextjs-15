@@ -271,6 +271,8 @@ model Notifications {
   user_id    Int
   message    String
   type       NotificationType
+  is_read    Boolean          @default(false)
+  link       String?          
   created_at DateTime         @default(now())
   updated_at DateTime         @updatedAt
 
@@ -278,8 +280,13 @@ model Notifications {
 }
 
 enum NotificationType {
-  PEMELIHARAAN
-  STOK_RENDAH
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  MESSAGE
+  SYSTEM
+  MAINTENANCE
 }
 
 model Session {

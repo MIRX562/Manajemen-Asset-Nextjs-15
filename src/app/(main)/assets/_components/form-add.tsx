@@ -42,13 +42,18 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { AssetStatus, LifecycleStage } from "@prisma/client";
 import { createAssetSchema } from "@/schemas/asset-schema";
-import { useDropdownContext } from "@/context/dropdown";
+import { useDropdownStore } from "@/stores/dropdown-store";
 import { createAsset } from "@/actions/assets-actions";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
+import { useEffect } from "react";
 
 export default function AddAssetForm() {
-  const { assetTypes, locations } = useDropdownContext();
+  const assetTypes = useDropdownStore((state) => state.assetTypes);
+  const locations = useDropdownStore((state) => state.locations);
+  const fetchDropdownData = useDropdownStore(
+    (state) => state.fetchDropdownData
+  );
   const router = useRouter();
   const form = useForm<z.infer<typeof createAssetSchema>>({
     resolver: zodResolver(createAssetSchema),
@@ -58,6 +63,10 @@ export default function AddAssetForm() {
       lifecycle_stage: LifecycleStage.BARU,
     },
   });
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, [fetchDropdownData]);
 
   async function onSubmit(values: z.infer<typeof createAssetSchema>) {
     try {

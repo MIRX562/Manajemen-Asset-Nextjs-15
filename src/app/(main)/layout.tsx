@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { AppSidebar } from "@/components/app-sidebar";
 import NotificationTray from "@/components/notification-tray";
@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import Loading from "./loading";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NotificationProvider } from "@/context/notifications";
-import { DropdownProvider } from "@/context/dropdown";
-import { UserProvider } from "@/context/session";
+import { useUserStore } from "@/stores/user-store";
 
 function Header() {
   return (
@@ -38,25 +36,24 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fetchUser = useUserStore((state) => state.fetchUser);
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
   return (
-    <UserProvider>
-      <NotificationProvider>
-        <DropdownProvider>
-          <ThemeProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                <Header />
-                <Suspense fallback={<Loading />}>
-                  <main className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-y-auto">
-                    {children}
-                  </main>
-                </Suspense>
-              </SidebarInset>
-            </SidebarProvider>
-          </ThemeProvider>
-        </DropdownProvider>
-      </NotificationProvider>
-    </UserProvider>
+    <ThemeProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <Header />
+          <Suspense fallback={<Loading />}>
+            <main className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-y-auto">
+              {children}
+            </main>
+          </Suspense>
+        </SidebarInset>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }

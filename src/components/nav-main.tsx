@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { useUser } from "@/context/session";
+import { useUserStore } from "@/stores/user-store";
 
 export function NavMain({
   items,
@@ -34,8 +34,8 @@ export function NavMain({
   }[];
 }) {
   const currentPath = usePathname();
-  const user = useUser();
-  const role = user.user?.role;
+  const user = useUserStore((state) => state.user);
+  const role = user?.role;
 
   // Filter items based on role
   const filteredItems =

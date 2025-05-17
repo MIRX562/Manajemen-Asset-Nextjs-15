@@ -36,9 +36,10 @@ import {
   updateAssetMechanic,
   updateInventory,
 } from "@/actions/maintenance-actions";
-import { useDropdownContext } from "@/context/dropdown";
+import { useDropdownStore } from "@/stores/dropdown-store";
 import { Check, ChevronsUpDown, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 type EditAssetMechanicFormProps = {
   assets: { id: number; name: string }[];
@@ -54,7 +55,14 @@ export function EditAssetMechanicForm({
     defaultValues: initialData,
   });
   const router = useRouter();
-  const { mechanics } = useDropdownContext();
+  const mechanics = useDropdownStore((state) => state.mechanics);
+  const fetchDropdownData = useDropdownStore(
+    (state) => state.fetchDropdownData
+  );
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, [fetchDropdownData]);
 
   function onSubmit(values: z.infer<typeof editAssetMechanicSchema>) {
     toast.promise(updateAssetMechanic(values), {

@@ -286,8 +286,25 @@ async function main() {
         data: {
           user_id: faker.helpers.arrayElement(users).id,
           message: faker.lorem.sentence(),
-          type: faker.helpers.arrayElement(["PEMELIHARAAN", "STOK_RENDAH"]),
-          // is_read: faker.datatype.boolean(),
+          type: faker.helpers.arrayElement([
+            "INFO",
+            "SUCCESS",
+            "WARNING",
+            "ERROR",
+            "MESSAGE",
+            "SYSTEM",
+            "MAINTENANCE",
+          ]),
+          is_read: faker.datatype.boolean(),
+          link: faker.helpers.arrayElement([
+            "/dashboard",
+            "/maintenance",
+            "/messages",
+            "/assets",
+            "/inventory",
+            "/settings",
+            "",
+          ]),
         },
       })
     )
