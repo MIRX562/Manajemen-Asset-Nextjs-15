@@ -34,7 +34,9 @@ export const locationColumns: ColumnDef<Location>[] = [
       <DataTableColumnHeader column={column} title="Address" />
     ),
     cell: ({ row }) => (
-      <div className="truncate text-sm">{row.getValue("address")}</div>
+      <div className="truncate max-w-[300px] text-sm">
+        {row.getValue("address")}
+      </div>
     ),
     enableSorting: false,
   },

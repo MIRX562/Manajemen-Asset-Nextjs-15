@@ -88,7 +88,13 @@ export async function validateSessionToken(
   }
   const { user, ...session } = result;
   if (Date.now() >= session.expiresAt.getTime()) {
-    await prisma.session.delete({ where: { id: sessionId } });
+    // Delete all expired sessions for this user
+    await prisma.session.deleteMany({
+      where: {
+        user_id: session.user_id,
+        expiresAt: { lt: new Date() },
+      },
+    });
     return { session: null, user: null };
   }
   if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 20) {
@@ -197,6 +203,14 @@ export const login = async (email: string, password: string) => {
   if (!isValidPassword) {
     throw new Error("Invalid password");
   }
+
+  // Delete all expired sessions for this user before creating a new one
+  await prisma.session.deleteMany({
+    where: {
+      user_id: user.id,
+      expiresAt: { lt: new Date() },
+    },
+  });
 
   const token = await generateSessionToken();
   const session = await createSession(token, user.id);

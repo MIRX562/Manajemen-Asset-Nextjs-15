@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   // experimental: {
-  //   reactCompiler: true,
+  //   nodeMiddleware: true,
   // },
 };
 
