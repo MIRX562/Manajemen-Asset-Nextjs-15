@@ -28,9 +28,12 @@ export async function checkoutAsset(data: CheckOutForm) {
     });
 
     // Update asset status (optional)
-    await tx.asset.update({
-      where: { id: data.asset_id },
-      data: { status: "TIDAK_AKTIF" },
+    await tx.assetLifecycle.create({
+      data: {
+        asset_id: data.asset_id,
+        stage: "DIGUNAKAN",
+        change_date: new Date(),
+      },
     });
 
     // Log activity

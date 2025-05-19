@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
-import { Inventory } from "@prisma/client";
+import { Inventory, NotificationType } from "@prisma/client";
 
 // Create a new inventory item
 export async function createInventoryItem(data: {
@@ -108,6 +108,8 @@ export async function consumeItem(data: z.infer<typeof consumeSchema>) {
       select: { id: true, quantity: true },
     });
 
+    const item_IDS = items.map((item) => item.id);
+
     const insufficientStock = parsedData.items
       .map((item) => {
         const dbItem = items.find((db) => db.id === item.item_ID);
@@ -134,6 +136,49 @@ export async function consumeItem(data: z.infer<typeof consumeSchema>) {
         })
       )
     );
+
+    await prisma.$transaction(
+      parsedData.items.map(({ item_ID, quantity }) =>
+        prisma.inventory.update({
+          where: { id: item_ID },
+          data: { quantity: { decrement: quantity } },
+        })
+      )
+    );
+
+    const lowStockItem = await prisma.inventory.findMany({
+      where: {
+        AND: {
+          id: {
+            in: item_IDS,
+          },
+          quantity: {
+            lte: prisma.inventory.fields.reorder_level,
+          },
+        },
+      },
+    });
+
+    if (lowStockItem.length > 0) {
+      const users = await prisma.user.findMany({
+        where: { role: { not: "TEKNISI" } },
+        select: { id: true },
+      });
+
+      if (users.length === 0) return;
+
+      const notification_data = users.map((user) => ({
+        user_id: user.id,
+        message: "Inventory item low!",
+        type: NotificationType.WARNING,
+        link: "/inventory",
+      }));
+
+      await prisma.notifications.createMany({
+        data: notification_data,
+      });
+    }
+
     for (const { item_ID, quantity } of parsedData.items) {
       await createActivityLog({
         action: `Consumed ${quantity} units`,
@@ -293,34 +338,6 @@ export async function getTotalInventoryValue() {
     );
     throw new Error(
       "Failed to calculate total inventory value. Please try again."
-    );
-  }
-}
-
-// Calculate inventory turnover rate
-export async function getInventoryTurnoverRate() {
-  try {
-    return await prisma.maintenanceInventory.groupBy({
-      by: ["inventory_id"],
-      _sum: {
-        quantity_used: true,
-      },
-      include: {
-        inventory: {
-          select: {
-            name: true,
-            quantity: true,
-          },
-        },
-      },
-    });
-  } catch (error) {
-    console.error(
-      "[getInventoryTurnoverRate] Failed to calculate inventory turnover rate:",
-      error
-    );
-    throw new Error(
-      "Failed to calculate inventory turnover rate. Please try again."
     );
   }
 }
