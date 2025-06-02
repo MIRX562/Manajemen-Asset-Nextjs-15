@@ -264,6 +264,7 @@ enum TargetType {
   CHECKOUT
   EMPLOYEE
   USER
+  SESSION
 }
 
 model Notifications {

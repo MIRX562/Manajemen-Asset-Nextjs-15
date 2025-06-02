@@ -10,6 +10,7 @@ import { type Session, Role } from "@prisma/client";
 import prisma from "./db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { createActivityLog } from "@/actions/activities-actions";
 
 /**
  * Hashes a plaintext password before storing it in the database.
@@ -215,6 +216,11 @@ export const login = async (email: string, password: string) => {
   const token = await generateSessionToken();
   const session = await createSession(token, user.id);
   await setSessionTokenCookie(token, session.expiresAt);
+  await createActivityLog({
+    action: `user ${user.username} logged in`,
+    target_id: user.id,
+    target_type: "SESSION",
+  });
 
   return session;
 };
@@ -227,6 +233,8 @@ export const login = async (email: string, password: string) => {
  */
 export async function logout(): Promise<void> {
   const cookieStore = cookies();
+  const { user } = await getCurrentSession();
+  if (!user) return;
 
   const sessionToken = (await cookieStore).get("session")?.value;
   if (!sessionToken) return;
@@ -236,6 +244,11 @@ export async function logout(): Promise<void> {
   try {
     await prisma.session.delete({
       where: { id: sessionId },
+    });
+    await createActivityLog({
+      action: `user ${user.username} logged in`,
+      target_id: user.id,
+      target_type: "SESSION",
     });
   } catch (error) {
     console.error("Error deleting session from database:", error);
