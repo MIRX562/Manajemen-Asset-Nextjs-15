@@ -9,10 +9,13 @@ import {
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
 export async function updateAssetMechanic(
   data: z.infer<typeof editAssetMechanicSchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.maintenance.update({
       where: {
@@ -36,12 +39,13 @@ export async function updateAssetMechanic(
 export async function updateInventory(
   data: z.infer<typeof editInventorySchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const validatedData = editInventorySchema.parse(data);
 
     const { id, inventory } = validatedData;
 
-    // Update inventory records
     await prisma.maintenanceInventory.deleteMany({
       where: { maintenance_id: id },
     });
@@ -64,10 +68,11 @@ export async function updateInventory(
   }
 }
 
-// Update a maintenance record
 export async function updateMaintenanceStatus(
   data: z.infer<typeof updateMaintenanceStatusSchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const { id, maintenance_status, notes, asset_id } = data;
   try {
     if (maintenance_status == "SELESAI") {
@@ -136,8 +141,9 @@ export async function updateMaintenanceStatus(
   }
 }
 
-// Delete a maintenance record
 export async function deleteMaintenance(data: any) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.maintenance.delete({
       where: { id: data.id },
@@ -158,8 +164,9 @@ export async function deleteMaintenance(data: any) {
   }
 }
 
-// Get upcoming maintenance tasks
 export async function getUpcomingMaintenance() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const maintenances = await prisma.maintenance.findMany({
       where: {
@@ -194,8 +201,9 @@ export async function getUpcomingMaintenance() {
   }
 }
 
-// Get all maintenance records
 export async function getAllMaintenances() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       include: {
@@ -218,8 +226,9 @@ export async function getAllMaintenances() {
   }
 }
 
-// Get maintenance record by ID
 export async function getMaintenanceById(id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const maintenance = await prisma.maintenance.findUnique({
       where: { id },
@@ -273,8 +282,9 @@ export async function getMaintenanceById(id: number) {
   }
 }
 
-// Get maintenance records by asset ID
 export async function getMaintenancesByAssetId(asset_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       where: { asset_id },
@@ -291,8 +301,9 @@ export async function getMaintenancesByAssetId(asset_id: number) {
   }
 }
 
-// Get maintenance records by mechanic ID
 export async function getMaintenancesByMechanicId(mechanic_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       where: { mechanic_id },
@@ -309,8 +320,9 @@ export async function getMaintenancesByMechanicId(mechanic_id: number) {
   }
 }
 
-// Get upcoming scheduled maintenances
 export async function getUpcomingMaintenances() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       where: {
@@ -328,8 +340,9 @@ export async function getUpcomingMaintenances() {
   }
 }
 
-// Get completed maintenance count
 export async function getCompletedMaintenanceCount() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.count({ where: { status: "SELESAI" } });
   } catch (error) {
@@ -343,8 +356,9 @@ export async function getCompletedMaintenanceCount() {
   }
 }
 
-// Get pending maintenance count
 export async function getPendingMaintenanceCount() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.count({ where: { status: "DIJADWALKAN" } });
   } catch (error) {
@@ -358,8 +372,9 @@ export async function getPendingMaintenanceCount() {
   }
 }
 
-// Get delayed maintenance records
 export async function getDelayedMaintenances() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       where: {
@@ -379,8 +394,9 @@ export async function getDelayedMaintenances() {
   }
 }
 
-// Get delayed maintenance records
 export async function getScheduledMaintenance() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenance.findMany({
       where: {
@@ -406,6 +422,8 @@ export async function getScheduledMaintenance() {
 }
 
 export async function getScheduledMaintenanceMetrics() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const now = new Date();
   const thisWeekStart = startOfWeek(now);
   const thisWeekEnd = endOfWeek(now);
@@ -417,11 +435,10 @@ export async function getScheduledMaintenanceMetrics() {
     uniqueMechanics,
     uniqueAssets,
   ] = await Promise.all([
-    // Total Scheduled Maintenance
     prisma.maintenance.count({
       where: { status: "DIJADWALKAN" },
     }),
-    // Maintenance Scheduled This Week
+
     prisma.maintenance.count({
       where: {
         status: "DIJADWALKAN",
@@ -431,19 +448,19 @@ export async function getScheduledMaintenanceMetrics() {
         },
       },
     }),
-    // Overdue Maintenance
+
     prisma.maintenance.count({
       where: {
         status: "DIJADWALKAN",
         scheduled_date: { lt: now },
       },
     }),
-    // Unique Mechanics Assigned
+
     prisma.maintenance.groupBy({
       by: ["mechanic_id"],
       where: { status: "DIJADWALKAN" },
     }),
-    // Unique Assets Scheduled
+
     prisma.maintenance.groupBy({
       by: ["asset_id"],
       where: { status: "DIJADWALKAN" },

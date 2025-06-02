@@ -4,8 +4,12 @@ import prisma from "@/lib/db";
 import { createAssetSchema, editAssetSchema } from "@/schemas/asset-schema";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
 export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
+
   const value = createAssetSchema.parse(data);
 
   try {
@@ -21,7 +25,6 @@ export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
       },
     });
 
-    // Create AssetLocationHistory
     await prisma.assetLocationHistory.create({
       data: {
         asset_id: asset.id,
@@ -30,7 +33,6 @@ export const createAsset = async (data: z.infer<typeof createAssetSchema>) => {
       },
     });
 
-    // Create AssetLifecycle
     await prisma.assetLifecycle.create({
       data: {
         asset_id: asset.id,
@@ -60,10 +62,11 @@ export const editAsset = async (
   locationId?: number,
   lifecycleNotes?: string
 ) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const value = editAssetSchema.parse(data);
 
   try {
-    // Update the asset itself
     const asset = await prisma.asset.update({
       where: { id: value.id },
       data: {
@@ -77,29 +80,25 @@ export const editAsset = async (
       },
     });
 
-    // If locationId is provided and has changed, update the location history
     if (locationId) {
       const currentLocation = await prisma.assetLocationHistory.findFirst({
         where: {
           asset_id: asset.id,
-          release_date: null, // Get the active location record
+          release_date: null,
         },
       });
 
-      // Check if the location has actually changed before updating
       if (currentLocation && currentLocation.location_id !== locationId) {
-        // Update the release date for the previous location
         await prisma.assetLocationHistory.updateMany({
           where: {
             asset_id: asset.id,
-            release_date: null, // Only update the active record
+            release_date: null,
           },
           data: {
             release_date: new Date(),
           },
         });
 
-        // Add a new AssetLocationHistory entry
         await prisma.assetLocationHistory.create({
           data: {
             asset_id: asset.id,
@@ -110,18 +109,16 @@ export const editAsset = async (
       }
     }
 
-    // If the lifecycle stage has changed, create a new AssetLifecycle entry
     if (value.lifecycle_stage) {
       const currentLifecycle = await prisma.assetLifecycle.findFirst({
         where: {
           asset_id: asset.id,
         },
         orderBy: {
-          change_date: "desc", // Get the latest lifecycle stage
+          change_date: "desc",
         },
       });
 
-      // Check if the lifecycle stage or notes have changed before creating a new record
       if (
         !currentLifecycle ||
         currentLifecycle.stage !== value.lifecycle_stage ||
@@ -154,6 +151,8 @@ export const editAsset = async (
 };
 
 export const deleteAsset = async (id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.asset.delete({
       where: { id },
@@ -170,6 +169,8 @@ export const deleteAsset = async (id: number) => {
 };
 
 export const getAllAssets = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const assets = await prisma.asset.findMany({
       include: {
@@ -236,6 +237,8 @@ export const getAllAssets = async () => {
 };
 
 export const getAssetById = async (id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const asset = await prisma.asset.findUnique({
       where: { id },
@@ -310,6 +313,8 @@ export const getAssetById = async (id: number) => {
 };
 
 export const getAssetByType = async (type_id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const asset = await prisma.asset.findMany({
       where: { type_id },
@@ -336,6 +341,8 @@ export const getAssetByType = async (type_id: number) => {
 };
 
 export const getAvailableAssets = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const availableAssets = await prisma.asset.findMany({
       where: {
@@ -362,6 +369,8 @@ export const getAvailableAssets = async () => {
 };
 
 export const getAvailableAssetsIncludeId = async (id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const availableAssets = await prisma.asset.findMany({
       where: {
@@ -378,7 +387,7 @@ export const getAvailableAssetsIncludeId = async (id: number) => {
             },
           },
           {
-            id, // Ensure the given asset ID is always included
+            id,
           },
         ],
       },
@@ -395,14 +404,16 @@ export const getAvailableAssetsIncludeId = async (id: number) => {
 };
 
 export async function getAssetData() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const checkedOutAssets = await prisma.checkInOut.count({
     where: {
-      status: "DIPINJAM", // Adjust this value based on your `AssetStatus` enum
+      status: "DIPINJAM",
     },
   });
   const returnedAssets = await prisma.checkInOut.count({
     where: {
-      status: "DIKEMBALIKAN", // Adjust this value based on your `AssetStatus` enum
+      status: "DIKEMBALIKAN",
     },
   });
 

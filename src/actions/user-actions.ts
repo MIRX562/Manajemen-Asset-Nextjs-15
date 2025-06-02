@@ -1,6 +1,6 @@
 "use server";
 
-import { hashPassword } from "@/lib/auth";
+import { getCurrentSession, hashPassword } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { addUserSchema, editUserSchema } from "@/schemas/user-schema";
 import { Prisma, User } from "@prisma/client";
@@ -8,6 +8,8 @@ import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
 
 export const addUser = async (data: z.infer<typeof addUserSchema>) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const value = addUserSchema.parse(data);
 
@@ -50,6 +52,8 @@ export const addUser = async (data: z.infer<typeof addUserSchema>) => {
 };
 
 export const editUser = async (data: z.infer<typeof editUserSchema>) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const value = editUserSchema.parse(data);
 
@@ -88,6 +92,8 @@ export const editUser = async (data: z.infer<typeof editUserSchema>) => {
 };
 
 export const deleteUser = async (data: User) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.user.delete({
       where: {
@@ -110,6 +116,8 @@ export const deleteUser = async (data: User) => {
 };
 
 export async function getUserDetail(user_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const data = await prisma.user.findUnique({
       where: {

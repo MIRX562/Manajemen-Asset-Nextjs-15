@@ -94,6 +94,8 @@ export const deleteAssetType = async (
 };
 
 export const getAssetTypeById = async (id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const assetType = await prisma.assetType.findUnique({
       where: { id },
@@ -108,6 +110,8 @@ export const getAssetTypeById = async (id: number) => {
 };
 
 export const getAllAssetTypes = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const assetTypes = await prisma.assetType.findMany({
       include: {

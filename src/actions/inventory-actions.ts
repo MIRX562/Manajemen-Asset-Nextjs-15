@@ -4,8 +4,8 @@ import prisma from "@/lib/db";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
 import { Inventory, NotificationType } from "@prisma/client";
+import { getCurrentSession } from "@/lib/auth";
 
-// Create a new inventory item
 export async function createInventoryItem(data: {
   name: string;
   category: string;
@@ -15,6 +15,8 @@ export async function createInventoryItem(data: {
   location_id: number;
 }) {
   try {
+    const { user } = await getCurrentSession();
+    if (!user) throw new Error("Not Authorized");
     const item = await prisma.inventory.create({ data });
     createActivityLog({
       action: `Add new inventory: ${item.name}`,
@@ -30,7 +32,6 @@ export async function createInventoryItem(data: {
   }
 }
 
-// Update an inventory item
 export async function updateInventoryItem(data: {
   id: number;
   name?: string;
@@ -40,6 +41,8 @@ export async function updateInventoryItem(data: {
   unit_price?: number;
   location_id?: number;
 }) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const updatedItem = await prisma.inventory.update({
       where: { id: data.id },
@@ -69,6 +72,8 @@ const restockSchema = z.object({
 });
 
 export async function restockItem(data: z.infer<typeof restockSchema>) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const parsedData = restockSchema.parse(data);
 
@@ -100,6 +105,8 @@ const consumeSchema = z.object({
 });
 
 export async function consumeItem(data: z.infer<typeof consumeSchema>) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const parsedData = consumeSchema.parse(data);
 
@@ -120,7 +127,7 @@ export async function consumeItem(data: z.infer<typeof consumeSchema>) {
         }
         return null;
       })
-      .filter(Boolean); // Remove null values
+      .filter(Boolean);
 
     if (insufficientStock.length > 0) {
       throw new Error(
@@ -194,8 +201,9 @@ export async function consumeItem(data: z.infer<typeof consumeSchema>) {
   }
 }
 
-// Delete an inventory item
 export async function deleteInventoryItem(data: Inventory) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const deleted = await prisma.inventory.delete({
       where: { id: data.id },
@@ -214,8 +222,9 @@ export async function deleteInventoryItem(data: Inventory) {
   }
 }
 
-// Get all inventory items
 export async function getAllInventoryItems() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.inventory.findMany({
       include: {
@@ -236,8 +245,9 @@ export async function getAllInventoryItems() {
   }
 }
 
-// Get inventory item by ID
 export async function getInventoryItemById(id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const item = await prisma.inventory.findUnique({
       where: { id },
@@ -258,8 +268,9 @@ export async function getInventoryItemById(id: number) {
   }
 }
 
-// Get all inventory items at a specific location
 export async function getInventoryItemsByLocation(location_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.inventory.findMany({
       where: { location_id },
@@ -279,6 +290,8 @@ export async function getInventoryItemsByLocation(location_id: number) {
 }
 
 export async function getAvailableInventoryItems() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.inventory.findMany({
       select: {
@@ -298,8 +311,9 @@ export async function getAvailableInventoryItems() {
   }
 }
 
-// Check low stock inventory items
 export async function getLowStockInventoryItems() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.inventory.findMany({
       where: {
@@ -322,8 +336,9 @@ export async function getLowStockInventoryItems() {
   }
 }
 
-// Calculate total value of inventory
 export async function getTotalInventoryValue() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const result = await prisma.inventory.aggregate({
       _sum: {

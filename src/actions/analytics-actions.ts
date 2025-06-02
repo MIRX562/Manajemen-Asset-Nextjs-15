@@ -1,9 +1,12 @@
 "use server";
 
+import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { eachMonthOfInterval, format, subMonths } from "date-fns";
 
 export async function getDashboardSummary() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const [
     totalAssets,
     activeAssets,
@@ -41,11 +44,12 @@ function calculateDepreciation(
 }
 
 export async function getAssetValuationOverYear() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const endDate = new Date();
-  const startDate = subMonths(endDate, 11); // Last 12 months
+  const startDate = subMonths(endDate, 11);
   const months = eachMonthOfInterval({ start: startDate, end: endDate });
 
-  // Fetch assets & their latest DIHAPUS lifecycle change (if exists)
   const assets = await prisma.asset.findMany({
     where: {
       purchase_date: { lte: endDate },
@@ -59,13 +63,12 @@ export async function getAssetValuationOverYear() {
       assetLifecycles: {
         where: { stage: "DIHAPUS" },
         orderBy: { change_date: "desc" },
-        take: 1, // Get latest DIHAPUS change date
+        take: 1,
         select: { change_date: true },
       },
     },
   });
 
-  // Prepare valuation map
   const valuationsByMonth: Record<string, number> = {};
   months.forEach((month) => {
     valuationsByMonth[format(month, "yyyy-MM")] = 0;
@@ -104,19 +107,21 @@ export async function getAssetValuationOverYear() {
 }
 
 export async function getInventoryMetrics() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const [totalItems, lowStockAlerts, totalValue, categories] =
     await Promise.all([
-      prisma.inventory.count(), // Total inventory items
+      prisma.inventory.count(),
       prisma.inventory.count({
-        where: { quantity: { lt: prisma.inventory.fields.reorder_level } }, // Low stock alerts
+        where: { quantity: { lt: prisma.inventory.fields.reorder_level } },
       }),
       prisma.inventory.aggregate({
         _sum: { quantity: true, unit_price: true },
-      }), // Total inventory value
+      }),
       prisma.inventory.groupBy({
         by: ["category"],
         _count: { category: true },
-      }), // Unique categories count
+      }),
     ]);
 
   return {
@@ -131,11 +136,13 @@ export async function getInventoryMetrics() {
 }
 
 export async function getRecentInventoryActivities() {
-  // Step 1: Fetch activity logs related to INVENTORY
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
+
   const activities = await prisma.activityLog.findMany({
     where: { target_type: "INVENTORY" },
     orderBy: { timestamp: "desc" },
-    take: 10, // Limit to recent 10 activities
+    take: 10,
     select: {
       id: true,
       action: true,
@@ -144,18 +151,15 @@ export async function getRecentInventoryActivities() {
     },
   });
 
-  // Step 2: Extract unique inventory IDs to reduce DB calls
   const inventoryIds = [
     ...new Set(activities.map((activity) => activity.target_id)),
   ];
 
-  // Step 3: Fetch inventory names in a single query
   const inventories = await prisma.inventory.findMany({
     where: { id: { in: inventoryIds } },
     select: { id: true, name: true },
   });
 
-  // Step 4: Map inventory names to activity logs
   const inventoryMap = Object.fromEntries(
     inventories.map((inv) => [inv.id, inv.name])
   );
@@ -164,11 +168,13 @@ export async function getRecentInventoryActivities() {
     id: activity.id,
     item: inventoryMap[activity.target_id] || "Unknown Item",
     action: activity.action,
-    timestamp: activity.timestamp.toISOString(), // Format timestamp
+    timestamp: activity.timestamp.toISOString(),
   }));
 }
 
 export async function getAssetTypeDistribution() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const assetCategoryCounts = await prisma.asset.groupBy({
     by: ["type_id"],
     _count: { type_id: true },
@@ -202,6 +208,8 @@ export async function getAssetTypeDistribution() {
 }
 
 export async function getAssetLifecycleData() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const lifecycleCounts = await prisma.assetLifecycle.groupBy({
     by: ["stage"],
     _count: { stage: true },
@@ -241,6 +249,8 @@ export async function getAssetStatusData() {
 }
 
 export async function getAssetLocationData() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const locationCounts = await prisma.assetLocationHistory.groupBy({
     by: ["location_id"],
     _count: { location_id: true },

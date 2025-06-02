@@ -5,17 +5,17 @@ import { scheduleMaintenanceSchema } from "@/schemas/maintenance-schema";
 import { LifecycleStage } from "@prisma/client";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
 export async function scheduleMaintenance(
   data: z.infer<typeof scheduleMaintenanceSchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
-    // Validate the data against the schema
     const validatedData = scheduleMaintenanceSchema.parse(data);
 
-    // Perform the creation within a transaction
     return await prisma.$transaction(async (tx) => {
-      // Create the maintenance record
       const maintenance = await tx.maintenance.create({
         data: {
           asset_id: validatedData.asset_id,
@@ -26,7 +26,6 @@ export async function scheduleMaintenance(
         },
       });
 
-      // Check if inventory data is provided
       if (validatedData.inventory && validatedData.inventory.length > 0) {
         const inventoryRecords = validatedData.inventory.map((item) => ({
           maintenance_id: maintenance.id,
@@ -34,7 +33,6 @@ export async function scheduleMaintenance(
           quantity_used: item.quantity,
         }));
 
-        // Create associated inventory records
         await tx.maintenanceInventory.createMany({
           data: inventoryRecords,
         });
@@ -71,8 +69,9 @@ export async function scheduleMaintenance(
   }
 }
 
-// Get all MaintenanceInventory record
 export async function getAllMaintenanceInventories() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenanceInventory.findMany({
       include: {
@@ -96,10 +95,11 @@ export async function getAllMaintenanceInventories() {
   }
 }
 
-// Get MaintenanceInventory record by ID
 export async function getMaintenanceInventoryById(
   maintenance_inventory_id: number
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const record = await prisma.maintenanceInventory.findUnique({
       where: { maintenance_inventory_id },
@@ -130,10 +130,11 @@ export async function getMaintenanceInventoryById(
   }
 }
 
-// Get MaintenanceInventory records by Maintenance ID
 export async function getMaintenanceInventoriesByMaintenanceId(
   maintenance_id: number
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenanceInventory.findMany({
       where: { maintenance_id },
@@ -158,10 +159,11 @@ export async function getMaintenanceInventoriesByMaintenanceId(
   }
 }
 
-// Get MaintenanceInventory records by Inventory ID
 export async function getMaintenanceInventoriesByInventoryId(
   inventory_id: number
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenanceInventory.findMany({
       where: { inventory_id },
@@ -186,7 +188,6 @@ export async function getMaintenanceInventoriesByInventoryId(
   }
 }
 
-// Update a MaintenanceInventory record
 export async function updateMaintenanceInventory(
   maintenance_inventory_id: number,
   data: {
@@ -195,6 +196,8 @@ export async function updateMaintenanceInventory(
     quantity_used?: number;
   }
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenanceInventory.update({
       where: { maintenance_inventory_id },
@@ -211,10 +214,11 @@ export async function updateMaintenanceInventory(
   }
 }
 
-// Delete a MaintenanceInventory record
 export async function deleteMaintenanceInventory(
   maintenance_inventory_id: number
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.maintenanceInventory.delete({
       where: { maintenance_inventory_id },
@@ -230,10 +234,11 @@ export async function deleteMaintenanceInventory(
   }
 }
 
-// Get total inventory usage for a specific maintenance
 export async function getTotalInventoryUsageByMaintenance(
   maintenance_id: number
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const result = await prisma.maintenanceInventory.aggregate({
       where: { maintenance_id },
@@ -251,8 +256,9 @@ export async function getTotalInventoryUsageByMaintenance(
   }
 }
 
-// Get total inventory usage for a specific inventory
 export async function getTotalUsageByInventory(inventory_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const result = await prisma.maintenanceInventory.aggregate({
       where: { inventory_id },
@@ -271,6 +277,8 @@ export async function getTotalUsageByInventory(inventory_id: number) {
 }
 
 export async function getInventoryMaintenanceUsage(inventory_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const data = await prisma.maintenanceInventory.findMany({
       where: {

@@ -2,13 +2,15 @@
 import prisma from "@/lib/db";
 import { Location, LocationType } from "@prisma/client";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
-// Create a new location
 export async function createLocation(data: {
   name: string;
   address: string;
   type: LocationType;
 }) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const newLocation = await prisma.location.create({ data });
     createActivityLog({
@@ -23,7 +25,6 @@ export async function createLocation(data: {
   }
 }
 
-// Update a location
 export async function updateLocation(data: {
   name?: string;
   address?: string;
@@ -31,6 +32,8 @@ export async function updateLocation(data: {
   id: number;
 }) {
   try {
+    const { user } = await getCurrentSession();
+    if (!user) throw new Error("Not Authorized");
     const updated = await prisma.location.update({
       where: { id: data.id },
       data,
@@ -50,8 +53,9 @@ export async function updateLocation(data: {
   }
 }
 
-// Delete a location
 export async function deleteLocation(data: Location) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.location.delete({
       where: { id: data.id },
@@ -71,8 +75,9 @@ export async function deleteLocation(data: Location) {
   }
 }
 
-// Get all locations
 export async function getAllLocations() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.location.findMany({
       orderBy: {
@@ -85,8 +90,9 @@ export async function getAllLocations() {
   }
 }
 
-// Get a single location by ID
 export async function getLocationById(id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const location = await prisma.location.findUnique({
       where: { id },
@@ -121,10 +127,11 @@ export async function getLocationById(id: number) {
   }
 }
 
-// Get all locations by type
 export async function getLocationsByType(
   type: "GUDANG" | "KANTOR" | "DATA_CENTER"
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.location.findMany({
       where: { type },

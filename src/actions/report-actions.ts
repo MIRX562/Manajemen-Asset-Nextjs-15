@@ -2,6 +2,7 @@
 import * as z from "zod";
 import prisma from "@/lib/db";
 import { AssetStatus, MaintenanceStatus } from "@prisma/client";
+import { getCurrentSession } from "@/lib/auth";
 
 const inventoryReportSchema = z.object({
   from: z.date(),
@@ -13,6 +14,8 @@ const inventoryReportSchema = z.object({
 export async function inventoryReport(
   data: z.infer<typeof inventoryReportSchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const validatedData = inventoryReportSchema.parse(data);
     const selectFields = validatedData.items.reduce(
@@ -57,6 +60,8 @@ const assetReportSchema = z.object({
 });
 
 export async function assetReport(data: z.infer<typeof assetReportSchema>) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const validatedData = assetReportSchema.parse(data);
     const selectFields = validatedData.items.reduce(
@@ -102,6 +107,8 @@ const maintenanceReportSchema = z.object({
 export async function maintenanceReport(
   data: z.infer<typeof maintenanceReportSchema>
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const validatedData = maintenanceReportSchema.parse(data);
     const selectFields = validatedData.items.reduce(

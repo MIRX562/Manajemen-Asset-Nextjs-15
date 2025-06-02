@@ -36,7 +36,7 @@ export async function getRecentActivities() {
     orderBy: {
       timestamp: "desc",
     },
-    take: 5, // Limit to 10 recent activities
+    take: 5,
   });
 
   return activities.map((activity) => ({
@@ -44,7 +44,7 @@ export async function getRecentActivities() {
     action: activity.action,
     item: `${activity.target_type} #${activity.target_id}`,
     user: activity.user.username || "Unknown",
-    date: activity.timestamp.toISOString().split("T")[0], // Format as YYYY-MM-DD
+    date: activity.timestamp.toISOString().split("T")[0],
   }));
 }
 
@@ -58,7 +58,7 @@ export async function getAllActivityLogs() {
           email: true,
           role: true,
         },
-      }, // Include user details
+      },
     },
     orderBy: {
       timestamp: "desc",

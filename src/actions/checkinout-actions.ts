@@ -6,16 +6,13 @@ import prisma from "@/lib/db";
 import { createActivityLog } from "./activities-actions";
 
 export async function checkoutAsset(data: CheckOutForm) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   if (!data) {
     throw new Error("no data recieved");
   }
-  const { user } = await getCurrentSession();
-  if (!user) {
-    throw new Error("not authorized");
-  }
 
   return await prisma.$transaction(async (tx) => {
-    // Create checkout record
     const checkout = await tx.checkInOut.create({
       data: {
         asset_id: data.asset_id,
@@ -27,7 +24,6 @@ export async function checkoutAsset(data: CheckOutForm) {
       },
     });
 
-    // Update asset status (optional)
     await tx.assetLifecycle.create({
       data: {
         asset_id: data.asset_id,
@@ -36,7 +32,6 @@ export async function checkoutAsset(data: CheckOutForm) {
       },
     });
 
-    // Log activity
     await tx.activityLog.create({
       data: {
         user_id: user.id,
@@ -52,6 +47,8 @@ export async function checkoutAsset(data: CheckOutForm) {
 }
 
 export async function checkIn(data: { id: number; actual_return_date: Date }) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   if (!data) {
     throw Error;
   }
@@ -79,7 +76,6 @@ export async function checkIn(data: { id: number; actual_return_date: Date }) {
   }
 }
 
-// Update a CheckInOut record
 export async function updateCheckInOut(
   id: number,
   data: {
@@ -87,6 +83,8 @@ export async function updateCheckInOut(
     status?: "DIPINJAM" | "DIKEMBALIKAN";
   }
 ) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const update = await prisma.checkInOut.update({
       where: { id },
@@ -109,8 +107,9 @@ export async function updateCheckInOut(
   }
 }
 
-// Delete a CheckInOut record
 export async function deleteCheckInOut(id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.checkInOut.delete({
       where: { id },
@@ -131,8 +130,9 @@ export async function deleteCheckInOut(id: number) {
   }
 }
 
-// Get all CheckInOut records
 export async function getAllCheckInOuts() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       include: {
@@ -166,10 +166,12 @@ export async function getAllCheckInOuts() {
 }
 
 export async function getAllActiveCheckoutsForm() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: {
-        actual_return_date: null, // Assuming active checkouts have no return date
+        actual_return_date: null,
       },
       select: {
         id: true,
@@ -189,8 +191,9 @@ export async function getAllActiveCheckoutsForm() {
   }
 }
 
-// Get CheckInOut record by ID
 export async function getCheckInOutById(id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const record = await prisma.checkInOut.findUnique({
       where: { id },
@@ -214,8 +217,9 @@ export async function getCheckInOutById(id: number) {
   }
 }
 
-// Get CheckInOut records by Asset ID
 export async function getCheckInOutsByAssetId(asset_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { asset_id },
@@ -235,8 +239,9 @@ export async function getCheckInOutsByAssetId(asset_id: number) {
   }
 }
 
-// Get CheckInOut records by User ID
 export async function getCheckInOutsByUserId(user_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { user_id },
@@ -256,8 +261,9 @@ export async function getCheckInOutsByUserId(user_id: number) {
   }
 }
 
-// Get CheckInOut records by User ID
 export async function getCheckInOutsByEmployeeId(employee_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { employee_id },
@@ -284,8 +290,10 @@ export async function getCheckInOutsByEmployeeId(employee_id: number) {
     );
   }
 }
-// Get CheckInOut records by User ID
+
 export async function getActiveCheckOuts() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { status: "DIPINJAM" },
@@ -304,8 +312,9 @@ export async function getActiveCheckOuts() {
   }
 }
 
-// Get active CheckInOuts (currently borrowed)
 export async function getActiveCheckInOuts() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { actual_return_date: null },
@@ -341,8 +350,9 @@ export async function getActiveCheckInOuts() {
   }
 }
 
-// Get overdue CheckInOuts
 export async function getOverdueCheckInOuts(currentDate: Date) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: {
@@ -365,8 +375,9 @@ export async function getOverdueCheckInOuts(currentDate: Date) {
   }
 }
 
-// Get return statistics for a user
 export async function getUserReturnStats(user_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const [totalBorrowed, totalReturned] = await Promise.all([
       prisma.checkInOut.count({
@@ -388,8 +399,9 @@ export async function getUserReturnStats(user_id: number) {
   }
 }
 
-// Get usage history for an asset
 export async function getAssetUsageHistory(asset_id: number) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     return await prisma.checkInOut.findMany({
       where: { asset_id },
@@ -410,6 +422,8 @@ export async function getAssetUsageHistory(asset_id: number) {
 }
 
 export const getCheckoutMetrics = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   const checkedOutAssets = await prisma.checkInOut.count({
     where: {
       status: "DIPINJAM",

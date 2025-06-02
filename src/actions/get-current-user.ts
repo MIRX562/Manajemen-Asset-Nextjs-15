@@ -7,14 +7,14 @@ export async function getCurrentUser() {
     .split("; ")
     .find((row) => row.startsWith("session="));
   if (!cookie) {
-    return null; // No session cookie
+    return null;
   }
   const sessionToken = cookie.split("=")[1];
 
   const { session, user } = await validateSessionToken(sessionToken);
 
   if (!session || !user) {
-    return null; // Invalid session or no user found
+    return null;
   }
 
   return user;

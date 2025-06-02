@@ -8,8 +8,11 @@ import {
 import { Prisma, Employee } from "@prisma/client";
 import { z } from "zod";
 import { createActivityLog } from "./activities-actions";
+import { getCurrentSession } from "@/lib/auth";
 
 export const addEmployee = async (data: z.infer<typeof addEmployeeSchema>) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const value = addEmployeeSchema.parse(data);
 
@@ -49,6 +52,8 @@ export const addEmployee = async (data: z.infer<typeof addEmployeeSchema>) => {
 export const editEmployee = async (
   data: z.infer<typeof editEmployeeSchema>
 ) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const value = editEmployeeSchema.parse(data);
 
@@ -84,6 +89,8 @@ export const editEmployee = async (
 };
 
 export const deleteEmployee = async (data: Employee) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     await prisma.employee.delete({
       where: {
@@ -106,6 +113,8 @@ export const deleteEmployee = async (data: Employee) => {
 };
 
 export const getAllEMployeesDropdown = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const employees = await prisma.employee.findMany({
       select: {
@@ -122,6 +131,8 @@ export const getAllEMployeesDropdown = async () => {
 };
 
 export const getEmployeeById = async (id: number) => {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const employee = await prisma.employee.findUnique({
       where: {
