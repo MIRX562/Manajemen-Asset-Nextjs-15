@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
 
 export async function GET() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const categories = await prisma.assetType.findMany({
       select: { category: true },

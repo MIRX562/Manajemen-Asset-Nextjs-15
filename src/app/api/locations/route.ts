@@ -1,7 +1,10 @@
+import { getCurrentSession } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const locations = await prisma.location.findMany();
 

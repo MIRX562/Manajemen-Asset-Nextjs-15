@@ -1,8 +1,12 @@
 import { NextRequest } from "next/server";
 import { notificationEmitter } from "@/lib/eventEmitter";
 import { Notifications } from "@prisma/client";
+import { getCurrentSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
+
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -13,7 +17,6 @@ export async function GET(req: NextRequest) {
         );
       };
 
-      // Listen for new notifications
       notificationEmitter.on("new_notification", sendNotification);
 
       req.signal.addEventListener("abort", () => {

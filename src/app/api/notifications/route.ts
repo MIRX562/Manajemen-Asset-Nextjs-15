@@ -3,11 +3,9 @@ import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
 
 export async function GET() {
-  // Get current user from session
   const { user } = await getCurrentSession();
-  if (!user) {
-    return NextResponse.json([], { status: 401 });
-  }
+  if (!user) throw new Error("Not Authorized");
+
   const notifications = await prisma.notifications.findMany({
     where: { AND: { user_id: user.id, is_read: false } },
     orderBy: [{ is_read: "asc" }, { created_at: "desc" }],

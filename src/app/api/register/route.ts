@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { registerAndRefresh } from "@/lib/auth";
+import { getCurrentSession, registerAndRefresh } from "@/lib/auth";
 import { z } from "zod";
 
 const RegisterSchema = z.object({
@@ -9,6 +9,8 @@ const RegisterSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const { user } = await getCurrentSession();
+  if (!user) throw new Error("Not Authorized");
   try {
     const body = await req.json();
     const parsedBody = RegisterSchema.parse(body);
