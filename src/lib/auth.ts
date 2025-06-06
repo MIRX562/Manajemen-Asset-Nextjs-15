@@ -183,7 +183,7 @@ export async function logout(): Promise<void> {
       where: { id: sessionId },
     });
     await createActivityLog({
-      action: `user ${user.username} logged in`,
+      action: `user ${user.username} logged out`,
       target_id: user.id,
       target_type: "SESSION",
     });
@@ -243,6 +243,12 @@ export async function registerAndRefresh(
       password: hashedPassword,
       role: Role.ADMIN,
     },
+  });
+
+  await createActivityLog({
+    action: `first admin created, welcome user ${newUser.username}`,
+    target_id: newUser.id,
+    target_type: "SESSION",
   });
 
   const token = generateSessionToken();
