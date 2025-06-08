@@ -1,4 +1,4 @@
-import { getAllAssets } from "@/actions/assets-actions";
+import { getAllAssets } from "@/actions/asset-actions";
 import { DataTable } from "@/components/table/data-table";
 import React from "react";
 import { assetColumns } from "./_components/collumn";

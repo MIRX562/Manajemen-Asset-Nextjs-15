@@ -43,7 +43,7 @@ import { Calendar as CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { AssetStatus, LifecycleStage } from "@prisma/client";
 import { createAssetSchema } from "@/schemas/asset-schema";
 import { useDropdownStore } from "@/stores/dropdown-store";
-import { createAsset } from "@/actions/assets-actions";
+import { createAsset } from "@/actions/asset-actions";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect } from "react";

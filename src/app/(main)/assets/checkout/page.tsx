@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CheckoutForm } from "./_components/form-checkout";
-import { getAvailableAssets } from "@/actions/assets-actions";
+import { getAvailableAssets } from "@/actions/asset-actions";
 import { getAllEMployeesDropdown } from "@/actions/employee-actions";
 import CheckoutMetrics from "./_components/metrics";
 

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ScheduleMaintenanceForm from "../_components/form-schedule";
-import { getAvailableAssets } from "@/actions/assets-actions";
+import { getAvailableAssets } from "@/actions/asset-actions";
 import { getAvailableInventoryItems } from "@/actions/inventory-actions";
 
 export const dynamic = "force-dynamic";

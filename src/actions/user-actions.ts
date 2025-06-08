@@ -13,7 +13,6 @@ export const addUser = async (data: z.infer<typeof addUserSchema>) => {
   try {
     const value = addUserSchema.parse(data);
 
-    // Check for unique constraints
     const existingUser = await prisma.user.findUnique({
       where: { email: value.email },
     });

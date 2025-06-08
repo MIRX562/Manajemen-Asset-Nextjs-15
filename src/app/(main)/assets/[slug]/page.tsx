@@ -1,4 +1,4 @@
-import { getAssetById } from "@/actions/assets-actions";
+import { getAssetById } from "@/actions/asset-actions";
 import AssetOverview from "./_components/asset-overview";
 import AssetTabs from "./_components/asset-tabs";
 import { Button } from "@/components/ui/button";

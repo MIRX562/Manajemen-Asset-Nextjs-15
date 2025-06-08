@@ -1,6 +1,6 @@
 import { getMaintenanceById } from "@/actions/maintenance-actions";
 import MaintenanceDetailView from "./main";
-import { getAvailableAssetsIncludeId } from "@/actions/assets-actions";
+import { getAvailableAssetsIncludeId } from "@/actions/asset-actions";
 import { getAvailableInventoryItems } from "@/actions/inventory-actions";
 
 export const dynamic = "force-dynamic";

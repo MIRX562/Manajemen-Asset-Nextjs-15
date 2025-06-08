@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import { Asset } from "@prisma/client"; // Replace with your Asset schema import
-import { deleteAsset } from "@/actions/assets-actions";
+import { deleteAsset } from "@/actions/asset-actions";
 import EditAssetForm from "./form-edit";
 import { calculateCurrentValue, formatCurrency } from "@/lib/utils";
 import { AssetDetail } from "@/schemas/asset-schema";
